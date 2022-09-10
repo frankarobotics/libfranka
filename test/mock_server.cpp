@@ -139,7 +139,8 @@ void MockServer<C>::serverThread() {
                            : typename C::Connect::Response(C::Connect::Status::kSuccess);
       });
 
-  Poco::Net::DatagramSocket udp_socket({kHostname, 0});
+  Poco::Net::DatagramSocket udp_socket;
+  udp_socket.bind({kHostname, 0});
   udp_socket.setBlocking(true);
   Socket udp_socket_wrapper;
   udp_socket_wrapper.sendBytes = [&](const void* data, size_t size) {
