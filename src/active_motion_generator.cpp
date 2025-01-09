@@ -42,10 +42,10 @@ void ActiveMotionGenerator<MotionGeneratorType>::writeOnce(
   if (motion_generator_input.motion_finished || isTorqueControlFinished(control_input)) {
     auto motion_command = robot_impl->createMotionCommand(motion_generator_input);
     if (!control_input.has_value()) {
-      robot_impl->finishMotion(motion_id, &motion_command, nullptr);
+      robot_impl->finishMotion(motion_id, motion_command, std::nullopt);
     } else {
       auto control_command = robot_impl->createControllerCommand(control_input.value());
-      robot_impl->finishMotion(motion_id, &motion_command, &control_command);
+      robot_impl->finishMotion(motion_id, motion_command, control_command);
     }
 
     control_finished = true;

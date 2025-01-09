@@ -132,7 +132,7 @@ T Network::udpBlockingReceive() {
 
 template <typename T>
 T Network::udpBlockingReceiveUnsafe() try {
-  std::array<uint8_t, sizeof(T)> buffer;
+  std::array<uint8_t, sizeof(T)> buffer{};
 
   int bytes_received =
       udp_socket_.receiveFrom(buffer.data(), static_cast<int>(buffer.size()), udp_server_address_);

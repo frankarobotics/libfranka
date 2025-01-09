@@ -78,7 +78,7 @@ void MockServer<C>::serverThread() {
   std::unique_lock<std::mutex> lock(command_mutex_);
 
   constexpr const char* kHostname = "127.0.0.1";
-  Poco::Net::ServerSocket srv;
+  Poco::Net::ServerSocket srv{};
   srv.bind({kHostname, C::kCommandPort}, true);
   srv.listen();
 
@@ -96,14 +96,14 @@ void MockServer<C>::serverThread() {
   tcp_socket.setBlocking(true);
   tcp_socket.setNoDelay(true);
 
-  Socket tcp_socket_wrapper;
+  Socket tcp_socket_wrapper{};
   tcp_socket_wrapper.sendBytes = [&](const void* data, size_t size) {
-    std::lock_guard<std::mutex> _(tcp_mutex_);
+    std::lock_guard<std::mutex> lock_guard(tcp_mutex_);
     int rv = tcp_socket.sendBytes(data, size);
     ASSERT_EQ(static_cast<int>(size), rv) << "Send error on TCP socket";
   };
   tcp_socket_wrapper.receiveBytes = [&](void* data, size_t size) {
-    std::lock_guard<std::mutex> _(tcp_mutex_);
+    std::lock_guard<std::mutex> lock_guard(tcp_mutex_);
     int rv = tcp_socket.receiveBytes(data, size);
     ASSERT_EQ(static_cast<int>(size), rv) << "Receive error on TCP socket";
   };

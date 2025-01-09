@@ -4,6 +4,7 @@
 
 #include <array>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -45,7 +46,9 @@ void testRobotStatesAreEqual(const research_interface::robot::RobotState& expect
                              const franka::RobotState& actual);
 void testRobotStatesAreEqual(const franka::RobotState& expected, const franka::RobotState& actual);
 
-void randomRobotCommand(research_interface::robot::RobotCommand& command);
+std::tuple<std::optional<research_interface::robot::MotionGeneratorCommand>,
+           std::optional<research_interface::robot::ControllerCommand>>
+randomRobotCommand();
 void testMotionGeneratorCommandsAreEqual(
     const research_interface::robot::MotionGeneratorCommand& expected,
     const research_interface::robot::MotionGeneratorCommand& actual);

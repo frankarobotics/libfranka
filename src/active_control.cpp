@@ -19,12 +19,7 @@ ActiveControl::ActiveControl(std::shared_ptr<Robot::Impl> robot_impl,
     : robot_impl(std::move(robot_impl)),
       motion_id(motion_id),
       control_lock(std::move(control_lock)),
-      control_finished(false) {
-  auto warning_message = std::string();
-  if (!setCurrentThreadToHighestSchedulerPriority(&warning_message)) {
-    logging::logWarn("{}", warning_message);
-  }
-}
+      control_finished(false) {}
 
 ActiveControl::~ActiveControl() {
   if (!control_finished) {
