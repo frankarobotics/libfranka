@@ -34,4 +34,10 @@ struct MotionGeneratorTraits<CartesianVelocities> {
       research_interface::robot::Move::MotionGeneratorMode::kCartesianVelocity;
 };
 
+template <>
+struct MotionGeneratorTraits<Torques> {
+  static constexpr auto kMotionGeneratorMode =
+      research_interface::robot::Move::MotionGeneratorMode::kNone;
+};
+
 }  // namespace franka

@@ -26,8 +26,9 @@ TEST(RobotStateLogger, LogIsFIFO) {
     randomRobotState(state);
     states.push_back(state);
 
-    research_interface::robot::RobotCommand command;
-    randomRobotCommand(command);
+    auto [motion_command, control_command] = randomRobotCommand();
+    research_interface::robot::RobotCommand command{
+        .message_id = 50, .motion = *motion_command, .control = *control_command};
     commands.push_back(command);
 
     logger.log(state, command);
@@ -53,8 +54,9 @@ TEST(RobotStateLogger, LogIsAFixedSizeRing) {
     randomRobotState(state);
     states.push_back(state);
 
-    research_interface::robot::RobotCommand command;
-    randomRobotCommand(command);
+    auto [motion_command, control_command] = randomRobotCommand();
+    research_interface::robot::RobotCommand command{
+        .message_id = 50, .motion = *motion_command, .control = *control_command};
     commands.push_back(command);
 
     logger.log(state, command);

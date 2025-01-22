@@ -1,10 +1,6 @@
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 ## Google Test
-set(GTEST_SOURCE_DIR ${THIRDPARTY_SOURCES_DIR}/googletest)
-set(GTEST_BINARY_DIR ${CMAKE_BINARY_DIR}/googletest)
-set(GTEST_VERSION 1.8.0)
-set(GTEST_ARCHIVE_HASH 58a6f4277ca2bc8565222b3bbd58a177609e9c488e8a72649359ba51450db7d8)
 set(GTEST_LIBRARIES gtest gmock gmock_main)
 
 include(SetupGoogleTest)
@@ -136,6 +132,7 @@ endforeach()
 ## Valgrind
 find_program(VALGRIND_PROG valgrind)
 if(VALGRIND_PROG)
+  message(STATUS "Found Valgrind: ${VALGRIND_PROG}")
   add_test(NAME Valgrind
     COMMAND ${VALGRIND_PROG} --error-exitcode=1 --track-origins=yes --
             ./run_all_tests --gtest_output=xml:${TEST_OUTPUT_DIR}/valgrind.xml

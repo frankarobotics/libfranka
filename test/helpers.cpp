@@ -558,30 +558,34 @@ void randomRobotState(research_interface::robot::RobotState& robot_state) {
   robot_state.controller_mode = research_interface::robot::ControllerMode::kJointImpedance;
 }
 
-void randomRobotCommand(research_interface::robot::RobotCommand& robot_command) {
+std::tuple<std::optional<research_interface::robot::MotionGeneratorCommand>,
+           std::optional<research_interface::robot::ControllerCommand>>
+randomRobotCommand() {
   // Reset to all-zeros first
-  robot_command = research_interface::robot::RobotCommand();
-  for (double& element : robot_command.motion.q_c) {
+  auto motion_command = research_interface::robot::MotionGeneratorCommand();
+  auto control_command = research_interface::robot::ControllerCommand();
+  for (double& element : motion_command.q_c) {
     element = randomDouble();
   }
-  for (double& element : robot_command.motion.dq_c) {
+  for (double& element : motion_command.dq_c) {
     element = randomDouble();
   }
-  for (double& element : robot_command.motion.O_T_EE_c) {
+  for (double& element : motion_command.O_T_EE_c) {
     element = randomDouble();
   }
-  for (double& element : robot_command.motion.O_dP_EE_c) {
+  for (double& element : motion_command.O_dP_EE_c) {
     element = randomDouble();
   }
-  for (double& element : robot_command.motion.elbow_c) {
+  for (double& element : motion_command.elbow_c) {
     element = randomDouble();
   }
-  robot_command.motion.valid_elbow = true;
-  robot_command.motion.motion_generation_finished = true;
-  for (double& element : robot_command.control.tau_J_d) {
+  motion_command.valid_elbow = true;
+  motion_command.motion_generation_finished = true;
+  for (double& element : control_command.tau_J_d) {
     element = randomDouble();
   }
-  robot_command.message_id = static_cast<uint32_t>(std::rand());
+
+  return {motion_command, control_command};
 }
 
 void testMotionGeneratorCommandsAreEqual(

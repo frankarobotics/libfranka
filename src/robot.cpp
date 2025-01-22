@@ -56,12 +56,9 @@ void Robot::control(std::function<Torques(const RobotState&, franka::Duration)> 
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<JointVelocities> loop(*impl_, std::move(control_callback),
-                                    [](const RobotState&, Duration) -> JointVelocities {
-                                      return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
-                                    },
-                                    limit_rate, cutoff_frequency);
-  loop();
+  ControlLoop<Torques> control_loop(*impl_, std::move(control_callback), limit_rate,
+                                    cutoff_frequency);
+  control_loop.loop();
 }
 
 void Robot::control(
@@ -72,10 +69,10 @@ void Robot::control(
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<JointPositions> loop(*impl_, std::move(control_callback),
-                                   std::move(motion_generator_callback), limit_rate,
-                                   cutoff_frequency);
-  loop();
+  ControlLoop<JointPositions> control_loop(*impl_, std::move(control_callback),
+                                           std::move(motion_generator_callback), limit_rate,
+                                           cutoff_frequency);
+  control_loop.loop();
 }
 
 void Robot::control(
@@ -86,10 +83,10 @@ void Robot::control(
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<JointVelocities> loop(*impl_, std::move(control_callback),
-                                    std::move(motion_generator_callback), limit_rate,
-                                    cutoff_frequency);
-  loop();
+  ControlLoop<JointVelocities> control_loop(*impl_, std::move(control_callback),
+                                            std::move(motion_generator_callback), limit_rate,
+                                            cutoff_frequency);
+  control_loop.loop();
 }
 
 void Robot::control(
@@ -100,10 +97,10 @@ void Robot::control(
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<CartesianPose> loop(*impl_, std::move(control_callback),
-                                  std::move(motion_generator_callback), limit_rate,
-                                  cutoff_frequency);
-  loop();
+  ControlLoop<CartesianPose> control_loop(*impl_, std::move(control_callback),
+                                          std::move(motion_generator_callback), limit_rate,
+                                          cutoff_frequency);
+  control_loop.loop();
 }
 
 void Robot::control(std::function<Torques(const RobotState&, franka::Duration)> control_callback,
@@ -114,10 +111,10 @@ void Robot::control(std::function<Torques(const RobotState&, franka::Duration)> 
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<CartesianVelocities> loop(*impl_, std::move(control_callback),
-                                        std::move(motion_generator_callback), limit_rate,
-                                        cutoff_frequency);
-  loop();
+  ControlLoop<CartesianVelocities> control_loop(*impl_, std::move(control_callback),
+                                                std::move(motion_generator_callback), limit_rate,
+                                                cutoff_frequency);
+  control_loop.loop();
 }
 
 void Robot::control(
@@ -128,9 +125,9 @@ void Robot::control(
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<JointPositions> loop(*impl_, controller_mode, std::move(motion_generator_callback),
-                                   limit_rate, cutoff_frequency);
-  loop();
+  ControlLoop<JointPositions> control_loop(
+      *impl_, controller_mode, std::move(motion_generator_callback), limit_rate, cutoff_frequency);
+  control_loop.loop();
 }
 
 void Robot::control(
@@ -141,9 +138,9 @@ void Robot::control(
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<JointVelocities> loop(*impl_, controller_mode, std::move(motion_generator_callback),
-                                    limit_rate, cutoff_frequency);
-  loop();
+  ControlLoop<JointVelocities> control_loop(
+      *impl_, controller_mode, std::move(motion_generator_callback), limit_rate, cutoff_frequency);
+  control_loop.loop();
 }
 
 void Robot::control(
@@ -154,9 +151,9 @@ void Robot::control(
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<CartesianPose> loop(*impl_, controller_mode, std::move(motion_generator_callback),
-                                  limit_rate, cutoff_frequency);
-  loop();
+  ControlLoop<CartesianPose> control_loop(
+      *impl_, controller_mode, std::move(motion_generator_callback), limit_rate, cutoff_frequency);
+  control_loop.loop();
 }
 
 void Robot::control(std::function<CartesianVelocities(const RobotState&, franka::Duration)>
@@ -167,9 +164,9 @@ void Robot::control(std::function<CartesianVelocities(const RobotState&, franka:
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  ControlLoop<CartesianVelocities> loop(
+  ControlLoop<CartesianVelocities> control_loop(
       *impl_, controller_mode, std::move(motion_generator_callback), limit_rate, cutoff_frequency);
-  loop();
+  control_loop.loop();
 }
 
 // NOLINTNEXTLINE(performance-unnecessary-value-param)
@@ -178,7 +175,7 @@ void Robot::read(std::function<bool(const RobotState&)> read_callback) {
   assertOwningLock(control_lock);
 
   while (true) {
-    RobotState robot_state = impl_->update(nullptr, nullptr);
+    RobotState robot_state = impl_->updateMotion(std::nullopt, std::nullopt);
     if (!read_callback(robot_state)) {
       break;
     }
@@ -279,7 +276,7 @@ std::unique_ptr<ActiveControlBase> Robot::startTorqueControl() {
   // hint: there is no startMotion implementation for Torques, so JointVelocities is used instead
   uint32_t motion_id =
       impl_->startMotion(research_interface::robot::Move::ControllerMode::kExternalController,
-                         MotionGeneratorTraits<JointVelocities>::kMotionGeneratorMode,
+                         research_interface::robot::Move::MotionGeneratorMode::kNone,
                          ControlLoop<JointVelocities>::kDefaultDeviation,
                          ControlLoop<JointVelocities>::kDefaultDeviation);
 

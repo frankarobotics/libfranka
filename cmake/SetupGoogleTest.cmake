@@ -1,31 +1,28 @@
-configure_file(${CMAKE_CURRENT_LIST_DIR}/GoogleTest-CMakeLists.txt.in
-               ${CMAKE_BINARY_DIR}/googletest-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download
-)
-if(result)
-  message(FATAL_ERROR "Running CMake for Google Test failed: ${result}")
-endif()
+# Try to find gtest package. If available, take it. Otherwise, try to download.
+find_package(googletest QUIET)
+if(NOT googletest_FOUND)
+  message(STATUS "googletest not found. Fetching googletest...")
+  include(FetchContent)
 
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download
-)
-if(result)
-  message(FATAL_ERROR "Downloading Google Test failed: ${result}")
+  FetchContent_Declare(
+    gtest
+    GIT_REPOSITORY https://github.com/google/googletest
+    GIT_TAG        v1.15.2)
+  FetchContent_GetProperties(gtest)
+  if(NOT gtest_POPULATED)
+      FetchContent_Populate(gtest)
+      add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR} EXCLUDE_FROM_ALL)
+  endif()
+
+  set_target_properties(gtest PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+  if(NOT gtest_POPULATED)
+    message(FATAL_ERROR "Failed to fetch googletest. Please install googletest or visit https://github.com/google/googletest")
+  endif()
+else()
+  message(STATUS "Found googletest: ${gtest_VERSION}")
 endif()
 
 # Prevent overriding the parent project's compiler/linker
 # settings on Windows
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-add_subdirectory(${GTEST_SOURCE_DIR}/googlemock ${GTEST_BINARY_DIR} EXCLUDE_FROM_ALL)
-mark_as_advanced(FORCE
-                 BUILD_SHARED_LIBS
-                 gmock_build_tests
-                 gtest_build_samples
-                 gtest_build_tests
-                 gtest_disable_pthreads
-                 gtest_force_shared_crt
-                 gtest_hide_internal_symbols)

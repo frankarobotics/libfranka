@@ -107,12 +107,12 @@ struct Model : public ::testing::Test {
   }
 
   RobotMockServer server{};
-  franka::Robot robot{"127.0.0.1"};
+  franka::Robot robot{"127.0.0.1", franka::RealtimeConfig::kIgnore};
 };
 
 TEST(InvalidModel, ThrowsIfNoModelReceived) {
   RobotMockServer server;
-  franka::Robot robot("127.0.0.1");
+  franka::Robot robot("127.0.0.1", franka::RealtimeConfig::kIgnore);
 
   server
       .waitForCommand<GetRobotModel>([this](const typename GetRobotModel::Request& /*request*/) {
@@ -131,7 +131,7 @@ TEST(InvalidModel, ThrowsIfNoModelReceived) {
 
 TEST(InvalidModel, ThrowsIfInvalidModelReceived) {
   RobotMockServer server;
-  franka::Robot robot("127.0.0.1");
+  franka::Robot robot("127.0.0.1", franka::RealtimeConfig::kIgnore);
   auto mock_robot_model = std::make_unique<MockRobotModel>();
 
   std::array<char, 10> buffer{};

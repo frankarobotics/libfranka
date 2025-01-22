@@ -14,16 +14,20 @@ class RobotImplMock : public Robot::Impl {
   virtual ~RobotImplMock() = default;
   RobotImplMock(std::unique_ptr<Network> network, size_t log_size, RealtimeConfig realtime_config)
       : Robot::Impl(std::move(network), log_size, realtime_config){};
-  MOCK_METHOD4(startMotion,
-               uint32_t(robot::Move::ControllerMode controller_mode,
-                        robot::Move::MotionGeneratorMode motion_generator_mode,
-                        const robot::Move::Deviation& maximum_path_deviation,
-                        const robot::Move::Deviation& maximum_goal_pose_deviation));
-  MOCK_METHOD1(cancelMotion, void(uint32_t motion_id));
-  MOCK_METHOD3(finishMotion,
-               void(uint32_t motion_id,
-                    const robot::MotionGeneratorCommand* motion_command,
-                    const robot::ControllerCommand* control_command));
+  MOCK_METHOD(uint32_t,
+              startMotion,
+              (research_interface::robot::Move::ControllerMode,
+               research_interface::robot::Move::MotionGeneratorMode,
+               const research_interface::robot::Move::Deviation&,
+               const research_interface::robot::Move::Deviation&),
+              (override));
+  MOCK_METHOD(void,
+              finishMotion,
+              (uint32_t,
+               const std::optional<research_interface::robot::MotionGeneratorCommand>&,
+               const std::optional<research_interface::robot::ControllerCommand>&),
+              (override));
+  MOCK_METHOD(void, cancelMotion, (uint32_t), (override));
   MOCK_METHOD1(writeOnce, void(const Torques& control_input));
   MOCK_METHOD1(writeOnce, void(const JointPositions& motion_input));
   MOCK_METHOD1(writeOnce, void(const JointVelocities& motion_input));
