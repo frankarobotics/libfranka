@@ -5,12 +5,12 @@ trap 'echo "Error: Script failed at line $LINENO" >&2; exit 1' ERR
 
 # This script performs the same actions that the Jenkins job will perform.
 # EXCEPT for publishing
-# It's done in a script so that you don't have to do this manually !
+# It's done in a script so that you don't have to do this manually.
 
-# NOTE !!!!!
-# STRICT is set to OFF, so that the build does not fail on warnings.
-# The Jenkins Job has STRICT=ON and will fail on warnings
-# You should fix them now !!
+# IMPORTANT !
+# In this script STRICT is set to OFF (-werror is not on), 
+# so that the build does not fail on warnings.
+# The real Jenkins Job has STRICT=ON and will fail on warnings
 
 echo 'Clean Workspace build dirs'
 rm -rf build-*
