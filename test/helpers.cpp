@@ -439,111 +439,111 @@ void randomRobotState(franka::RobotState& robot_state) {
 void randomRobotState(research_interface::robot::RobotState& robot_state) {
   // Reset to all-zeros first
   robot_state = research_interface::robot::RobotState();
-  for (double& element : robot_state.O_T_EE) {
+  for (auto& element : robot_state.O_T_EE) {
     element = randomDouble();
   }
-  for (double& element : robot_state.F_T_NE) {
+  for (auto& element : robot_state.F_T_NE) {
     element = randomDouble();
   }
-  for (double& element : robot_state.NE_T_EE) {
+  for (auto& element : robot_state.NE_T_EE) {
     element = randomDouble();
   }
-  for (double& element : robot_state.O_T_EE_d) {
+  for (auto& element : robot_state.O_T_EE_d) {
     element = randomDouble();
   }
-  for (double& element : robot_state.EE_T_K) {
+  for (auto& element : robot_state.EE_T_K) {
     element = randomDouble();
   }
-  for (double& element : robot_state.F_T_EE) {
+  for (auto& element : robot_state.F_T_EE) {
     element = randomDouble();
   }
   robot_state.m_ee = randomDouble();
-  for (double& element : robot_state.F_x_Cee) {
+  for (auto& element : robot_state.F_x_Cee) {
     element = randomDouble();
   }
-  for (double& element : robot_state.I_ee) {
+  for (auto& element : robot_state.I_ee) {
     element = randomDouble();
   }
   robot_state.m_load = randomDouble();
-  for (double& element : robot_state.F_x_Cload) {
+  for (auto& element : robot_state.F_x_Cload) {
     element = randomDouble();
   }
-  for (double& element : robot_state.I_load) {
+  for (auto& element : robot_state.I_load) {
     element = randomDouble();
   }
-  for (double& element : robot_state.elbow) {
+  for (auto& element : robot_state.elbow) {
     element = randomDouble();
   }
-  for (double& element : robot_state.elbow_d) {
+  for (auto& element : robot_state.elbow_d) {
     element = randomDouble();
   }
-  for (double& element : robot_state.tau_J) {
+  for (auto& element : robot_state.tau_J) {
     element = randomDouble();
   }
-  for (double& element : robot_state.dtau_J) {
+  for (auto& element : robot_state.dtau_J) {
     element = randomDouble();
   }
-  for (double& element : robot_state.q) {
+  for (auto& element : robot_state.q) {
     element = randomDouble();
   }
-  for (double& element : robot_state.dq) {
+  for (auto& element : robot_state.dq) {
     element = randomDouble();
   }
-  for (double& element : robot_state.q_d) {
+  for (auto& element : robot_state.q_d) {
     element = randomDouble();
   }
-  for (double& element : robot_state.dq_d) {
+  for (auto& element : robot_state.dq_d) {
     element = randomDouble();
   }
-  for (double& element : robot_state.ddq_d) {
+  for (auto& element : robot_state.ddq_d) {
     element = randomDouble();
   }
-  for (double& element : robot_state.joint_contact) {
+  for (auto& element : robot_state.joint_contact) {
     element = randomDouble();
   }
-  for (double& element : robot_state.cartesian_contact) {
+  for (auto& element : robot_state.cartesian_contact) {
     element = randomDouble();
   }
-  for (double& element : robot_state.joint_collision) {
+  for (auto& element : robot_state.joint_collision) {
     element = randomDouble();
   }
-  for (double& element : robot_state.cartesian_collision) {
+  for (auto& element : robot_state.cartesian_collision) {
     element = randomDouble();
   }
-  for (double& element : robot_state.tau_ext_hat_filtered) {
+  for (auto& element : robot_state.tau_ext_hat_filtered) {
     element = randomDouble();
   }
-  for (double& element : robot_state.O_F_ext_hat_K) {
+  for (auto& element : robot_state.O_F_ext_hat_K) {
     element = randomDouble();
   }
-  for (double& element : robot_state.K_F_ext_hat_K) {
+  for (auto& element : robot_state.K_F_ext_hat_K) {
     element = randomDouble();
   }
-  for (double& element : robot_state.O_dP_EE_d) {
+  for (auto& element : robot_state.O_dP_EE_d) {
     element = randomDouble();
   }
-  for (double& element : robot_state.elbow_c) {
+  for (auto& element : robot_state.elbow_c) {
     element = randomDouble();
   }
-  for (double& element : robot_state.delbow_c) {
+  for (auto& element : robot_state.delbow_c) {
     element = randomDouble();
   }
-  for (double& element : robot_state.ddelbow_c) {
+  for (auto& element : robot_state.ddelbow_c) {
     element = randomDouble();
   }
-  for (double& element : robot_state.O_T_EE_c) {
+  for (auto& element : robot_state.O_T_EE_c) {
     element = randomDouble();
   }
-  for (double& element : robot_state.O_dP_EE_c) {
+  for (auto& element : robot_state.O_dP_EE_c) {
     element = randomDouble();
   }
-  for (double& element : robot_state.O_ddP_EE_c) {
+  for (auto& element : robot_state.O_ddP_EE_c) {
     element = randomDouble();
   }
-  for (double& element : robot_state.theta) {
+  for (auto& element : robot_state.theta) {
     element = randomDouble();
   }
-  for (double& element : robot_state.dtheta) {
+  for (auto& element : robot_state.dtheta) {
     element = randomDouble();
   }
   for (bool& error : robot_state.errors) {
