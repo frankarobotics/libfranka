@@ -1,3 +1,4 @@
 [submodule "common"]
 	path = common
-	url = ssh://git@bitbucket.fe.lan:7999/swdev/libfranka-common.git
+	url = ../libfranka-common.git
+	branch = master

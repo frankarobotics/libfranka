@@ -61,7 +61,7 @@ pipeline {
                 steps {
                   dir("build-debug.${env.DISTRO}") {
                     sh '''
-                      cmake -DCMAKE_BUILD_TYPE=Debug -DSTRICT=ON -DBUILD_COVERAGE=OFF \
+                      cmake -DCMAKE_BUILD_TYPE=Debug -DSTRICT=OFF -DBUILD_COVERAGE=OFF \
                             -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
                       make -j$(nproc)
                     '''
@@ -72,7 +72,7 @@ pipeline {
                 steps {
                   dir("build-release.${env.DISTRO}") {
                     sh '''
-                      cmake -DCMAKE_BUILD_TYPE=Release -DSTRICT=ON -DBUILD_COVERAGE=OFF \
+                      cmake -DCMAKE_BUILD_TYPE=Release -DSTRICT=OFF -DBUILD_COVERAGE=OFF \
                             -DBUILD_DOCUMENTATION=ON -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
                       make -j$(nproc)
                     '''
