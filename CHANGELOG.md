@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Pending Release
+
+- Use updated libfranka-common (aka: common-libfranka) - with float based RobotState struct
+
 ## 0.15.0 - 2025-01-16
 
 Requires Franka Research 3 System Version >= 5.7.2
