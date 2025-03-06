@@ -180,12 +180,29 @@ pipeline {
               dir("build-release.${env.DISTRO}") {
                 catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
                   sh 'cpack'
+
+                  // Get Git commit hash for package naming
+                  sh "echo 'Publishing with version: ${env.VERSION}'"
+
+                  sh '''
+                    DEB_FILE=$(ls *.deb)
+                    echo "Original deb file: $DEB_FILE"
+
+                    NEW_NAME="libfranka-${VERSION}-${DISTRO}_amd64.deb"
+                    echo "New deb file name: $NEW_NAME"
+
+                    # Rename the file
+                    mv "$DEB_FILE" "$NEW_NAME"
+                  '''
+
+                  // Publish Debian packages with Git commit hash in the name
                   fePublishDebian('*.deb', 'fci', "deb.distribution=${env.DISTRO};deb.component=main;deb.architecture=amd64")
+
                   dir('doc') {
                     sh 'mv docs/*/html/ html/'
                     sh 'tar cfz ../libfranka-docs.tar.gz html'
                   }
-                  sh "rename -e 's/(.tar.gz|.deb)\$/-${env.DISTRO}\$1/' *.deb *.tar.gz"
+                  sh "rename -e 's/(.tar.gz)\$/-${env.DISTRO}\$1/' *.tar.gz"
                   publishHTML([allowMissing: false,
                             alwaysLinkToLastBuild: false,
                             keepAll: true,
