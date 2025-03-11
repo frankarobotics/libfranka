@@ -24,11 +24,6 @@ pipeline {
         agent {
           dockerfile {
             filename ".ci/Dockerfile.${env.DISTRO}"
-            args '-e PATH=/opt/openrobots/bin:$PATH ' +
-                '-e PKG_CONFIG_PATH=/opt/openrobots/lib/pkgconfig:$PKG_CONFIG_PATH ' +
-                '-e LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH ' +
-                '-e PYTHONPATH=/opt/openrobots/lib/python3.10/site-packages:$PYTHONPATH ' +
-                '-e CMAKE_PREFIX_PATH=/opt/openrobots:$CMAKE_PREFIX_PATH'
             reuseNode true
          }
         }

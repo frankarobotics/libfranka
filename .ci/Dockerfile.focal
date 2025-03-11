@@ -99,24 +99,14 @@ RUN git clone --branch 4.0.0 https://github.com/ros/urdfdom.git \
     && cd ../.. \
     && rm -rf urdfdom
 
-RUN git clone --recursive --branch v2.7.0 https://github.com/stack-of-tasks/pinocchio.git \
+RUN git clone --recursive --branch v3.3.1 https://github.com/stack-of-tasks/pinocchio.git \
     && cd pinocchio \
     && mkdir build \
     && cd build \
-    && cmake .. -DBUILD_TESTING=OFF -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    && cmake .. -DBUILD_PYTHON_INTERFACE=OFF -DBUILD_DOCUMENTATION=OFF -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
     && make -j4 \
     && make install \
     && cd ../.. \
     && rm -rf pinocchio
-
-RUN git clone --recursive --branch v3.11.1 https://github.com/nlohmann/json.git \
-    && cd json \
-    && mkdir build \
-    && cd build \
-    && cmake .. -DJSON_BuildTests=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
-    && make -j4 \
-    && make install \
-    && cd ../.. \
-    && rm -rf json
 
 USER $USERNAME
