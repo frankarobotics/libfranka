@@ -99,7 +99,7 @@ RUN git clone --branch 4.0.0 https://github.com/ros/urdfdom.git \
     && cd ../.. \
     && rm -rf urdfdom
 
-RUN git clone --recursive --branch v3.3.1 https://github.com/stack-of-tasks/pinocchio.git \
+RUN git clone --recursive --branch v3.4.0 https://github.com/stack-of-tasks/pinocchio.git \
     && cd pinocchio \
     && mkdir build \
     && cd build \
