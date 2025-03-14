@@ -103,4 +103,81 @@ class RobotModelBase {
   virtual std::array<double, 16> poseStiffness(const std::array<double, 7>& q,
                                                const std::array<double, 16>& f_t_ee,
                                                const std::array<double, 16>& ee_t_k) = 0;
+  /**
+   * Calculates the 6x7 body Jacobian for the given joint, relative to that joint's frame.
+   *
+   * @param[in] q Joint position.
+   * @param[in] joint_index The index of the joint/link for which to calculate the Jacobian.
+   * @return Vectorized 6x7 Jacobian, column-major.
+   */
+  virtual std::array<double, 42> bodyJacobian(const std::array<double, 7>& q, int joint_index) = 0;
+
+  /**
+   * Calculates the 6x7 body Jacobian for the flange frame, relative to that frame.
+   *
+   * @param[in] q Joint position.
+   * @return Vectorized 6x7 Jacobian, column-major.
+   */
+  virtual std::array<double, 42> bodyJacobianFlange(const std::array<double, 7>& q) = 0;
+
+  /**
+   * Calculates the 6x7 body Jacobian for the end effector frame, relative to that frame.
+   *
+   * @param[in] q Joint position.
+   * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
+   * @return Vectorized 6x7 Jacobian, column-major.
+   */
+  virtual std::array<double, 42> bodyJacobianEe(const std::array<double, 7>& q,
+                                                const std::array<double, 16>& f_t_ee) = 0;
+
+  /**
+   * Calculates the 6x7 body Jacobian for the stiffness frame, relative to that frame.
+   *
+   * @param[in] q Joint position.
+   * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
+   * @param[in] ee_t_k The transformation from flange to stiffness frame (4x4 matrix, column-major).
+   * @return Vectorized 6x7 Jacobian, column-major.
+   */
+  virtual std::array<double, 42> bodyJacobianStiffness(const std::array<double, 7>& q,
+                                                       const std::array<double, 16>& f_t_ee,
+                                                       const std::array<double, 16>& ee_t_k) = 0;
+
+  /**
+   * Calculates the 6x7 zero Jacobian for the given joint, relative to the base frame.
+   *
+   * @param[in] q Joint position.
+   * @param[in] joint_index The index of the joint/link for which to calculate the Jacobian.
+   * @return Vectorized 6x7 Jacobian, column-major.
+   */
+  virtual std::array<double, 42> zeroJacobian(const std::array<double, 7>& q, int joint_index) = 0;
+
+  /**
+   * Calculates the 6x7 zero Jacobian for the flange frame, relative to the base frame.
+   *
+   * @param[in] q Joint position.
+   * @return Vectorized 6x7 Jacobian, column-major.
+   */
+  virtual std::array<double, 42> zeroJacobianFlange(const std::array<double, 7>& q) = 0;
+
+  /**
+   * Calculates the 6x7 zero Jacobian for the end effector frame, relative to the base frame.
+   *
+   * @param[in] q Joint position.
+   * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
+   * @return Vectorized 6x7 Jacobian, column-major.
+   */
+  virtual std::array<double, 42> zeroJacobianEe(const std::array<double, 7>& q,
+                                                const std::array<double, 16>& f_t_ee) = 0;
+
+  /**
+   * Calculates the 6x7 zero Jacobian for the stiffness frame, relative to the base frame.
+   *
+   * @param[in] q Joint position.
+   * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
+   * @param[in] ee_t_k The transformation from flange to stiffness frame (4x4 matrix, column-major).
+   * @return Vectorized 6x7 Jacobian, column-major.
+   */
+  virtual std::array<double, 42> zeroJacobianStiffness(const std::array<double, 7>& q,
+                                                       const std::array<double, 16>& f_t_ee,
+                                                       const std::array<double, 16>& ee_t_k) = 0;
 };
