@@ -4,6 +4,7 @@
 
 - Updated libfranka-common (aka: common-libfranka) - with float based RobotState struct
 - Updated pinocchio to version 3.4.0
+- Feat: use pinocchio to compute forward kinematics
 
 ## 0.15.0 - 2025-01-16
 

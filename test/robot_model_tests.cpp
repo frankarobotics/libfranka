@@ -2,13 +2,13 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include "franka/robot_model.h"
 #include "gtest/gtest.h"
+#include "test_utils.h"
 
 #include <Eigen/Dense>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
-constexpr double kEps = 1e-5;
 constexpr double kDeltaCoriolis = 0.2;
 constexpr double kDeltaInertia = 0.1;
 constexpr double kDeltaGravity = 0.2;
@@ -16,24 +16,6 @@ constexpr double kDeltaGravity = 0.2;
 constexpr double kDeltaGravityDot = 0.4;
 constexpr double kDeltaInertiaDot = 0.03;
 constexpr double kDeltaCoriolisDot = 0.3;
-
-std::string current_file_path = __FILE__;
-std::string urdf_path =
-    current_file_path.substr(0, current_file_path.find_last_of("/\\") + 1) + "fr3.urdf";
-
-std::string readFileToString(const std::string& filename) {
-  std::ifstream file(filename);
-  if (!file.is_open()) {
-    std::cerr << "Error opening file: " << filename << std::endl;
-    return "";
-  }
-
-  std::ostringstream oss;
-  oss << file.rdbuf();
-  file.close();
-
-  return oss.str();
-}
 
 class RobotModelTest : public ::testing::Test {
  protected:
@@ -55,7 +37,8 @@ class RobotModelTest : public ::testing::Test {
   double ee_m_total = 0.73;
 
   RobotModelTest() {
-    auto urdf_string = readFileToString(urdf_path);
+    std::string urdf_path = franka_test_utils::getUrdfPath(__FILE__);
+    auto urdf_string = franka_test_utils::readFileToString(urdf_path);
     model = std::make_unique<franka::RobotModel>(urdf_string);
   }
 };
@@ -80,7 +63,7 @@ TEST_F(RobotModelTest, TestGravity) {
   expected_gravity << 0, -3.52387, 0, -3.44254, 0, 1.63362, -2.47128e-17;
 
   for (int i = 0; i < expected_gravity.rows(); i++) {
-    ASSERT_NEAR(g_ne[i], expected_gravity(i), kEps);
+    ASSERT_NEAR(g_ne[i], expected_gravity(i), franka_test_utils::kEps);
   }
 }
 
@@ -99,7 +82,7 @@ TEST_F(RobotModelTest, TestMass) {
       -0.000309373, 0.00216462, -0.000309373, 8.72329e-05, 5.97777e-05;
 
   for (int i = 0; i < expected_mass_matrix.size(); i++) {
-    ASSERT_NEAR(m_ne[i], expected_mass_matrix(i), kEps);
+    ASSERT_NEAR(m_ne[i], expected_mass_matrix(i), franka_test_utils::kEps);
   }
 }
 
@@ -113,7 +96,7 @@ TEST_F(RobotModelTest, TestCoriolisWithAddedFrankaEndEffectorInertiaToLastLink) 
   ;
 
   for (int i = 0; i < expected_coriolis.rows(); i++) {
-    ASSERT_NEAR(c_ne[i], expected_coriolis(i), kEps);
+    ASSERT_NEAR(c_ne[i], expected_coriolis(i), franka_test_utils::kEps);
   }
 }
 
@@ -127,7 +110,7 @@ TEST_F(RobotModelTest, TestGravityWithAddedFrankaEndEffectorInertiaToLastLink) {
   ;
 
   for (int i = 0; i < expected_gravity.rows(); i++) {
-    ASSERT_NEAR(g_ne[i], expected_gravity(i), kEps);
+    ASSERT_NEAR(g_ne[i], expected_gravity(i), franka_test_utils::kEps);
   }
 }
 
@@ -146,7 +129,7 @@ TEST_F(RobotModelTest, TestMassWithAddedFrankaEndEffectorInertiaToLastLink) {
       -0.00272477, 0.00216462, -0.00272477, 8.72329e-05, 0.00183278;
 
   for (int i = 0; i < expected_mass_matrix.size(); i++) {
-    ASSERT_NEAR(m_ne[i], expected_mass_matrix(i), kEps);
+    ASSERT_NEAR(m_ne[i], expected_mass_matrix(i), franka_test_utils::kEps);
   }
 }
 

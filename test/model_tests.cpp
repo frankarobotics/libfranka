@@ -18,6 +18,7 @@
 
 using ::testing::_;
 using ::testing::Invoke;
+using ::testing::Return;
 using ::testing::WithArgs;
 using namespace research_interface::robot;
 
@@ -42,6 +43,14 @@ class MockRobotModel : public RobotModelBase {
                     const double,
                     const std::array<double, 3>&,
                     std::array<double, 7>&));
+  MOCK_METHOD2(pose, std::array<double, 16>(const std::array<double, 7>&, int));
+  MOCK_METHOD2(poseEe,
+               std::array<double, 16>(const std::array<double, 7>&, const std::array<double, 16>&));
+  MOCK_METHOD1(poseFlange, std::array<double, 16>(const std::array<double, 7>&));
+  MOCK_METHOD3(poseStiffness,
+               std::array<double, 16>(const std::array<double, 7>&,
+                                      const std::array<double, 16>&,
+                                      const std::array<double, 16>&));
 };
 
 struct MockModel : public ModelLibraryInterface {
@@ -225,56 +234,19 @@ TEST_F(Model, CanGetJointPoses) {
 
   std::array<double, 16> expected_pose{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}};
 
-  MockModel mock;
-  EXPECT_CALL(mock, O_T_J1(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_pose.cbegin(), expected_pose.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_T_J2(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_pose.cbegin(), expected_pose.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_T_J3(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_pose.cbegin(), expected_pose.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_T_J4(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_pose.cbegin(), expected_pose.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_T_J5(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_pose.cbegin(), expected_pose.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_T_J6(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_pose.cbegin(), expected_pose.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_T_J7(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_pose.cbegin(), expected_pose.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_T_J8(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_pose.cbegin(), expected_pose.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_T_J9(robot_state.q.data(), _, _))
-      .WillOnce(WithArgs<1, 2>(Invoke([=](const double* input, double* output) {
-        std::array<double, 16> expected;
-        Eigen::Map<Eigen::Matrix4d>(expected.data(), 4, 4) =
-            (Eigen::Matrix4d(robot_state.F_T_EE.data()) *
-             Eigen::Matrix4d(robot_state.EE_T_K.data()));
-        std::array<double, 16> input_array;
-        std::copy(&input[0], &input[16], input_array.data());
-        EXPECT_EQ(expected, input_array);
-        std::copy(expected_pose.cbegin(), expected_pose.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_T_J9(robot_state.q.data(), robot_state.F_T_EE.data(), _))
-      .WillOnce(WithArgs<2>(Invoke([=](double* output) {
-        std::copy(expected_pose.cbegin(), expected_pose.cend(), output);
-      })));
-
-  model_library_interface = &mock;
+  EXPECT_CALL(*mock_robot_model, pose(robot_state.q, 1)).WillOnce(Return(expected_pose));
+  EXPECT_CALL(*mock_robot_model, pose(robot_state.q, 2)).WillOnce(Return(expected_pose));
+  EXPECT_CALL(*mock_robot_model, pose(robot_state.q, 3)).WillOnce(Return(expected_pose));
+  EXPECT_CALL(*mock_robot_model, pose(robot_state.q, 4)).WillOnce(Return(expected_pose));
+  EXPECT_CALL(*mock_robot_model, pose(robot_state.q, 5)).WillOnce(Return(expected_pose));
+  EXPECT_CALL(*mock_robot_model, pose(robot_state.q, 6)).WillOnce(Return(expected_pose));
+  EXPECT_CALL(*mock_robot_model, pose(robot_state.q, 7)).WillOnce(Return(expected_pose));
+  EXPECT_CALL(*mock_robot_model, poseFlange(robot_state.q)).WillOnce(Return(expected_pose));
+  EXPECT_CALL(*mock_robot_model, poseEe(robot_state.q, robot_state.F_T_EE))
+      .WillOnce(Return(expected_pose));
+  EXPECT_CALL(*mock_robot_model,
+              poseStiffness(robot_state.q, robot_state.F_T_EE, robot_state.EE_T_K))
+      .WillOnce(Return(expected_pose));
 
   franka::Model model(robot.loadModel(std::move(mock_robot_model)));
   for (franka::Frame joint = franka::Frame::kJoint1; joint <= franka::Frame::kStiffness; joint++) {
