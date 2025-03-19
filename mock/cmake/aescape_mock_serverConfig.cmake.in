@@ -1,0 +1,11 @@
+include(CMakeFindDependencyMacro)
+
+# Same syntax as find_package
+find_dependency(Eigen3 REQUIRED)
+find_dependency(fmt REQUIRED)
+find_dependency(Tracy REQUIRED)
+find_dependency(Poco REQUIRED COMPONENTS Net)
+find_dependency(magic_enum REQUIRED)
+
+# Add the targets file
+include("${CMAKE_CURRENT_LIST_DIR}/aescape_mock_serverTargets.cmake")

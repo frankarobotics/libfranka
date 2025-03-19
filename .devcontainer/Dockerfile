@@ -79,5 +79,10 @@ RUN git clone --branch v0.10 https://github.com/wolfpld/tracy.git \
     && cmake -DBUILD_SHARED_LIBS=1 -DTRACY_ENABLE=1 -DTRACY_ON_DEMAND=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -S . -B build \
     && cmake --build build --parallel `nproc` --target install
 
+RUN git clone --branch v0.9.5 https://github.com/Neargye/magic_enum.git                                                                        \
+    && cd magic_enum                                                                                                                           \
+    && cmake -S . -B build -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DMAGIC_ENUM_OPT_BUILD_EXAMPLES=0 -DMAGIC_ENUM_OPT_BUILD_TESTS=0 -DCMAKE_CXX_STANDARD=20 \
+    && cmake --build build --parallel `nproc` --target install
+
 USER $USERNAME
 SHELL ["/bin/bash", "-c"]
