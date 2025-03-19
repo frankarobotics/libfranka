@@ -50,6 +50,7 @@ set(THIRDPARTY_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty" CACHE PATH
 find_package(Poco REQUIRED COMPONENTS Net Foundation)
 find_package(Eigen3 REQUIRED)
 find_package(pinocchio REQUIRED)
+find_package(Tracy REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -146,6 +147,7 @@ target_link_libraries(franka PRIVATE
   Eigen3::Eigen3
   Threads::Threads
   pinocchio::pinocchio
+  Tracy::TracyClient
 )
 
 target_link_libraries(franka PUBLIC
@@ -200,6 +202,12 @@ option(BUILD_TESTS "Build tests" ON)
 if(BUILD_TESTS)
   enable_testing()
   add_subdirectory(test)
+endif()
+
+option(BUILD_AESCAPE_MOCK_SERVER "Build aescape_mock_server" ON)
+if(BUILD_AESCAPE_MOCK_SERVER)
+  enable_testing()
+  add_subdirectory(mock)
 endif()
 
 option(BUILD_EXAMPLES "Build example code" ON)

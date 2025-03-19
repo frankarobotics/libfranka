@@ -5,6 +5,7 @@
 #include <franka/active_torque_control.h>
 #include <franka/robot.h>
 
+#include <tracy/Tracy.hpp>
 #include <utility>
 
 #include "control_loop.h"
@@ -32,11 +33,15 @@ Robot::Robot(const std::string& franka_address, RealtimeConfig realtime_config, 
 Robot::~Robot() noexcept = default;
 
 Robot::Robot(Robot&& other) noexcept {
+  ZoneScoped;
+
   std::lock_guard<std::mutex> _(other.control_mutex_);
   impl_ = std::move(other.impl_);
 }
 
 Robot& Robot::operator=(Robot&& other) noexcept {
+  ZoneScoped;
+
   if (&other != this) {
     std::unique_lock<std::mutex> this_lock(control_mutex_, std::defer_lock);
     std::unique_lock<std::mutex> other_lock(other.control_mutex_, std::defer_lock);
@@ -53,6 +58,8 @@ Robot::ServerVersion Robot::serverVersion() const noexcept {
 void Robot::control(std::function<Torques(const RobotState&, franka::Duration)> control_callback,
                     bool limit_rate,
                     double cutoff_frequency) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -69,6 +76,8 @@ void Robot::control(
     std::function<JointPositions(const RobotState&, franka::Duration)> motion_generator_callback,
     bool limit_rate,
     double cutoff_frequency) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -83,6 +92,8 @@ void Robot::control(
     std::function<JointVelocities(const RobotState&, franka::Duration)> motion_generator_callback,
     bool limit_rate,
     double cutoff_frequency) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -97,6 +108,8 @@ void Robot::control(
     std::function<CartesianPose(const RobotState&, franka::Duration)> motion_generator_callback,
     bool limit_rate,
     double cutoff_frequency) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -111,6 +124,8 @@ void Robot::control(std::function<Torques(const RobotState&, franka::Duration)> 
                         motion_generator_callback,
                     bool limit_rate,
                     double cutoff_frequency) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -125,6 +140,8 @@ void Robot::control(
     ControllerMode controller_mode,
     bool limit_rate,
     double cutoff_frequency) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -138,6 +155,8 @@ void Robot::control(
     ControllerMode controller_mode,
     bool limit_rate,
     double cutoff_frequency) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -151,6 +170,8 @@ void Robot::control(
     ControllerMode controller_mode,
     bool limit_rate,
     double cutoff_frequency) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -164,6 +185,8 @@ void Robot::control(std::function<CartesianVelocities(const RobotState&, franka:
                     ControllerMode controller_mode,
                     bool limit_rate,
                     double cutoff_frequency) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -174,6 +197,8 @@ void Robot::control(std::function<CartesianVelocities(const RobotState&, franka:
 
 // NOLINTNEXTLINE(performance-unnecessary-value-param)
 void Robot::read(std::function<bool(const RobotState&)> read_callback) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -186,6 +211,8 @@ void Robot::read(std::function<bool(const RobotState&)> read_callback) {
 }
 
 RobotState Robot::readOnce() {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -193,6 +220,8 @@ RobotState Robot::readOnce() {
 }
 
 auto Robot::getRobotModel() -> std::string {
+  ZoneScoped;
+
   auto get_robot_model =
       impl_->executeCommand<research_interface::robot::GetRobotModel, GetRobotModelResult>();
   return get_robot_model.robot_model_urdf;
@@ -206,6 +235,8 @@ void Robot::setCollisionBehavior(const std::array<double, 7>& lower_torque_thres
                                  const std::array<double, 6>& upper_force_thresholds_acceleration,
                                  const std::array<double, 6>& lower_force_thresholds_nominal,
                                  const std::array<double, 6>& upper_force_thresholds_nominal) {
+  ZoneScoped;
+
   impl_->executeCommand<research_interface::robot::SetCollisionBehavior>(
       lower_torque_thresholds_acceleration, upper_torque_thresholds_acceleration,
       lower_torque_thresholds_nominal, upper_torque_thresholds_nominal,
@@ -217,6 +248,8 @@ void Robot::setCollisionBehavior(const std::array<double, 7>& lower_torque_thres
                                  const std::array<double, 7>& upper_torque_thresholds,
                                  const std::array<double, 6>& lower_force_thresholds,
                                  const std::array<double, 6>& upper_force_thresholds) {
+  ZoneScoped;
+
   impl_->executeCommand<research_interface::robot::SetCollisionBehavior>(
       lower_torque_thresholds, upper_torque_thresholds, lower_torque_thresholds,
       upper_torque_thresholds, lower_force_thresholds, upper_force_thresholds,
@@ -225,23 +258,33 @@ void Robot::setCollisionBehavior(const std::array<double, 7>& lower_torque_thres
 
 void Robot::setJointImpedance(
     const std::array<double, 7>& K_theta) {  // NOLINT(readability-identifier-naming)
+  ZoneScoped;
+
   impl_->executeCommand<research_interface::robot::SetJointImpedance>(K_theta);
 }
 
 void Robot::setCartesianImpedance(
     const std::array<double, 6>& K_x) {  // NOLINT(readability-identifier-naming)
+  ZoneScoped;
+
   impl_->executeCommand<research_interface::robot::SetCartesianImpedance>(K_x);
 }
 
 void Robot::setGuidingMode(const std::array<bool, 6>& guiding_mode, bool elbow) {
+  ZoneScoped;
+
   impl_->executeCommand<research_interface::robot::SetGuidingMode>(guiding_mode, elbow);
 }
 
 void Robot::setK(const std::array<double, 16>& EE_T_K) {  // NOLINT(readability-identifier-naming)
+  ZoneScoped;
+
   impl_->executeCommand<research_interface::robot::SetEEToK>(EE_T_K);
 }
 
 void Robot::setEE(const std::array<double, 16>& NE_T_EE) {  // NOLINT(readability-identifier-naming)
+  ZoneScoped;
+
   impl_->executeCommand<research_interface::robot::SetNEToEE>(NE_T_EE);
 }
 
@@ -249,16 +292,22 @@ void Robot::setLoad(
     double load_mass,
     const std::array<double, 3>& F_x_Cload,  // NOLINT(readability-identifier-naming)
     const std::array<double, 9>& load_inertia) {
+  ZoneScoped;
+
   impl_->executeCommand<research_interface::robot::SetLoad>(load_mass, F_x_Cload, load_inertia);
 }
 
 void Robot::automaticErrorRecovery() {
+  ZoneScoped;
+
   impl_->executeCommand<research_interface::robot::AutomaticErrorRecovery>();
 }
 
 template <typename MotionGeneratorType>
 std::unique_ptr<ActiveControlBase> Robot::startControl(
     const research_interface::robot::Move::ControllerMode& controller_type) {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -273,6 +322,8 @@ std::unique_ptr<ActiveControlBase> Robot::startControl(
 }
 
 std::unique_ptr<ActiveControlBase> Robot::startTorqueControl() {
+  ZoneScoped;
+
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -289,37 +340,53 @@ std::unique_ptr<ActiveControlBase> Robot::startTorqueControl() {
 
 std::unique_ptr<ActiveControlBase> Robot::startJointPositionControl(
     const research_interface::robot::Move::ControllerMode& control_type) {
+  ZoneScoped;
+
   return startControl<JointPositions>(control_type);
 }
 
 std::unique_ptr<ActiveControlBase> Robot::startJointVelocityControl(
     const research_interface::robot::Move::ControllerMode& control_type) {
+  ZoneScoped;
+
   return startControl<JointVelocities>(control_type);
 }
 
 std::unique_ptr<ActiveControlBase> Robot::startCartesianPoseControl(
     const research_interface::robot::Move::ControllerMode& control_type) {
+  ZoneScoped;
+
   return startControl<CartesianPose>(control_type);
 }
 
 std::unique_ptr<ActiveControlBase> Robot::startCartesianVelocityControl(
     const research_interface::robot::Move::ControllerMode& control_type) {
+  ZoneScoped;
+
   return startControl<CartesianVelocities>(control_type);
 }
 
 void Robot::stop() {
+  ZoneScoped;
+
   impl_->executeCommand<research_interface::robot::StopMove>();
 }
 
 Model Robot::loadModel() {
+  ZoneScoped;
+
   return impl_->loadModel(getRobotModel());
 }
 
 Model Robot::loadModel(std::unique_ptr<RobotModelBase> robot_model) {
+  ZoneScoped;
+
   return impl_->loadModel(std::move(robot_model));
 }
 
-Robot::Robot(std::shared_ptr<Impl> robot_impl) : impl_(std::move(robot_impl)){};
+Robot::Robot(std::shared_ptr<Impl> robot_impl) : impl_(std::move(robot_impl)){
+  ZoneScoped;
+};
 
 template std::unique_ptr<ActiveControlBase> Robot::startControl<JointVelocities>(
     const research_interface::robot::Move::ControllerMode& controller_type);

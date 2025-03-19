@@ -17,6 +17,8 @@ inline ControlException createControlException(const char* message,
                                                research_interface::robot::Move::Status move_status,
                                                const Errors& reflex_errors,
                                                const std::vector<Record>& log) {
+  ZoneScoped;
+
   std::ostringstream message_stream;
   message_stream << message;
   if (move_status == decltype(move_status)::kReflexAborted) {
@@ -45,6 +47,8 @@ inline ControlException createControlException(const char* message,
 
 Robot::Impl::Impl(std::unique_ptr<Network> network, size_t log_size, RealtimeConfig realtime_config)
     : network_{std::move(network)}, logger_{log_size}, realtime_config_{realtime_config} {
+  ZoneScoped;
+
   if (!network_) {
     throw std::invalid_argument("libfranka robot: Invalid argument");
   }
@@ -57,6 +61,8 @@ Robot::Impl::Impl(std::unique_ptr<Network> network, size_t log_size, RealtimeCon
 RobotState Robot::Impl::update(
     const research_interface::robot::MotionGeneratorCommand* motion_command,
     const research_interface::robot::ControllerCommand* control_command) {
+  ZoneScoped;
+
   network_->tcpThrowIfConnectionClosed();
 
   research_interface::robot::RobotCommand robot_command =
@@ -69,6 +75,8 @@ RobotState Robot::Impl::update(
 }
 
 void Robot::Impl::throwOnMotionError(const RobotState& robot_state, uint32_t motion_id) {
+  ZoneScoped;
+
   if (robot_state.robot_mode != RobotMode::kMove ||
       motion_generator_mode_ != current_move_motion_generator_mode_ ||
       controller_mode_ != current_move_controller_mode_) {
@@ -87,11 +95,15 @@ void Robot::Impl::throwOnMotionError(const RobotState& robot_state, uint32_t mot
 }
 
 RobotState Robot::Impl::readOnce() {
+  ZoneScoped;
+
   current_state_ = convertRobotState(receiveRobotState());
   return current_state_;
 }
 
 void Robot::Impl::writeOnce(const Torques& control_input) {
+  ZoneScoped;
+
   research_interface::robot::ControllerCommand control_command =
       createControllerCommand(control_input);
   research_interface::robot::MotionGeneratorCommand motion_command{};
@@ -105,6 +117,8 @@ void Robot::Impl::writeOnce(const Torques& control_input) {
 template <typename MotionGeneratorType>
 void Robot::Impl::writeOnce(const MotionGeneratorType& motion_generator_input,
                             const Torques& control_input) {
+  ZoneScoped;
+
   auto motion_command = createMotionCommand(motion_generator_input);
   auto control_command = createControllerCommand(control_input);
   network_->tcpThrowIfConnectionClosed();
@@ -113,6 +127,8 @@ void Robot::Impl::writeOnce(const MotionGeneratorType& motion_generator_input,
 
 template <typename MotionGeneratorType>
 void Robot::Impl::writeOnce(const MotionGeneratorType& motion_generator_input) {
+  ZoneScoped;
+
   auto motion_command = createMotionCommand(motion_generator_input);
   network_->tcpThrowIfConnectionClosed();
   sendRobotCommand(&motion_command, nullptr);
@@ -121,6 +137,8 @@ void Robot::Impl::writeOnce(const MotionGeneratorType& motion_generator_input) {
 research_interface::robot::RobotCommand Robot::Impl::sendRobotCommand(
     const research_interface::robot::MotionGeneratorCommand* motion_command,
     const research_interface::robot::ControllerCommand* control_command) const {
+  ZoneScoped;
+
   research_interface::robot::RobotCommand robot_command{};
   if (motion_command != nullptr || control_command != nullptr) {
     robot_command.message_id = message_id_;
@@ -156,6 +174,8 @@ research_interface::robot::RobotCommand Robot::Impl::sendRobotCommand(
 }
 
 research_interface::robot::RobotState Robot::Impl::receiveRobotState() {
+  ZoneScoped;
+
   research_interface::robot::RobotState latest_accepted_state;
   latest_accepted_state.message_id = message_id_;
 
@@ -180,6 +200,8 @@ research_interface::robot::RobotState Robot::Impl::receiveRobotState() {
 }
 
 void Robot::Impl::updateState(const research_interface::robot::RobotState& robot_state) {
+  ZoneScoped;
+
   robot_mode_ = robot_state.robot_mode;
   motion_generator_mode_ = robot_state.motion_generator_mode;
   controller_mode_ = robot_state.controller_mode;
@@ -207,6 +229,8 @@ uint32_t Robot::Impl::startMotion(
     research_interface::robot::Move::MotionGeneratorMode motion_generator_mode,
     const research_interface::robot::Move::Deviation& maximum_path_deviation,
     const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation) {
+  ZoneScoped;
+
   if (motionGeneratorRunning() || controllerRunning()) {
     throw ControlException("libfranka robot: Attempted to start multiple motions!");
   }
@@ -275,6 +299,8 @@ void Robot::Impl::finishMotion(
     uint32_t motion_id,
     const research_interface::robot::MotionGeneratorCommand* motion_command,
     const research_interface::robot::ControllerCommand* control_command) {
+  ZoneScoped;
+
   if (!motionGeneratorRunning() && !controllerRunning()) {
     current_move_motion_generator_mode_ = research_interface::robot::MotionGeneratorMode::kIdle;
     current_move_controller_mode_ = research_interface::robot::ControllerMode::kOther;
@@ -311,6 +337,8 @@ void Robot::Impl::finishMotion(
 }
 
 void Robot::Impl::finishMotion(uint32_t motion_id, const Torques& control_input) {
+  ZoneScoped;
+
   research_interface::robot::MotionGeneratorCommand motion_command{};
   motion_command.dq_c = {0, 0, 0, 0, 0, 0, 0};
 
@@ -321,6 +349,8 @@ void Robot::Impl::finishMotion(uint32_t motion_id, const Torques& control_input)
 }
 research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionCommand(
     const JointPositions& motion_input) {
+  ZoneScoped;
+
   checkFinite(motion_input.q);
 
   research_interface::robot::MotionGeneratorCommand motion_command{};
@@ -331,6 +361,8 @@ research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionComma
 
 research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionCommand(
     const JointVelocities& motion_input) {
+  ZoneScoped;
+
   checkFinite(motion_input.dq);
 
   research_interface::robot::MotionGeneratorCommand motion_command{};
@@ -341,6 +373,8 @@ research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionComma
 
 research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionCommand(
     const CartesianPose& motion_input) {
+  ZoneScoped;
+
   checkMatrix(motion_input.O_T_EE);
 
   research_interface::robot::MotionGeneratorCommand motion_command{};
@@ -360,6 +394,8 @@ research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionComma
 
 research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionCommand(
     const CartesianVelocities& motion_input) {
+  ZoneScoped;
+
   checkFinite(motion_input.O_dP_EE);
 
   research_interface::robot::MotionGeneratorCommand motion_command{};
@@ -379,6 +415,8 @@ research_interface::robot::MotionGeneratorCommand Robot::Impl::createMotionComma
 
 research_interface::robot::ControllerCommand Robot::Impl::createControllerCommand(
     const Torques& control_input) {
+  ZoneScoped;
+
   checkFinite(control_input.tau_J);
 
   research_interface::robot::ControllerCommand control_command{};
@@ -388,6 +426,7 @@ research_interface::robot::ControllerCommand Robot::Impl::createControllerComman
 }
 
 void Robot::Impl::cancelMotion(uint32_t motion_id) {
+  ZoneScoped;
   if (!network_->isTcpSocketAlive()) {
     logging::logWarn("libfranka robot: TCP connection is closed. Cannot cancel motion.");
     return;
@@ -412,15 +451,21 @@ void Robot::Impl::cancelMotion(uint32_t motion_id) {
 }
 
 Model Robot::Impl::loadModel(const std::string& urdf_model) const {
+  ZoneScoped;
+
   return Model(*network_, urdf_model);
 }
 
 // for the tests
 Model Robot::Impl::loadModel(std::unique_ptr<RobotModelBase> robot_model) const {
+  ZoneScoped;
+
   return Model(*network_, std::move(robot_model));
 }
 
 RobotState convertRobotState(const research_interface::robot::RobotState& robot_state) noexcept {
+  ZoneScoped;
+
   RobotState converted;
   converted.O_T_EE = robot_state.O_T_EE;
   converted.O_T_EE_d = robot_state.O_T_EE_d;
@@ -521,38 +566,54 @@ template void Robot::Impl::writeOnce<CartesianVelocities>(
     const Torques& control_input);
 
 void Robot::Impl::writeOnce(const JointPositions& motion_generator_input) {
+  ZoneScoped;
+
   writeOnce<JointPositions>(motion_generator_input);
 }
 
 void Robot::Impl::writeOnce(const JointVelocities& motion_generator_input) {
+  ZoneScoped;
+
   writeOnce<JointVelocities>(motion_generator_input);
 }
 
 void Robot::Impl::writeOnce(const CartesianPose& motion_generator_input) {
+  ZoneScoped;
+
   writeOnce<CartesianPose>(motion_generator_input);
 }
 
 void Robot::Impl::writeOnce(const CartesianVelocities& motion_generator_input) {
+  ZoneScoped;
+
   writeOnce<CartesianVelocities>(motion_generator_input);
 }
 
 void Robot::Impl::writeOnce(const JointPositions& motion_generator_input,
                             const Torques& control_input) {
+  ZoneScoped;
+
   writeOnce<JointPositions>(motion_generator_input, control_input);
 }
 
 void Robot::Impl::writeOnce(const JointVelocities& motion_generator_input,
                             const Torques& control_input) {
+  ZoneScoped;
+
   writeOnce<JointVelocities>(motion_generator_input, control_input);
 }
 
 void Robot::Impl::writeOnce(const CartesianPose& motion_generator_input,
                             const Torques& control_input) {
+  ZoneScoped;
+
   writeOnce<CartesianPose>(motion_generator_input, control_input);
 }
 
 void Robot::Impl::writeOnce(const CartesianVelocities& motion_generator_input,
                             const Torques& control_input) {
+  ZoneScoped;
+
   writeOnce<CartesianVelocities>(motion_generator_input, control_input);
 }
 

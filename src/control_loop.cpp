@@ -7,6 +7,9 @@
 #include <cstring>
 #include <exception>
 #include <fstream>
+#include <iostream>
+
+#include <tracy/Tracy.hpp>
 
 #include <franka/control_tools.h>
 #include <franka/control_types.h>
@@ -55,6 +58,8 @@ ControlLoop<T>::ControlLoop(RobotControl& robot,
                   std::move(control_callback),
                   limit_rate,
                   cutoff_frequency) {
+  ZoneScoped;
+
   if (!control_callback_) {
     throw std::invalid_argument("libfranka: Invalid control callback given.");
   }
@@ -74,6 +79,8 @@ ControlLoop<T>::ControlLoop(RobotControl& robot,
                             bool limit_rate,
                             double cutoff_frequency)
     : ControlLoop(robot, std::move(motion_callback), {}, limit_rate, cutoff_frequency) {
+  ZoneScoped;
+
   if (!motion_callback_) {
     throw std::invalid_argument("libfranka: Invalid motion callback given.");
   }
@@ -94,6 +101,8 @@ ControlLoop<T>::ControlLoop(RobotControl& robot,
 
 template <typename T>
 void ControlLoop<T>::operator()() try {
+  ZoneScoped;
+
   RobotState robot_state = robot_.update(nullptr, nullptr);
   robot_.throwOnMotionError(robot_state, motion_id_);
 
@@ -117,8 +126,9 @@ void ControlLoop<T>::operator()() try {
     }
     robot_.finishMotion(motion_id_, &motion_command, nullptr);
   }
-} catch (...) {
+} catch (const Exception & exc) {
   try {
+    std::cout << "TODO: Handle stop properly, for now raise Exception: " << exc.what() << std::endl;
     robot_.cancelMotion(motion_id_);
   } catch (...) {
   }
@@ -129,6 +139,8 @@ template <typename T>
 bool ControlLoop<T>::spinControl(const RobotState& robot_state,
                                  franka::Duration time_step,
                                  research_interface::robot::ControllerCommand* command) {
+  ZoneScoped;
+
   Torques control_output = control_callback_(robot_state, time_step);
   if (cutoff_frequency_ < kMaxCutoffFrequency) {
     for (size_t i = 0; i < 7; i++) {
@@ -148,6 +160,8 @@ template <typename T>
 bool ControlLoop<T>::spinMotion(const RobotState& robot_state,
                                 franka::Duration time_step,
                                 research_interface::robot::MotionGeneratorCommand* command) {
+  ZoneScoped;
+
   T motion_output = motion_callback_(robot_state, time_step);
   convertMotion(motion_output, robot_state, command);
   return !motion_output.motion_finished;
@@ -158,6 +172,8 @@ void ControlLoop<JointPositions>::convertMotion(
     const JointPositions& motion,
     const RobotState& robot_state,
     research_interface::robot::MotionGeneratorCommand* command) {
+  ZoneScoped;
+
   command->q_c = motion.q;
   std::array<double, 7> previous_joint_position{};
   if (!initialized_filter_) {
@@ -186,6 +202,8 @@ void ControlLoop<JointVelocities>::convertMotion(
     const JointVelocities& motion,
     const RobotState& robot_state,
     research_interface::robot::MotionGeneratorCommand* command) {
+  ZoneScoped;
+
   command->dq_c = motion.dq;
   if (cutoff_frequency_ < kMaxCutoffFrequency) {
     for (size_t i = 0; i < 7; i++) {
@@ -207,6 +225,8 @@ void ControlLoop<CartesianPose>::convertMotion(
     const CartesianPose& motion,
     const RobotState& robot_state,
     research_interface::robot::MotionGeneratorCommand* command) {
+  ZoneScoped;
+
   command->O_T_EE_c = motion.O_T_EE;
   std::array<double, 16> previous_cartesian_pose{};
   std::array<double, 2> previous_elbow_pose{};
@@ -259,6 +279,8 @@ void ControlLoop<CartesianVelocities>::convertMotion(
     const CartesianVelocities& motion,
     const RobotState& robot_state,
     research_interface::robot::MotionGeneratorCommand* command) {
+  ZoneScoped;
+
   command->O_dP_EE_c = motion.O_dP_EE;
   if (cutoff_frequency_ < kMaxCutoffFrequency) {
     for (size_t i = 0; i < 6; i++) {

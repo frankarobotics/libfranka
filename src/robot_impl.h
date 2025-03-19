@@ -7,6 +7,8 @@
 #include <sstream>
 #include <type_traits>
 
+#include <tracy/Tracy.hpp>
+
 #include <franka/model.h>
 #include <franka/robot.h>
 #include <franka/robot_model_base.h>
@@ -213,6 +215,8 @@ Robot::Impl::handleCommandResponse<research_interface::robot::GetRobotModel, Get
     const research_interface::robot::GetRobotModel::Response& response) const {
   using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
+  ZoneScoped;
+
   switch (response.status) {
     case research_interface::robot::GetRobotModel::Status::kSuccess:
       return GetRobotModelResult{.robot_model_urdf = response.robot_model};
@@ -240,6 +244,8 @@ template <>
 inline void Robot::Impl::handleCommandResponse<research_interface::robot::Move>(
     const research_interface::robot::Move::Response& response) const {
   using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
+
+  ZoneScoped;
 
   switch (response.status) {
     case research_interface::robot::Move::Status::kSuccess:
@@ -317,6 +323,8 @@ inline void Robot::Impl::handleCommandResponse<research_interface::robot::StopMo
     const research_interface::robot::StopMove::Response& response) const {
   using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
+  ZoneScoped;
+
   switch (response.status) {
     case research_interface::robot::StopMove::Status::kSuccess:
       break;
@@ -358,6 +366,8 @@ template <>
 inline void Robot::Impl::handleCommandResponse<research_interface::robot::AutomaticErrorRecovery>(
     const research_interface::robot::AutomaticErrorRecovery::Response& response) const {
   using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
+
+  ZoneScoped;
 
   switch (response.status) {
     case research_interface::robot::AutomaticErrorRecovery::Status::kSuccess:
@@ -405,6 +415,8 @@ inline void Robot::Impl::handleCommandResponse<research_interface::robot::Automa
 
 template <typename T, typename ReturnType, typename... TArgs>
 ReturnType Robot::Impl::executeCommand(TArgs... args) {
+  ZoneScoped;
+
   uint32_t command_id = network_->tcpSendRequest<T>(args...);
   typename T::Response response = network_->tcpBlockingReceiveResponse<T>(command_id);
   handleCommandResponse<T>(response);
@@ -414,6 +426,8 @@ ReturnType Robot::Impl::executeCommand(TArgs... args) {
 template <>
 inline GetRobotModelResult
 Robot::Impl::executeCommand<research_interface::robot::GetRobotModel, GetRobotModelResult>() {
+  ZoneScoped;
+
   uint32_t command_id = network_->tcpSendRequest<research_interface::robot::GetRobotModel>();
   research_interface::robot::GetRobotModel::Response response =
       network_->tcpBlockingReceiveResponse<research_interface::robot::GetRobotModel>(command_id);

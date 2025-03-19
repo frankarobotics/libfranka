@@ -73,5 +73,11 @@ ENV PATH=/opt/openrobots/bin:$PATH \
     PYTHONPATH=/opt/openrobots/lib/python3.10/site-packages:$PYTHONPATH \
     CMAKE_PREFIX_PATH=/opt/openrobots/lib/cmake:$CMAKE_PREFIX_PATH
 
+ENV TRACY_NO_INVARIANT_CHECK=1
+RUN git clone --branch v0.10 https://github.com/wolfpld/tracy.git \
+    && cd tracy \
+    && cmake -DBUILD_SHARED_LIBS=1 -DTRACY_ENABLE=1 -DTRACY_ON_DEMAND=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -S . -B build \
+    && cmake --build build --parallel `nproc` --target install
+
 USER $USERNAME
 SHELL ["/bin/bash", "-c"]

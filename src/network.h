@@ -16,6 +16,8 @@
 #include <Poco/Net/NetException.h>
 #include <Poco/Net/StreamSocket.h>
 
+#include <tracy/Tracy.hpp>
+
 #include <franka/exception.h>
 
 #include <research_interface/robot/service_types.h>
@@ -115,6 +117,8 @@ class Network {
 
 template <typename T>
 bool Network::udpReceive(T* data) {
+  ZoneScoped;
+
   std::lock_guard<std::mutex> _(udp_mutex_);
 
   if (udp_socket_.available() >= static_cast<int>(sizeof(T))) {
@@ -126,12 +130,16 @@ bool Network::udpReceive(T* data) {
 
 template <typename T>
 T Network::udpBlockingReceive() {
+  ZoneScoped;
+
   std::lock_guard<std::mutex> _(udp_mutex_);
   return udpBlockingReceiveUnsafe<T>();
 }
 
 template <typename T>
 T Network::udpBlockingReceiveUnsafe() try {
+  ZoneScoped;
+
   std::array<uint8_t, sizeof(T)> buffer;
 
   int bytes_received =
@@ -150,6 +158,7 @@ T Network::udpBlockingReceiveUnsafe() try {
 
 template <typename T>
 void Network::udpSend(const T& data) try {
+  ZoneScoped;
   std::lock_guard<std::mutex> _(udp_mutex_);
 
   int bytes_sent = udp_socket_.sendTo(&data, sizeof(data), udp_server_address_);
@@ -163,6 +172,8 @@ void Network::udpSend(const T& data) try {
 
 template <typename T>
 void Network::tcpReadFromBuffer(std::chrono::microseconds timeout) try {
+  ZoneScoped;
+
   if (tcp_socket_.poll(0, Poco::Net::Socket::SELECT_ERROR)) {
     throw NetworkException("libfranka: TCP connection got interrupted.");
   }
@@ -203,6 +214,8 @@ void Network::tcpReadFromBuffer(std::chrono::microseconds timeout) try {
 
 template <typename T, typename... TArgs>
 uint32_t Network::tcpSendRequest(TArgs&&... args) try {
+  ZoneScoped;
+
   std::lock_guard<std::mutex> _(tcp_mutex_);
 
   typename T::template Message<typename T::Request> message(
@@ -227,6 +240,8 @@ uint32_t Network::tcpSendRequest(TArgs&&... args) try {
 template <typename T>
 bool Network::tcpReceiveResponse(uint32_t command_id,
                                  std::function<void(const typename T::Response&)> handler) {
+  ZoneScoped;
+
   using namespace std::literals::chrono_literals;  // NOLINT(google-build-using-namespace)
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::try_to_lock);
   if (!lock.owns_lock()) {
@@ -251,6 +266,8 @@ bool Network::tcpReceiveResponse(uint32_t command_id,
 template <typename T>
 typename T::Response Network::tcpBlockingReceiveResponse(uint32_t command_id,
                                                          std::vector<uint8_t>* vl_buffer) {
+  ZoneScoped;
+
   using namespace std::literals::chrono_literals;  // NOLINT(google-build-using-namespace)
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::defer_lock);
   decltype(received_responses_)::const_iterator it;
@@ -284,6 +301,8 @@ inline research_interface::robot::GetRobotModel::Response
 Network::tcpBlockingReceiveResponse<research_interface::robot::GetRobotModel>(
     uint32_t command_id,
     std::vector<uint8_t>* /*vl_buffer*/) {
+  ZoneScoped;
+
   using namespace std::literals::chrono_literals;  // NOLINT(google-build-using-namespace)
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::defer_lock);
   decltype(received_responses_)::const_iterator it;
@@ -306,6 +325,8 @@ Network::tcpBlockingReceiveResponse<research_interface::robot::GetRobotModel>(
 
 template <typename T, uint16_t kLibraryVersion>
 void connect(Network& network, uint16_t* ri_version) {
+  ZoneScoped;
+
   uint32_t command_id = network.tcpSendRequest<T>(network.udpPort());
   typename T::Response connect_response = network.tcpBlockingReceiveResponse<T>(command_id);
   switch (connect_response.status) {
