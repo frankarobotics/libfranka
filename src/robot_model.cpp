@@ -105,4 +105,82 @@ void RobotModel::mass(const std::array<double, 7>& q,
   std::copy(data.M.data(), data.M.data() + data.M.size(), m_ne.begin());
 }
 
+// Helper method to perform forward kinematics calculation
+pinocchio::Data RobotModel::computeForwardKinematics(const std::array<double, 7>& q) const {
+  // Create Pinocchio data object
+  pinocchio::Data data(pinocchio_model_);
+
+  // Convert joint positions array to Eigen vector
+  Eigen::VectorXd q_vec = Eigen::Map<const Eigen::VectorXd>(q.data(), last_joint_index_);
+
+  // Perform forward kinematics
+  pinocchio::forwardKinematics(pinocchio_model_, data, q_vec);
+
+  return data;
+}
+
+// Helper function to convert Eigen Matrix4d to std::array<double, 16>
+std::array<double, 16> RobotModel::eigenToArray(const Eigen::Matrix4d& matrix) const {
+  std::array<double, 16> result;
+  std::copy(matrix.data(), matrix.data() + 16, result.begin());
+  return result;
+}
+
+std::array<double, 16> RobotModel::pose(const std::array<double, 7>& q, int joint_index) {
+  // Validate joint_index to prevent segmentation fault
+  if (joint_index < 1 || joint_index > static_cast<int>(last_joint_index_)) {
+    throw std::runtime_error("Joint index out of bounds: " + std::to_string(joint_index) +
+                             " (valid range: 1 to " + std::to_string(last_joint_index_) + ")");
+  }
+
+  // Compute forward kinematics
+  pinocchio::Data data = computeForwardKinematics(q);
+
+  // Get the transformation matrix for the specified joint
+  Eigen::Matrix4d homogeneous_transform = data.oMi[joint_index].toHomogeneousMatrix();
+
+  // Convert to array and return
+  return eigenToArray(homogeneous_transform);
+}
+
+std::array<double, 16> RobotModel::poseEe(const std::array<double, 7>& q,
+                                          const std::array<double, 16>& f_t_ee) {
+  // Get the flange pose
+  std::array<double, 16> flange_transform = poseFlange(q);
+
+  // Apply end effector transformation
+  Eigen::Matrix4d ee_transform = Eigen::Map<const Eigen::Matrix4d>(flange_transform.data()) *
+                                 Eigen::Map<const Eigen::Matrix4d>(f_t_ee.data());
+
+  // Convert to array and return
+  return eigenToArray(ee_transform);
+}
+
+std::array<double, 16> RobotModel::poseFlange(const std::array<double, 7>& q) {
+  // Compute forward kinematics
+  pinocchio::Data data = computeForwardKinematics(q);
+
+  // Update the frame placement for the specific frame we need
+  pinocchio::updateFramePlacement(pinocchio_model_, data, last_link_frame_index_);
+
+  // Get the transformation matrix using the frame index
+  Eigen::Matrix4d flange_transform = data.oMf[last_link_frame_index_].toHomogeneousMatrix();
+
+  // Convert to array and return
+  return eigenToArray(flange_transform);
+}
+
+std::array<double, 16> RobotModel::poseStiffness(const std::array<double, 7>& q,
+                                                 const std::array<double, 16>& f_t_ee,
+                                                 const std::array<double, 16>& ee_t_k) {
+  std::array<double, 16> ee_pose = poseEe(q, f_t_ee);
+
+  // apply the stiffness frame transform
+  Eigen::Matrix4d transform = Eigen::Map<const Eigen::Matrix4d>(ee_pose.data()) *
+                              Eigen::Map<const Eigen::Matrix4d>(ee_t_k.data());
+
+  // Convert to array and return
+  return eigenToArray(transform);
+}
+
 }  // namespace franka

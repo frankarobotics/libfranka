@@ -63,4 +63,44 @@ class RobotModelBase {
                     double m_total,
                     const std::array<double, 3>& f_x_ctotal,
                     std::array<double, 49>& m_ne) = 0;
+
+  /**
+   * Calculates the homogeneous transformation matrix for the specified joint or link.
+   *
+   * @param[in] q Joint position.
+   * @param[in] joint_index The index of the joint/link for which to calculate the pose.
+   * @return Homogeneous transformation matrix (4x4) in column-major order.
+   */
+  virtual std::array<double, 16> pose(const std::array<double, 7>& q, int joint_index) = 0;
+
+  /**
+   * Calculates the homogeneous transformation matrix for the end effector, applying
+   * the end effector transformation.
+   *
+   * @param[in] q Joint position.
+   * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
+   * @return Homogeneous transformation matrix (4x4) in column-major order.
+   */
+  virtual std::array<double, 16> poseEe(const std::array<double, 7>& q,
+                                        const std::array<double, 16>& f_t_ee) = 0;
+
+  /**
+   * Calculates the homogeneous transformation matrix for the flange.
+   *
+   * @param[in] q Joint position.
+   * @return Homogeneous transformation matrix (4x4) in column-major order.
+   */
+  virtual std::array<double, 16> poseFlange(const std::array<double, 7>& q) = 0;
+
+  /**
+   * Calculates the homogeneous transformation matrix for the stiffness frame.
+   *
+   * @param[in] q Joint position.
+   * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
+   * @param[in] ee_t_k The transformation from flange to stiffness frame (4x4 matrix, column-major).
+   * @return Homogeneous transformation matrix (4x4) in column-major order.
+   */
+  virtual std::array<double, 16> poseStiffness(const std::array<double, 7>& q,
+                                               const std::array<double, 16>& f_t_ee,
+                                               const std::array<double, 16>& ee_t_k) = 0;
 };

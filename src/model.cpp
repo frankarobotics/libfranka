@@ -53,38 +53,25 @@ std::array<double, 16> Model::pose(
   std::array<double, 16> output;
   switch (frame) {
     case Frame::kJoint1:
-      library_->joint1(q.data(), output.data());
-      break;
+      return robot_model_->pose(q, 1);
     case Frame::kJoint2:
-      library_->joint2(q.data(), output.data());
-      break;
+      return robot_model_->pose(q, 2);
     case Frame::kJoint3:
-      library_->joint3(q.data(), output.data());
-      break;
+      return robot_model_->pose(q, 3);
     case Frame::kJoint4:
-      library_->joint4(q.data(), output.data());
-      break;
+      return robot_model_->pose(q, 4);
     case Frame::kJoint5:
-      library_->joint5(q.data(), output.data());
-      break;
+      return robot_model_->pose(q, 5);
     case Frame::kJoint6:
-      library_->joint6(q.data(), output.data());
-      break;
+      return robot_model_->pose(q, 6);
     case Frame::kJoint7:
-      library_->joint7(q.data(), output.data());
-      break;
+      return robot_model_->pose(q, 7);
     case Frame::kFlange:
-      library_->flange(q.data(), output.data());
-      break;
+      return robot_model_->poseFlange(q);
     case Frame::kEndEffector:
-      library_->ee(q.data(), F_T_EE.data(), output.data());
-      break;
+      return robot_model_->poseEe(q, F_T_EE);
     case Frame::kStiffness:
-      library_->ee(
-          q.data(),
-          Eigen::Matrix4d(Eigen::Matrix4d(F_T_EE.data()) * Eigen::Matrix4d(EE_T_K.data())).data(),
-          output.data());
-      break;
+      return robot_model_->poseStiffness(q, F_T_EE, EE_T_K);
     default:
       throw std::invalid_argument("Invalid frame given.");
   }
