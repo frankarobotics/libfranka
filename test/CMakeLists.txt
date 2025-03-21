@@ -52,6 +52,7 @@ add_executable(run_all_tests
   robot_impl_tests.cpp
   robot_model_tests.cpp
   robot_model_fk_tests.cpp
+  robot_jacobian_tests.cpp
   robot_state_tests.cpp
   robot_tests.cpp
   vacuum_gripper_tests.cpp

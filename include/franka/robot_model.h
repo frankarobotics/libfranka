@@ -3,11 +3,15 @@
 #pragma once
 
 #include <pinocchio/algorithm/centroidal.hpp>
+#include <pinocchio/algorithm/compute-all-terms.hpp>
 #include <pinocchio/algorithm/crba.hpp>
 #include <pinocchio/algorithm/frames.hpp>
+#include <pinocchio/algorithm/jacobian.hpp>
+#include <pinocchio/algorithm/kinematics.hpp>
 #include <pinocchio/algorithm/rnea.hpp>
 #include <pinocchio/multibody/model.hpp>
 #include <pinocchio/parsers/urdf.hpp>
+
 #include <string>
 
 #include "franka/robot_model_base.h"
@@ -43,6 +47,20 @@ class RobotModel : public RobotModelBase {
   std::array<double, 16> poseStiffness(const std::array<double, 7>& q,
                                        const std::array<double, 16>& f_t_ee,
                                        const std::array<double, 16>& ee_t_k) override;
+  std::array<double, 42> bodyJacobian(const std::array<double, 7>& q, int joint_index) override;
+  std::array<double, 42> bodyJacobianFlange(const std::array<double, 7>& q) override;
+  std::array<double, 42> bodyJacobianEe(const std::array<double, 7>& q,
+                                        const std::array<double, 16>& f_t_ee) override;
+  std::array<double, 42> bodyJacobianStiffness(const std::array<double, 7>& q,
+                                               const std::array<double, 16>& f_t_ee,
+                                               const std::array<double, 16>& ee_t_k) override;
+  std::array<double, 42> zeroJacobian(const std::array<double, 7>& q, int joint_index) override;
+  std::array<double, 42> zeroJacobianFlange(const std::array<double, 7>& q) override;
+  std::array<double, 42> zeroJacobianEe(const std::array<double, 7>& q,
+                                        const std::array<double, 16>& f_t_ee) override;
+  std::array<double, 42> zeroJacobianStiffness(const std::array<double, 7>& q,
+                                               const std::array<double, 16>& f_t_ee,
+                                               const std::array<double, 16>& ee_t_k) override;
 
  private:
   /**
@@ -77,10 +95,78 @@ class RobotModel : public RobotModelBase {
    */
   std::array<double, 16> eigenToArray(const Eigen::Matrix4d& matrix) const;
 
+  /**
+   * @brief Helper function to convert Eigen Matrix6x7d to std::array<double, 42>
+   * @param matrix The Eigen matrix to convert
+   * @return Array representation of the matrix
+   */
+  std::array<double, 42> eigenToArray(const Eigen::Matrix<double, 6, 7>& matrix) const;
+
+  /**
+   * @brief Adds a new frame to the Pinocchio model
+   * @param name Name of the frame to add
+   * @param parent_frame_id ID of the parent frame
+   * @param placement Transformation from parent frame to the new frame
+   * @return Index of the newly added frame
+   */
+  pinocchio::FrameIndex addFrame(const std::string& name,
+                                 pinocchio::FrameIndex parent_frame_id,
+                                 const pinocchio::SE3& placement);
+
+  /**
+   * @brief A generic helper function to compute Jacobians for joints or frames
+   * @param q Joint positions
+   * @param frame_or_joint_index Index of the joint or frame for which to compute the Jacobian
+   * @param is_joint Whether the index refers to a joint (true) or frame (false)
+   * @param reference_frame The reference frame type (LOCAL or LOCAL_WORLD_ALIGNED)
+   * @return The computed Jacobian as a std::array<double, 42>
+   */
+  std::array<double, 42> computeJacobian(const std::array<double, 7>& q,
+                                         int frame_or_joint_index,
+                                         bool is_joint,
+                                         pinocchio::ReferenceFrame reference_frame);
+
+  /**
+   * @brief Prepares and computes a Jacobian for the end-effector frame
+   * @param q Joint positions
+   * @param f_t_ee Transformation from flange to end-effector
+   * @param reference_frame The reference frame type (LOCAL or LOCAL_WORLD_ALIGNED)
+   * @return The computed Jacobian as a std::array<double, 42>
+   */
+  std::array<double, 42> computeEeJacobian(const std::array<double, 7>& q,
+                                           const std::array<double, 16>& f_t_ee,
+                                           pinocchio::ReferenceFrame reference_frame);
+
+  /**
+   * @brief Prepares and computes a Jacobian for the stiffness frame
+   * @param q Joint positions
+   * @param f_t_ee Transformation from flange to end-effector
+   * @param ee_t_k Transformation from end-effector to stiffness frame
+   * @param reference_frame The reference frame type (LOCAL or LOCAL_WORLD_ALIGNED)
+   * @return The computed Jacobian as a std::array<double, 42>
+   */
+  std::array<double, 42> computeStiffnessJacobian(const std::array<double, 7>& q,
+                                                  const std::array<double, 16>& f_t_ee,
+                                                  const std::array<double, 16>& ee_t_k,
+                                                  pinocchio::ReferenceFrame reference_frame);
+
+  /**
+   * @brief Updates the placement of frames based on transforms
+   * @param f_t_ee Transformation from flange to end-effector
+   * @param ee_t_k Transformation from end-effector to stiffness frame (optional)
+   * @param update_stiffness Whether to update the stiffness frame (default: false)
+   */
+  void updateFramePlacements(const std::array<double, 16>& f_t_ee,
+                             const std::array<double, 16>& ee_t_k = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+                                                                     1, 0, 0, 0, 0, 1},
+                             bool update_stiffness = false);
+
   pinocchio::Model pinocchio_model_;
   pinocchio::Inertia initial_last_link_inertia_;
   pinocchio::FrameIndex last_link_frame_index_;
   pinocchio::JointIndex last_joint_index_;
+  pinocchio::FrameIndex ee_frame_index_;
+  pinocchio::FrameIndex stiffness_frame_index_;
 };
 
 }  // namespace franka

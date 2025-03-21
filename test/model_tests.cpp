@@ -51,6 +51,22 @@ class MockRobotModel : public RobotModelBase {
                std::array<double, 16>(const std::array<double, 7>&,
                                       const std::array<double, 16>&,
                                       const std::array<double, 16>&));
+  MOCK_METHOD2(bodyJacobian, std::array<double, 42>(const std::array<double, 7>&, int));
+  MOCK_METHOD2(bodyJacobianEe,
+               std::array<double, 42>(const std::array<double, 7>&, const std::array<double, 16>&));
+  MOCK_METHOD1(bodyJacobianFlange, std::array<double, 42>(const std::array<double, 7>&));
+  MOCK_METHOD3(bodyJacobianStiffness,
+               std::array<double, 42>(const std::array<double, 7>&,
+                                      const std::array<double, 16>&,
+                                      const std::array<double, 16>&));
+  MOCK_METHOD2(zeroJacobian, std::array<double, 42>(const std::array<double, 7>&, int));
+  MOCK_METHOD1(zeroJacobianFlange, std::array<double, 42>(const std::array<double, 7>&));
+  MOCK_METHOD2(zeroJacobianEe,
+               std::array<double, 42>(const std::array<double, 7>&, const std::array<double, 16>&));
+  MOCK_METHOD3(zeroJacobianStiffness,
+               std::array<double, 42>(const std::array<double, 7>&,
+                                      const std::array<double, 16>&,
+                                      const std::array<double, 16>&));
 };
 
 struct MockModel : public ModelLibraryInterface {
@@ -265,55 +281,27 @@ TEST_F(Model, CanGetBodyJacobian) {
     expected_jacobian[i] = i;
   }
 
-  MockModel mock;
-  EXPECT_CALL(mock, Ji_J_J1(_)).WillOnce(WithArgs<0>(Invoke([=](double* output) {
-    std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-  })));
-  EXPECT_CALL(mock, Ji_J_J2(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, Ji_J_J3(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, Ji_J_J4(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, Ji_J_J5(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, Ji_J_J6(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, Ji_J_J7(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, Ji_J_J8(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, Ji_J_J9(robot_state.q.data(), _, _))
-      .WillOnce(WithArgs<1, 2>(Invoke([=](const double* input, double* output) {
-        std::array<double, 16> expected;
-        Eigen::Map<Eigen::Matrix4d>(expected.data(), 4, 4) =
-            (Eigen::Matrix4d(robot_state.F_T_EE.data()) *
-             Eigen::Matrix4d(robot_state.EE_T_K.data()));
-        std::array<double, 16> input_array;
-        std::copy(&input[0], &input[16], input_array.data());
-        EXPECT_EQ(expected, input_array);
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, Ji_J_J9(robot_state.q.data(), robot_state.F_T_EE.data(), _))
-      .WillOnce(WithArgs<2>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-
-  model_library_interface = &mock;
+  EXPECT_CALL(*mock_robot_model, bodyJacobian(robot_state.q, 1))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, bodyJacobian(robot_state.q, 2))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, bodyJacobian(robot_state.q, 3))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, bodyJacobian(robot_state.q, 4))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, bodyJacobian(robot_state.q, 5))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, bodyJacobian(robot_state.q, 6))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, bodyJacobian(robot_state.q, 7))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, bodyJacobianFlange(robot_state.q))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, bodyJacobianEe(robot_state.q, robot_state.F_T_EE))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model,
+              bodyJacobianStiffness(robot_state.q, robot_state.F_T_EE, robot_state.EE_T_K))
+      .WillOnce(Return(expected_jacobian));
 
   franka::Model model(robot.loadModel(std::move(mock_robot_model)));
   for (franka::Frame joint = franka::Frame::kJoint1; joint <= franka::Frame::kStiffness; joint++) {
@@ -332,55 +320,27 @@ TEST_F(Model, CanGetZeroJacobian) {
     expected_jacobian[i] = i;
   }
 
-  MockModel mock;
-  EXPECT_CALL(mock, O_J_J1(_)).WillOnce(WithArgs<0>(Invoke([=](double* output) {
-    std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-  })));
-  EXPECT_CALL(mock, O_J_J2(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_J_J3(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_J_J4(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_J_J5(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_J_J6(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_J_J7(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_J_J8(robot_state.q.data(), _))
-      .WillOnce(WithArgs<1>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_J_J9(robot_state.q.data(), _, _))
-      .WillOnce(WithArgs<1, 2>(Invoke([=](const double* input, double* output) {
-        std::array<double, 16> expected;
-        Eigen::Map<Eigen::Matrix4d>(expected.data(), 4, 4) =
-            Eigen::Matrix4d(Eigen::Matrix4d(robot_state.F_T_EE.data()) *
-                            Eigen::Matrix4d(robot_state.EE_T_K.data()));
-        std::array<double, 16> input_array;
-        std::copy(&input[0], &input[16], input_array.data());
-        EXPECT_EQ(expected, input_array);
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-  EXPECT_CALL(mock, O_J_J9(robot_state.q.data(), robot_state.F_T_EE.data(), _))
-      .WillOnce(WithArgs<2>(Invoke([=](double* output) {
-        std::copy(expected_jacobian.cbegin(), expected_jacobian.cend(), output);
-      })));
-
-  model_library_interface = &mock;
+  EXPECT_CALL(*mock_robot_model, zeroJacobian(robot_state.q, 1))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, zeroJacobian(robot_state.q, 2))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, zeroJacobian(robot_state.q, 3))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, zeroJacobian(robot_state.q, 4))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, zeroJacobian(robot_state.q, 5))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, zeroJacobian(robot_state.q, 6))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, zeroJacobian(robot_state.q, 7))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, zeroJacobianFlange(robot_state.q))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model, zeroJacobianEe(robot_state.q, robot_state.F_T_EE))
+      .WillOnce(Return(expected_jacobian));
+  EXPECT_CALL(*mock_robot_model,
+              zeroJacobianStiffness(robot_state.q, robot_state.F_T_EE, robot_state.EE_T_K))
+      .WillOnce(Return(expected_jacobian));
 
   franka::Model model(robot.loadModel(std::move(mock_robot_model)));
   for (franka::Frame joint = franka::Frame::kJoint1; joint <= franka::Frame::kStiffness; joint++) {

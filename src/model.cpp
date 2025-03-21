@@ -90,46 +90,30 @@ std::array<double, 42> Model::bodyJacobian(
     const std::array<double, 16>& F_T_EE,  // NOLINT(readability-identifier-naming)
     const std::array<double, 16>& EE_T_K)  // NOLINT(readability-identifier-naming)
     const {
-  std::array<double, 42> output;
   switch (frame) {
     case Frame::kJoint1:
-      library_->body_jacobian_joint1(output.data());
-      break;
+      return robot_model_->bodyJacobian(q, 1);
     case Frame::kJoint2:
-      library_->body_jacobian_joint2(q.data(), output.data());
-      break;
+      return robot_model_->bodyJacobian(q, 2);
     case Frame::kJoint3:
-      library_->body_jacobian_joint3(q.data(), output.data());
-      break;
+      return robot_model_->bodyJacobian(q, 3);
     case Frame::kJoint4:
-      library_->body_jacobian_joint4(q.data(), output.data());
-      break;
+      return robot_model_->bodyJacobian(q, 4);
     case Frame::kJoint5:
-      library_->body_jacobian_joint5(q.data(), output.data());
-      break;
+      return robot_model_->bodyJacobian(q, 5);
     case Frame::kJoint6:
-      library_->body_jacobian_joint6(q.data(), output.data());
-      break;
+      return robot_model_->bodyJacobian(q, 6);
     case Frame::kJoint7:
-      library_->body_jacobian_joint7(q.data(), output.data());
-      break;
+      return robot_model_->bodyJacobian(q, 7);
     case Frame::kFlange:
-      library_->body_jacobian_flange(q.data(), output.data());
-      break;
+      return robot_model_->bodyJacobianFlange(q);
     case Frame::kEndEffector:
-      library_->body_jacobian_ee(q.data(), F_T_EE.data(), output.data());
-      break;
+      return robot_model_->bodyJacobianEe(q, F_T_EE);
     case Frame::kStiffness:
-      library_->body_jacobian_ee(
-          q.data(),
-          Eigen::Matrix4d(Eigen::Matrix4d(F_T_EE.data()) * Eigen::Matrix4d(EE_T_K.data())).data(),
-          output.data());
-      break;
+      return robot_model_->bodyJacobianStiffness(q, F_T_EE, EE_T_K);
     default:
       throw std::invalid_argument("Invalid frame given.");
   }
-
-  return output;
 }
 
 std::array<double, 42> Model::zeroJacobian(Frame frame,
@@ -143,46 +127,30 @@ std::array<double, 42> Model::zeroJacobian(
     const std::array<double, 16>& F_T_EE,  // NOLINT(readability-identifier-naming)
     const std::array<double, 16>& EE_T_K)  // NOLINT(readability-identifier-naming)
     const {
-  std::array<double, 42> output;
   switch (frame) {
     case Frame::kJoint1:
-      library_->zero_jacobian_joint1(output.data());
-      break;
+      return robot_model_->zeroJacobian(q, 1);
     case Frame::kJoint2:
-      library_->zero_jacobian_joint2(q.data(), output.data());
-      break;
+      return robot_model_->zeroJacobian(q, 2);
     case Frame::kJoint3:
-      library_->zero_jacobian_joint3(q.data(), output.data());
-      break;
+      return robot_model_->zeroJacobian(q, 3);
     case Frame::kJoint4:
-      library_->zero_jacobian_joint4(q.data(), output.data());
-      break;
+      return robot_model_->zeroJacobian(q, 4);
     case Frame::kJoint5:
-      library_->zero_jacobian_joint5(q.data(), output.data());
-      break;
+      return robot_model_->zeroJacobian(q, 5);
     case Frame::kJoint6:
-      library_->zero_jacobian_joint6(q.data(), output.data());
-      break;
+      return robot_model_->zeroJacobian(q, 6);
     case Frame::kJoint7:
-      library_->zero_jacobian_joint7(q.data(), output.data());
-      break;
+      return robot_model_->zeroJacobian(q, 7);
     case Frame::kFlange:
-      library_->zero_jacobian_flange(q.data(), output.data());
-      break;
+      return robot_model_->zeroJacobianFlange(q);
     case Frame::kEndEffector:
-      library_->zero_jacobian_ee(q.data(), F_T_EE.data(), output.data());
-      break;
+      return robot_model_->zeroJacobianEe(q, F_T_EE);
     case Frame::kStiffness:
-      library_->zero_jacobian_ee(
-          q.data(),
-          Eigen::Matrix4d(Eigen::Matrix4d(F_T_EE.data()) * Eigen::Matrix4d(EE_T_K.data())).data(),
-          output.data());
-      break;
+      return robot_model_->zeroJacobianStiffness(q, F_T_EE, EE_T_K);
     default:
       throw std::invalid_argument("Invalid frame given.");
   }
-
-  return output;
 }
 
 std::array<double, 49> franka::Model::mass(const franka::RobotState& robot_state) const noexcept {
