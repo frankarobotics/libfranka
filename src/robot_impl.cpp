@@ -447,12 +447,12 @@ void Robot::Impl::cancelMotion(uint32_t motion_id) {
 }
 
 Model Robot::Impl::loadModel(const std::string& urdf_model) const {
-  return Model(*network_, urdf_model);
+  return Model(urdf_model);
 }
 
 // for the tests
 Model Robot::Impl::loadModel(std::unique_ptr<RobotModelBase> robot_model) const {
-  return Model(*network_, std::move(robot_model));
+  return Model(std::move(robot_model));
 }
 
 RobotState convertRobotState(const research_interface::robot::RobotState& robot_state) noexcept {

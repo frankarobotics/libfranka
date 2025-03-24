@@ -14,7 +14,7 @@
 
 #include "helpers.h"
 #include "mock_server.h"
-#include "model_library_interface.h"
+#include "test_utils.h"
 
 using ::testing::_;
 using ::testing::Invoke;
@@ -69,111 +69,30 @@ class MockRobotModel : public RobotModelBase {
                                       const std::array<double, 16>&));
 };
 
-struct MockModel : public ModelLibraryInterface {
-  MOCK_METHOD1(Ji_J_J1, void(double*));
-  MOCK_METHOD2(Ji_J_J2, void(const double*, double*));
-  MOCK_METHOD2(Ji_J_J3, void(const double*, double*));
-  MOCK_METHOD2(Ji_J_J4, void(const double*, double*));
-  MOCK_METHOD2(Ji_J_J5, void(const double*, double*));
-  MOCK_METHOD2(Ji_J_J6, void(const double*, double*));
-  MOCK_METHOD2(Ji_J_J7, void(const double*, double*));
-  MOCK_METHOD2(Ji_J_J8, void(const double*, double*));
-  MOCK_METHOD3(Ji_J_J9, void(const double*, const double*, double*));
-
-  MOCK_METHOD1(O_J_J1, void(double*));
-  MOCK_METHOD2(O_J_J2, void(const double*, double*));
-  MOCK_METHOD2(O_J_J3, void(const double*, double*));
-  MOCK_METHOD2(O_J_J4, void(const double*, double*));
-  MOCK_METHOD2(O_J_J5, void(const double*, double*));
-  MOCK_METHOD2(O_J_J6, void(const double*, double*));
-  MOCK_METHOD2(O_J_J7, void(const double*, double*));
-  MOCK_METHOD2(O_J_J8, void(const double*, double*));
-  MOCK_METHOD3(O_J_J9, void(const double*, const double*, double*));
-
-  MOCK_METHOD2(O_T_J1, void(const double*, double*));
-  MOCK_METHOD2(O_T_J2, void(const double*, double*));
-  MOCK_METHOD2(O_T_J3, void(const double*, double*));
-  MOCK_METHOD2(O_T_J4, void(const double*, double*));
-  MOCK_METHOD2(O_T_J5, void(const double*, double*));
-  MOCK_METHOD2(O_T_J6, void(const double*, double*));
-  MOCK_METHOD2(O_T_J7, void(const double*, double*));
-  MOCK_METHOD2(O_T_J8, void(const double*, double*));
-  MOCK_METHOD3(O_T_J9, void(const double*, const double*, double*));
-};
-
 struct Model : public ::testing::Test {
-  Model() {
-    using namespace std::string_literals;
-
-    std::ifstream model_library_stream(
-        FRANKA_TEST_BINARY_DIR + "/libfcimodels.so"s,
-        std::ios_base::in | std::ios_base::binary | std::ios_base::ate);
-    std::vector<char> buffer;
-    buffer.resize(model_library_stream.tellg());
-    model_library_stream.seekg(0, std::ios::beg);
-    if (!model_library_stream.read(buffer.data(), buffer.size())) {
-      throw std::runtime_error("Model test: Cannot load mock libfcimodels.so");
-    }
-
-    server
-        .generic([=](decltype(server)::Socket& tcp_socket, decltype(server)::Socket&) {
-          CommandHeader header;
-          server.receiveRequest<LoadModelLibrary>(tcp_socket, &header);
-          server.sendResponse<LoadModelLibrary>(
-              tcp_socket,
-              CommandHeader(Command::kLoadModelLibrary, header.command_id,
-                            sizeof(CommandMessage<LoadModelLibrary::Response>) + buffer.size()),
-              LoadModelLibrary::Response(LoadModelLibrary::Status::kSuccess));
-          tcp_socket.sendBytes(buffer.data(), buffer.size());
-        })
-        .spinOnce();
-
-    model_library_interface = nullptr;
-  }
+  Model() {}
 
   RobotMockServer server{};
   franka::Robot robot{"127.0.0.1", franka::RealtimeConfig::kIgnore};
 };
 
-TEST(InvalidModel, ThrowsIfNoModelReceived) {
+TEST(CorrectModel, CanHandleNoModel) {
   RobotMockServer server;
   franka::Robot robot("127.0.0.1", franka::RealtimeConfig::kIgnore);
 
-  server
-      .waitForCommand<GetRobotModel>([this](const typename GetRobotModel::Request& /*request*/) {
-        return GetRobotModel::Response(GetRobotModel::Status::kSuccess);
-      })
-      .spinOnce();
+  // Find and load a valid URDF from the test directory
+  std::string urdf_path = franka_test_utils::getUrdfPath(__FILE__);
+  auto urdf_string = franka_test_utils::readFileToString(urdf_path);
 
   server
-      .waitForCommand<LoadModelLibrary>([&](const LoadModelLibrary::Request&) {
-        return LoadModelLibrary::Response(LoadModelLibrary::Status::kError);
-      })
+      .waitForCommand<GetRobotModel>(
+          [urdf_string](const typename GetRobotModel::Request& /*request*/) {
+            return GetRobotModel::Response(GetRobotModel::Status::kSuccess, urdf_string);
+          })
       .spinOnce();
 
-  EXPECT_THROW(robot.loadModel(), franka::ModelException);
-}
-
-TEST(InvalidModel, ThrowsIfInvalidModelReceived) {
-  RobotMockServer server;
-  franka::Robot robot("127.0.0.1", franka::RealtimeConfig::kIgnore);
-  auto mock_robot_model = std::make_unique<MockRobotModel>();
-
-  std::array<char, 10> buffer{};
-  server
-      .generic([&](decltype(server)::Socket& tcp_socket, decltype(server)::Socket&) {
-        CommandHeader header;
-        server.receiveRequest<LoadModelLibrary>(tcp_socket, &header);
-        server.sendResponse<LoadModelLibrary>(
-            tcp_socket,
-            CommandHeader(Command::kLoadModelLibrary, header.command_id,
-                          sizeof(CommandMessage<LoadModelLibrary::Response>) + buffer.size()),
-            LoadModelLibrary::Response(LoadModelLibrary::Status::kSuccess));
-        tcp_socket.sendBytes(buffer.data(), buffer.size());
-      })
-      .spinOnce();
-
-  EXPECT_THROW(robot.loadModel(std::move(mock_robot_model)), franka::ModelException);
+  // Robot should now get the URDF model from the server
+  EXPECT_NO_THROW(robot.loadModel());
 }
 
 TEST_F(Model, CanCreateModel) {

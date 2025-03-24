@@ -5,7 +5,13 @@
 #include <array>
 
 /**
- *  @brief Robot dynamic parameters computed from the URDF model with Pinocchio.
+ * @file robot_model_base.h
+ * Abstract interface class for robot dynamic parameters computed from the URDF model with
+ * Pinocchio.
+ */
+
+/**
+ * @brief Robot dynamic parameters computed from the URDF model with Pinocchio.
  */
 class RobotModelBase {
  public:
@@ -97,7 +103,8 @@ class RobotModelBase {
    *
    * @param[in] q Joint position.
    * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
-   * @param[in] ee_t_k The transformation from flange to stiffness frame (4x4 matrix, column-major).
+   * @param[in] ee_t_k The transformation from end effector to stiffness frame (4x4 matrix,
+   * column-major).
    * @return Homogeneous transformation matrix (4x4) in column-major order.
    */
   virtual std::array<double, 16> poseStiffness(const std::array<double, 7>& q,
@@ -135,7 +142,8 @@ class RobotModelBase {
    *
    * @param[in] q Joint position.
    * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
-   * @param[in] ee_t_k The transformation from flange to stiffness frame (4x4 matrix, column-major).
+   * @param[in] ee_t_k The transformation from end effector to stiffness frame (4x4 matrix,
+   * column-major).
    * @return Vectorized 6x7 Jacobian, column-major.
    */
   virtual std::array<double, 42> bodyJacobianStiffness(const std::array<double, 7>& q,
@@ -174,7 +182,8 @@ class RobotModelBase {
    *
    * @param[in] q Joint position.
    * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
-   * @param[in] ee_t_k The transformation from flange to stiffness frame (4x4 matrix, column-major).
+   * @param[in] ee_t_k The transformation from end effector to stiffness frame (4x4 matrix,
+   * column-major).
    * @return Vectorized 6x7 Jacobian, column-major.
    */
   virtual std::array<double, 42> zeroJacobianStiffness(const std::array<double, 7>& q,

@@ -19,7 +19,6 @@ using franka::Torques;
 using research_interface::robot::AutomaticErrorRecovery;
 using research_interface::robot::Connect;
 using research_interface::robot::GetRobotModel;
-using research_interface::robot::LoadModelLibrary;
 using research_interface::robot::Move;
 using research_interface::robot::SetCartesianImpedance;
 using research_interface::robot::SetCollisionBehavior;

@@ -91,12 +91,9 @@ add_library(franka SHARED
   src/exception.cpp
   src/gripper.cpp
   src/gripper_state.cpp
-  src/library_downloader.cpp
-  src/library_loader.cpp
   src/load_calculations.cpp
   src/lowpass_filter.cpp
   src/model.cpp
-  src/model_library.cpp
   src/network.cpp
   src/rate_limiting.cpp
   src/robot.cpp
@@ -237,7 +234,6 @@ file(GLOB_RECURSE TEST_FILES
   test/*.cpp
 )
 file(GLOB_RECURSE TIDY_IGNORED_FILES
-  src/libfcimodels.h
 )
 
 find_program(CLANG_FORMAT_PROG clang-format DOC "'clang-format' executable")
@@ -262,9 +258,6 @@ find_program(CLANG_TIDY_PROG clang-tidy DOC "'clang-tidy' executable")
 if(CLANG_TIDY_PROG)
   # Build JSON string for clang-tidy's line filter
   set(TIDY_FILES ${SOURCES} ${HEADERS})
-  foreach(ignored_file ${TIDY_IGNORED_FILES})
-    list(REMOVE_ITEM TIDY_FILES ${ignored_file})
-  endforeach()
   string(REPLACE ";" "\"},{\"name\":\"" TIDY_LINE_FILTER "${TIDY_FILES}")
   set(TIDY_LINE_FILTER "[{\"name\":\"${TIDY_LINE_FILTER}\"}]")
 

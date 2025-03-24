@@ -22,16 +22,6 @@ set(TEST_DEPENDENCIES
 )
 set(TEST_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 
-## Test libraries
-add_library(fcimodels SHARED
-  libfcimodels_stub.cpp
-)
-
-target_include_directories(fcimodels PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(fcimodels PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
-
-list(APPEND TEST_DEPENDENCIES fcimodels)
-
 ## Test runner
 add_executable(run_all_tests
   active_motion_generator_tests.cpp
