@@ -43,9 +43,6 @@ enum class Frame {
  */
 Frame operator++(Frame& frame, int /* dummy */) noexcept;
 
-class ModelLibrary;
-class Network;
-
 /**
  * Calculates poses of joints and dynamic properties of the robot.
  */
@@ -58,22 +55,21 @@ class Model {
    *
    * @see Robot::loadModel
    *
-   * @param[in] network For internal use.
+   * @param[in] urdf_model The URDF model string from the robot.
    *
-   * @throw ModelException if the model library cannot be loaded.
+   * @throw ModelException if the model cannot be initialized.
    */
-  explicit Model(franka::Network& network, const std::string& urdf_model);
+  explicit Model(const std::string& urdf_model);
 
   /**
    * Creates a new Model instance only for the tests.
    *
    * This constructor is for the unittests for enabling mocks.
    *
-   * @param[in] network For internal use.
    * @param[in] robot_model unique pointer to the mocked robot_model
    *
    */
-  explicit Model(franka::Network& network, std::unique_ptr<RobotModelBase> robot_model);
+  explicit Model(std::unique_ptr<RobotModelBase> robot_model);
 
   /**
    * Move-constructs a new Model instance.
@@ -296,7 +292,6 @@ class Model {
   /// @endcond
 
  private:
-  std::unique_ptr<ModelLibrary> library_;
   std::unique_ptr<RobotModelBase> robot_model_;
 };
 

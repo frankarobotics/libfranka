@@ -6,6 +6,7 @@
 - Updated pinocchio to version 3.4.0
 - Feat: use pinocchio to compute forward kinematics
 - Feat: use pinocchio to compute jacobians
+- Chore: remove dynamic library loading from model constructor
 
 ## 0.15.0 - 2025-01-16
 

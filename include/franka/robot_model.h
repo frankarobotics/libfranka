@@ -16,6 +16,11 @@
 
 #include "franka/robot_model_base.h"
 
+/**
+ * @file robot_model.h
+ * Implements RobotModelBase using Pinocchio.
+ */
+
 namespace franka {
 
 /**

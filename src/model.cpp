@@ -11,8 +11,6 @@
 
 #include <fstream>
 #include <sstream>
-#include "model_library.h"
-#include "network.h"
 
 using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
@@ -24,18 +22,16 @@ Frame operator++(Frame& frame, int /* dummy */) noexcept {
   return original;
 }
 
-Model::Model(Network& network, const std::string& urdf_model)
-    : library_{new ModelLibrary(network)} {
+Model::Model(const std::string& urdf_model) {
   robot_model_ = std::make_unique<RobotModel>(urdf_model);
 }
 
 // for the tests
-Model::Model(Network& network, std::unique_ptr<RobotModelBase> robot_model)
-    : library_{new ModelLibrary(network)} {
+Model::Model(std::unique_ptr<RobotModelBase> robot_model) {
   robot_model_ = std::move(robot_model);
 }
 
-// Has to be declared here, as the ModelLibrary type is incomplete in the header
+// Has to be declared here for proper destruction of robot_model_
 Model::~Model() noexcept = default;
 Model::Model(Model&&) noexcept = default;
 Model& Model::operator=(Model&&) noexcept = default;
