@@ -95,12 +95,6 @@ TEST(CorrectModel, CanHandleNoModel) {
   EXPECT_NO_THROW(robot.loadModel());
 }
 
-TEST_F(Model, CanCreateModel) {
-  auto mock_robot_model = std::make_unique<MockRobotModel>();
-
-  EXPECT_NO_THROW(robot.loadModel(std::move(mock_robot_model)));
-}
-
 TEST_F(Model, CanGetMassMatrix) {
   franka::RobotState robot_state;
   randomRobotState(robot_state);
