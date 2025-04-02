@@ -25,121 +25,121 @@ std::vector<std::string> splitAt(const std::string& s, char delimiter) {
 }
 
 void testRobotStateIsZero(const franka::RobotState& actual) {
-  for (double element : actual.O_T_EE) {
+  for (auto element : actual.O_T_EE) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.F_T_NE) {
+  for (auto element : actual.F_T_NE) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.NE_T_EE) {
+  for (auto element : actual.NE_T_EE) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.O_T_EE_d) {
+  for (auto element : actual.O_T_EE_d) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.F_T_EE) {
+  for (auto element : actual.F_T_EE) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.EE_T_K) {
+  for (auto element : actual.EE_T_K) {
     EXPECT_EQ(0.0, element);
   }
   EXPECT_EQ(0.0, actual.m_ee);
-  for (double element : actual.I_ee) {
+  for (auto element : actual.I_ee) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.F_x_Cee) {
+  for (auto element : actual.F_x_Cee) {
     EXPECT_EQ(0.0, element);
   }
   EXPECT_EQ(0.0, actual.m_load);
-  for (double element : actual.I_load) {
+  for (auto element : actual.I_load) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.F_x_Cload) {
+  for (auto element : actual.F_x_Cload) {
     EXPECT_EQ(0.0, element);
   }
   EXPECT_EQ(0.0, actual.m_total);
-  for (double element : actual.I_total) {
+  for (auto element : actual.I_total) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.F_x_Ctotal) {
+  for (auto element : actual.F_x_Ctotal) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.elbow) {
+  for (auto element : actual.elbow) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.elbow_d) {
+  for (auto element : actual.elbow_d) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.elbow_c) {
+  for (auto element : actual.elbow_c) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.delbow_c) {
+  for (auto element : actual.delbow_c) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.ddelbow_c) {
+  for (auto element : actual.ddelbow_c) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.tau_J) {
+  for (auto element : actual.tau_J) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.tau_J_d) {
+  for (auto element : actual.tau_J_d) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.dtau_J) {
+  for (auto element : actual.dtau_J) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.q) {
+  for (auto element : actual.q) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.q_d) {
+  for (auto element : actual.q_d) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.dq) {
+  for (auto element : actual.dq) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.dq_d) {
+  for (auto element : actual.dq_d) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.ddq_d) {
+  for (auto element : actual.ddq_d) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.joint_contact) {
+  for (auto element : actual.joint_contact) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.cartesian_contact) {
+  for (auto element : actual.cartesian_contact) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.joint_collision) {
+  for (auto element : actual.joint_collision) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.cartesian_collision) {
+  for (auto element : actual.cartesian_collision) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.tau_ext_hat_filtered) {
+  for (auto element : actual.tau_ext_hat_filtered) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.O_F_ext_hat_K) {
+  for (auto element : actual.O_F_ext_hat_K) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.K_F_ext_hat_K) {
+  for (auto element : actual.K_F_ext_hat_K) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.O_dP_EE_d) {
+  for (auto element : actual.O_dP_EE_d) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.O_T_EE_c) {
+  for (auto element : actual.O_T_EE_c) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.O_dP_EE_c) {
+  for (auto element : actual.O_dP_EE_c) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.O_ddP_EE_c) {
+  for (auto element : actual.O_ddP_EE_c) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.theta) {
+  for (auto element : actual.theta) {
     EXPECT_EQ(0.0, element);
   }
-  for (double element : actual.dtheta) {
+  for (auto element : actual.dtheta) {
     EXPECT_EQ(0.0, element);
   }
   EXPECT_FALSE(actual.current_errors);
