@@ -28,33 +28,47 @@ MockServer<C>::MockServer(ConnectCallbackT on_connect, uint32_t sequence_number,
       sequence_number_{sequence_number},
       on_connect_{on_connect},
       ip_(std::move(ip)),
-      sim_time_(sim_time) {
-  std::unique_lock<std::mutex> lock(command_mutex_);
-  server_thread_ = std::thread(&MockServer<C>::serverThread, this);
+      sim_time_(sim_time) {}
 
-  cv_.wait(lock, [this] { return initialized_; });
-  lock.unlock();
-  spinOnce();  // Spin to accept connections immediately.
+template <typename C>
+void MockServer<C>::Initialize() {
+  std::unique_lock<std::mutex> lock(command_mutex_);
+
+  if (!initialized_) {
+    server_thread_ = std::thread(&MockServer<C>::serverThread, this);
+
+    cv_.wait(lock, [this] { return initialized_; });
+    lock.unlock();
+    spinOnce();  // Spin to accept connections immediately.
+  }
+}
+
+template <typename C>
+void MockServer<C>::Shutdown() {
+  std::unique_lock lock(command_mutex_);
+  if (!shutdown_) {
+    shutdown_ = true;
+    lock.unlock();
+    cv_.notify_one();
+    server_thread_.join();
+
+    LOG_INFO("Joined server thread");
+
+    if (!commands_.empty()) {
+      std::stringstream ss;
+      ss << "Mock server did not process all commands. Unprocessed commands:" << std::endl;
+      while (!commands_.empty()) {
+        ss << commands_.front().first << std::endl;
+        commands_.pop_front();
+      }
+      LOG_INFO(ss.str());
+    }
+  }
 }
 
 template <typename C>
 MockServer<C>::~MockServer() {
-  shutdown_ = true;
-  cv_.notify_one();
-  udp_cv_.notify_one();
-  server_thread_.join();
-
-  LOG_INFO("Joined server thread");
-
-  if (!commands_.empty()) {
-    std::stringstream ss;
-    ss << "Mock server did not process all commands. Unprocessed commands:" << std::endl;
-    while (!commands_.empty()) {
-      ss << commands_.front().first << std::endl;
-      commands_.pop_front();
-    }
-    LOG_INFO(ss.str());
-  }
+  Shutdown();
 }
 
 template <typename C>
@@ -136,6 +150,9 @@ void MockServer<C>::serverThread() {
 
   Poco::Net::SocketAddress remote_address;
   Poco::Net::StreamSocket tcp_socket = srv.acceptConnection(remote_address);
+
+  LOG_INFO("Accepted TCP donnection");
+
   tcp_socket.setBlocking(true);
   tcp_socket.setNoDelay(true);
 
@@ -219,7 +236,12 @@ void MockServer<C>::serverThread() {
     cv_.notify_one();
   }
   
+  // Barrier and notify the UDP thread to stop
+  udp_command_mutex_.lock();
+  udp_command_mutex_.unlock();
+  udp_cv_.notify_one();
   udp_only_command_thread_.join();
+  LOG_INFO("Joined UDP command thread");
 
   if (!ignore_udp_buffer_) {
     if (udp_socket.poll(Poco::Timespan(), Poco::Net::Socket::SelectMode::SELECT_READ)) {

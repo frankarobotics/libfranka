@@ -41,6 +41,11 @@ class MockServer {
              bool sim_time = false);
   virtual ~MockServer();
 
+
+  void Initialize();
+
+  void Shutdown();
+
   template <typename T>
   MockServer& sendEmptyState();
 

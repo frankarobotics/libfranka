@@ -87,6 +87,7 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
         model_buffer_(loadModelStream()),
         sim_time_(sim_time)
       {
+        MockServer<C>::Initialize();
         // Grab initial state from backend
         robot_backend_->updateRobotState(state_);
 
@@ -299,6 +300,7 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
   void stop() {
     stopUpdateLoop();
     stopStateLoop();
+    MockServer<C>::Shutdown();
   }
 
   void run() {
@@ -471,7 +473,9 @@ AescapeMockServer<C>::AescapeMockServer(std::shared_ptr<aescape::BackendInterfac
 
 
 template <typename C>
-AescapeMockServer<C>::~AescapeMockServer() = default;
+AescapeMockServer<C>::~AescapeMockServer() {
+  stop();
+}
 
 template <typename C>
 void AescapeMockServer<C>::run() {
