@@ -19,15 +19,26 @@
 
 #include <tracy/Tracy.hpp>
 
+#include <Poco/Net/StreamSocket.h>
+
 #include <franka/robot_state.h>
+#include <franka/exception.h>
+
 #include <franka_mock/server_types.h>
+#include "logging_macros.h"
 
 template <typename C>
 class MockServer {
  public:
-  struct Socket {
+  struct UDPSocket {
     std::function<void(const void*, size_t)> sendBytes;
     std::function<void(void*, size_t)> receiveBytes;
+  };
+
+  struct TCPSocket {
+    std::function<void(const void*, size_t)> sendBytes;
+    std::function<void(void*, size_t)> receiveBytes;
+    Poco::Net::StreamSocket socket_impl;
   };
 
   using ConnectCallbackT =
@@ -74,18 +85,18 @@ class MockServer {
   MockServer& onReceiveRobotCommandSeparateQueue(
       ReceiveRobotCommandCallbackT on_receive_robot_command = ReceiveRobotCommandCallbackT());
 
-  MockServer& generic(std::function<void(Socket&, Socket&)> generic_command);
+  MockServer& generic(std::function<void(TCPSocket&, UDPSocket&)> generic_command);
 
   template <typename T>
-  typename T::Request receiveRequest(Socket& tcp_socket, typename T::Header* header = nullptr);
+  typename T::Request receiveRequest(TCPSocket& tcp_socket, typename T::Header* header = nullptr);
 
   template <typename T>
-  void sendResponse(Socket& tcp_socket,
+  void sendResponse(TCPSocket& tcp_socket,
                     const typename T::Header& header,
                     const typename T::Response& response);
 
   template <typename T>
-  void handleCommand(Socket& tcp_socket,
+  void handleCommand(TCPSocket& tcp_socket,
                      std::function<typename T::Response(const typename T::Request&)> callback,
                      uint32_t* command_id = nullptr);
 
@@ -103,11 +114,17 @@ class MockServer {
 
   void ignoreUdpBuffer();
 
+  void close() {
+    ZoneScoped;
+    LOG_ERROR("Forcibly closing TCP socket");
+    tcp_socket_wrapper_.socket_impl.shutdown();
+  }
+
  private:
   void serverThread();
   void UdpOnlyThread();
 
-  void sendInitialState(Socket& udp_socket);
+  void sendInitialState(UDPSocket& udp_socket);
 
   template <typename T>
   MockServer& onSendUDP(std::function<T()> on_send_udp);
@@ -134,11 +151,11 @@ class MockServer {
 
   bool sim_time_;
 
-  Socket tcp_socket_wrapper_;
-  Socket udp_socket_wrapper_;
+  TCPSocket tcp_socket_wrapper_;
+  UDPSocket udp_socket_wrapper_;
 
-  std::deque<std::pair<std::string, std::function<void(Socket&, Socket&)>>> commands_;
-  std::deque<std::pair<std::string, std::function<void(Socket&, Socket&)>>> udp_commands_;
+  std::deque<std::pair<std::string, std::function<void(TCPSocket&, UDPSocket&)>>> commands_;
+  std::deque<std::pair<std::string, std::function<void(TCPSocket&, UDPSocket&)>>> udp_commands_;
 
   MockServer& doForever(std::function<bool()> callback,
                         typename decltype(MockServer::commands_)::iterator it);
@@ -153,10 +170,17 @@ MockServer<C>& MockServer<C>::sendResponse(const uint32_t& command_id,
   using namespace std::string_literals;
 
   std::lock_guard<std::mutex> _(command_mutex_);
+
+  if (shutdown_) {
+    throw franka::NetworkException("MockServer is shutting down");
+  }
+
   block_ = true;
   commands_.emplace_back(
       "sendResponse<"s + typeid(typename T::Response).name() + ">",
-      [=, &command_id](Socket& tcp_socket, Socket&) {
+      [=, &command_id](TCPSocket& tcp_socket, UDPSocket&) {
+        ZoneScoped;
+        TRACY_MESSAGE(msg, "command_id:{}", command_id);
         typename T::template Message<typename T::Response> message(
             typename T::Header(T::kCommand, command_id,
                                sizeof(typename T::template Message<typename T::Response>)),
@@ -175,9 +199,14 @@ MockServer<C>& MockServer<C>::queueResponse(const uint32_t& command_id,
   using namespace std::string_literals;
 
   std::lock_guard<std::mutex> _(command_mutex_);
+
+  if (shutdown_) {
+    throw franka::NetworkException("MockServer is shutting down");
+  }
+
   commands_.emplace_back(
       "sendResponse<"s + typeid(typename T::Response).name() + ">",
-      [=, &command_id](Socket& tcp_socket, Socket&) {
+      [=, &command_id](TCPSocket& tcp_socket, UDPSocket&) {
         typename T::template Message<typename T::Response> message(
             typename T::Header(T::kCommand, command_id,
                                sizeof(typename T::template Message<typename T::Response>)),
@@ -210,34 +239,6 @@ MockServer<C>& MockServer<C>::sendRandomState(std::function<void(T&)> random_gen
   });
 }
 
-template <typename C>
-template <typename T>
-MockServer<C>& MockServer<C>::onSendUDP(std::function<T()> on_send_udp) {
-  ZoneScoped;
-
-  std::lock_guard<std::mutex> _(command_mutex_);
-  commands_.emplace_back("onSendUDP", [=](Socket&, Socket& udp_socket) {
-    T state = on_send_udp();
-    udp_socket.sendBytes(&state, sizeof(state));
-  });
-  block_ = true;
-  return *this;
-}
-
-template <typename C>
-template <typename T>
-MockServer<C>& MockServer<C>::onSendUDP(std::function<void(T&)> on_send_udp) {
-  ZoneScopedN("onSendUDP_2");
-
-  return onSendUDP<T>([=]() {
-    T state{};
-    state.message_id = ++sequence_number_;
-    if (on_send_udp) {
-      on_send_udp(state);
-    }
-    return state;
-  });
-}
 
 template <typename C>
 template <typename T>
@@ -245,7 +246,12 @@ MockServer<C>& MockServer<C>::onSendUDPSeparateQueue(std::function<T()> on_send_
   ZoneScoped;
 
   std::lock_guard<std::mutex> _(udp_command_mutex_);
-  udp_commands_.emplace_back("onSendUDPSeparateQueue", [=](Socket&, Socket& udp_socket) {
+
+  if (shutdown_) {
+    throw franka::NetworkException("MockServer is shutting down");
+  }
+
+  udp_commands_.emplace_back("onSendUDPSeparateQueue", [=](TCPSocket&, UDPSocket& udp_socket) {
     T state = on_send_udp();
     udp_socket.sendBytes(&state, sizeof(state));
   });
@@ -270,7 +276,7 @@ MockServer<C>& MockServer<C>::onSendUDPSeparateQueue(std::function<void(T&)> on_
 
 template <typename C>
 template <typename T>
-typename T::Request MockServer<C>::receiveRequest(Socket& tcp_socket,
+typename T::Request MockServer<C>::receiveRequest(TCPSocket& tcp_socket,
                                                   typename T::Header* header_ptr) {
   ZoneScoped;
 
@@ -288,7 +294,7 @@ typename T::Request MockServer<C>::receiveRequest(Socket& tcp_socket,
 
 template <typename C>
 template <typename T>
-void MockServer<C>::sendResponse(Socket& tcp_socket,
+void MockServer<C>::sendResponse(TCPSocket& tcp_socket,
                                  const typename T::Header& header,
                                  const typename T::Response& response) {
   ZoneScoped;
@@ -300,7 +306,7 @@ void MockServer<C>::sendResponse(Socket& tcp_socket,
 template <>
 template <>
 inline void MockServer<RobotTypes>::sendResponse<research_interface::robot::GetRobotModel>(
-    Socket& tcp_socket,
+    TCPSocket& tcp_socket,
     const research_interface::robot::GetRobotModel::Header& header,
     const research_interface::robot::GetRobotModel::Response& response) {
   ZoneScoped;
@@ -315,7 +321,7 @@ inline void MockServer<RobotTypes>::sendResponse<research_interface::robot::GetR
 template <typename C>
 template <typename T>
 void MockServer<C>::handleCommand(
-    Socket& tcp_socket,
+    TCPSocket& tcp_socket,
     std::function<typename T::Response(const typename T::Request&)> callback,
     uint32_t* command_id) {
   ZoneScoped;
@@ -341,9 +347,14 @@ MockServer<C>& MockServer<C>::waitForCommand(
   using namespace std::string_literals;
 
   std::lock_guard<std::mutex> _(command_mutex_);
+
+  if (shutdown_) {
+    throw franka::NetworkException("MockServer is shutting down");
+  }
+
   std::string name = "waitForCommand<"s + typeid(typename T::Request).name() + ", " +
                      typeid(typename T::Response).name();
-  commands_.emplace_back(name, [this, callback, command_id](Socket& tcp_socket, Socket&) {
+  commands_.emplace_back(name, [this, callback, command_id](TCPSocket& tcp_socket, UDPSocket&) {
     handleCommand<T>(tcp_socket, callback, command_id);
   });
   return *this;

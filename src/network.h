@@ -267,7 +267,6 @@ template <typename T>
 typename T::Response Network::tcpBlockingReceiveResponse(uint32_t command_id,
                                                          std::vector<uint8_t>* vl_buffer) {
   ZoneScoped;
-
   using namespace std::literals::chrono_literals;  // NOLINT(google-build-using-namespace)
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::defer_lock);
   decltype(received_responses_)::const_iterator it;

@@ -6,6 +6,7 @@
 
 #include <franka/robot_model.h>
 #include <franka/control_types.h>
+#include <franka/exception.h>
 
 #include <franka_mock/backend/forward_dynamics_backend.h>
 #include <franka_mock/backend/proportional_controller_backend.h>

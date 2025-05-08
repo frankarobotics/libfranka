@@ -10,7 +10,7 @@ build:
 init: 
 	git submodule update --init
 	mkdir -p build
-	cd build;cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=OFF -DCMAKE_PREFIX_PATH=/opt/openrobots/lib/cmake ..
+	cd build;cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH=/opt/openrobots/lib/cmake -DBUILD_TESTS=OFF ..
 
 all: init build
 

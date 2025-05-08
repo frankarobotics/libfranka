@@ -1,6 +1,7 @@
 #include <franka_mock/aescape_mock_server.h>
 #include "mock_server.h"
 #include "logging_macros.h"
+#include <tracy/Tracy.hpp>
 
 #include <fstream>
 #include <magic_enum.hpp>
@@ -68,6 +69,13 @@ inline r::Move::Response moveSuccessResp() {
 }
 
 /*
+ * Create a preempt stop move response
+ */
+inline r::Move::Response movePreemptedResp() {
+  return r::Move::Response(r::Move::Status::kPreempted);
+}
+
+/*
  * Aescape Mock Server
  */
 template <typename C>
@@ -99,11 +107,11 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
   /*
    * Handle robot.readOnce() by responding with the robot state
    */
-  Impl& handleReadOnce() {
+  Impl& handleReadOnce(bool finish = false) {
     ZoneScoped;
 
     MockServer<C>::template onSendUDPSeparateQueue<r::RobotState>(
-        [this](r::RobotState& robot_state) {
+        [this, finish](r::RobotState& robot_state) {
           ZoneScopedN("SendState");
           std::lock_guard<std::mutex> lck(mut_);
           // Set server local state_.message_id to the server's sequence number (which is what is being sent to client)
@@ -113,9 +121,16 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
           state_.message_id = robot_state.message_id;
           robot_state = state_;
           // Mode
-          robot_state.robot_mode = modes_.robot_mode;
-          robot_state.controller_mode = modes_.ctrl_mode;
-          robot_state.motion_generator_mode = modes_.motion_mode;
+          if (finish) {
+            LOG_INFO("    -- Stopped, send finished state");
+            robot_state.robot_mode = r::RobotMode::kIdle;
+            robot_state.controller_mode = r::ControllerMode::kOther;
+            robot_state.motion_generator_mode = r::MotionGeneratorMode::kIdle;
+          } else {
+            robot_state.robot_mode = modes_.robot_mode;
+            robot_state.controller_mode = modes_.ctrl_mode;
+            robot_state.motion_generator_mode = modes_.motion_mode;
+          }
         });
     return *this;
   }
@@ -131,16 +146,17 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
           ZoneScopedN("OnReceiveRobotCommand");
           //LOG_INFO("    -- Received control robot command");
           std::lock_guard<std::mutex> state_lck(mut_);
-          if (cmd.message_id == 0) {
-            // We never receive a robot command until the sequence number is > 0, as we
-            // send an initial state. So a message_id == 0 means that we didn't receive a command
-            LOG_INFO("Command timed out");
-            cmd_timeout_ = true;
-          } else if (cmd.motion.motion_generation_finished) {
+          if (cmd.motion.motion_generation_finished) {
             LOG_INFO("    -- Motion generation finished");
             modes_.motion_mode = r::MotionGeneratorMode::kIdle;
             modes_.ctrl_mode = r::ControllerMode::kOther;
             stopped_ = true;
+            MockServer<C>::close();
+          } else if (cmd.message_id == 0) {
+            // We never receive a robot command until the sequence number is > 0, as we
+            // send an initial state. So a message_id == 0 means that we didn't receive a command
+            LOG_INFO("Command timed out");
+            cmd_timeout_ = true;
           } else {
             cmd_ = cmd;
           }
@@ -159,17 +175,20 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
         [&](const r::Move::Request& req) {
           ZoneScopedN("WaitForMove");
           std::unique_lock<std::mutex> state_lck(mut_);
-          modes_.motion_mode = convertMode(req.motion_generator_mode);
-          modes_.ctrl_mode = convertMode(req.controller_mode);
-          modes_.robot_mode = r::RobotMode::kMove;
-          LOG_INFO("    -- Move Received: Controller Mode: {}, Motion Mode: {}",
-                   magic_enum::enum_name(modes_.ctrl_mode),
-                   magic_enum::enum_name(modes_.motion_mode));
-
-          state_lck.unlock();
-          // Stop Update Thread
-          stopUpdateLoop();
+          {
+            ZoneScopedN("WaitForMoveLocked");
+            modes_.motion_mode = convertMode(req.motion_generator_mode);
+            modes_.ctrl_mode = convertMode(req.controller_mode);
+            modes_.robot_mode = r::RobotMode::kMove;
+            LOG_INFO("    -- Move Received: Controller Mode: {}, Motion Mode: {}",
+                    magic_enum::enum_name(modes_.ctrl_mode),
+                    magic_enum::enum_name(modes_.motion_mode));
+          }
           LOG_INFO("Stopped Update Thread");
+	   // We don't call stopUpdateThread() here because joining a thread that sleeps would potentially block us
+          // and we want to respond ASAP
+          stop_update_thread_ = true;
+          state_lck.unlock();
 
           return moveSuccessResp();
         },
@@ -183,7 +202,15 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
    */
   AescapeMockServer<C>::Impl& respondMove() {
     ZoneScoped;
-    MockServer<C>::template sendResponse<r::Move>(move_id_, moveSuccessResp);
+
+    std::unique_lock<std::mutex> lck(mut_);
+    if (stopped_) {
+      LOG_INFO("    -- Stopped, send preempted response");
+      MockServer<C>::template sendResponse<r::Move>(move_id_, movePreemptedResp);
+    } else {
+      LOG_INFO("    -- Moving send success response");
+      MockServer<C>::template sendResponse<r::Move>(move_id_, moveSuccessResp);
+    }
     return *this;
   }
 
@@ -235,6 +262,7 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
       // Send current state back to client and wait for next command, or command rcv timeout
       handleUpdate();
 
+
       mut.lock();
 
       {
@@ -252,14 +280,13 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
       
       mut.unlock();
 
-      if (cmd_timeout_) {
+      if (!cmd_timeout_) {
         // Do nothing, we will resend the previous state at the next iteration.
         // Alternatively, we could still update the state without updating the command
-      } else {
-        // Update Command and state
         robot_backend_->updateRobotCommand(cmd);
-        robot_backend_->updateRobotState(state);
       }
+
+      robot_backend_->updateRobotState(state);
 
       if (!sim_time_) {
         // Sleep until appropriate to send the computed state. In sim time, we expect the backend to regulate time by
@@ -280,16 +307,18 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
   }
 
   void stopUpdateLoop() {
+    ZoneScoped;
     std::unique_lock<std::mutex> lck(mut_);
-    if (!stop_update_thread_) {
-      stop_update_thread_ = true;
-      lck.unlock();
-      cv_.notify_all();
+    stop_update_thread_ = true;
+    lck.unlock();
+    cv_.notify_all();
+    if (update_thread_.joinable()) {
       update_thread_.join();
     }
   }
 
   void stopStateLoop() {
+    ZoneScoped;
     std::lock_guard<std::mutex> lck(mut_);
     if (!stopped_)  {
       stopped_ = true;
@@ -297,9 +326,51 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
     }
   }
 
+  void stopMotionThreadFn() {
+    ZoneScoped;
+    bool stop_move = false;
+
+    try {
+      MockServer<C>::template waitForCommand<r::StopMove>([this, &stop_move](const r::StopMove::Request&) {
+        ZoneScopedN("StopMove_recv");
+        LOG_INFO(" ++ Received StopMove");
+        std::unique_lock<std::mutex> lck(mut_);
+        stop_move = true;
+        cv_.notify_all();
+
+        return r::StopMove::Response(r::StopMove::Status::kSuccess);
+      }).spinOnce();
+    } catch (const franka::NetworkException& e) {
+      LOG_ERROR("Shutting down mock server, Exception: {}", e.what());
+      stop_move = true;
+    }
+
+    std::unique_lock<std::mutex> lck(mut_);
+    cv_.wait(lck, [this, &stop_move] {return stop_move || stopped_;});
+    if (!stopped_) {
+      lck.unlock();
+      LOG_INFO("Stopping state loop");
+      stopStateLoop();
+    }
+  }
+
+  void stopStopMotionThread() {
+    ZoneScoped;
+
+    // This should be called when stopping
+    assert(stopped_);
+
+    if (stop_thread_.joinable()){
+      stop_thread_.join();
+    }
+  }
+
   void stop() {
     stopUpdateLoop();
+    // Stop thread should join after stopStateLoop too
     stopStateLoop();
+    stopStopMotionThread();
+
     MockServer<C>::Shutdown();
   }
 
@@ -316,88 +387,106 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
     // Easier to have a thread send states at init and then kill it once we get into Move mode
     startUpdateThread();
 
-    // Handle init methods from the controls stack
-    MockServer<C>::template waitForCommand<r::GetRobotModel>([this](const typename r::GetRobotModel::Request& /*request*/) {
-          ZoneScopedN("LoadModelCommand");
-          LOG_INFO("--- Receive load model request -> loadModel");
-          LOG_INFO(" ++ GetRobotModel");
-          return r::GetRobotModel::Response(r::GetRobotModel::Status::kSuccess, kUrdf_str_);
-        })
-        .spinOnce()
-        .generic([this](typename MockServer<C>::Socket& tcp_socket, typename MockServer<C>::Socket&) {
-          ZoneScopedN("LoadModelResponse");
-          LOG_INFO(" ++ LoadModelLibrary");
-          r::CommandHeader header;
-          this->template receiveRequest<r::LoadModelLibrary>(tcp_socket, &header);
-          this->template sendResponse<r::LoadModelLibrary>(
-              tcp_socket,
-              r::CommandHeader(
-                  r::Command::kLoadModelLibrary, header.command_id,
-                  sizeof(r::CommandMessage<r::LoadModelLibrary::Response>) + model_buffer_.size()),
-              r::LoadModelLibrary::Response(r::LoadModelLibrary::Status::kSuccess));
-          tcp_socket.sendBytes(model_buffer_.data(), model_buffer_.size());
-        })
-        .spinOnce()
-        .template waitForCommand<r::AutomaticErrorRecovery>(
-            [](const typename r::AutomaticErrorRecovery::Request&) {
-              ZoneScopedN("ErrorRecoveryCmd");
-              LOG_INFO("--- Automatic Error Recovery");
-              return r::AutomaticErrorRecovery::Response(r::AutomaticErrorRecovery::Status::kSuccess);
-            })
-        .spinOnce()
-        .template waitForCommand<r::SetCollisionBehavior>(
-            [](const typename r::SetCollisionBehavior::Request&) {
-              ZoneScopedN("CollisonBehaviorCmd");
-              LOG_INFO("--- SetCollisionBehavior");
-              return r::SetCollisionBehavior::Response(r::SetCollisionBehavior::Status::kSuccess);
-            })
-        .spinOnce()
-        .template waitForCommand<r::SetJointImpedance>([](const typename r::SetJointImpedance::Request&) {
-          ZoneScopedN("JointImpedanceCmd");
-          LOG_INFO("--- SetJointImpedance");
-          return r::SetJointImpedance::Response(r::SetJointImpedance::Status::kSuccess);
-        })
-        .spinOnce()
-        .template waitForCommand<r::SetCartesianImpedance>(
-            [](const typename r::SetCartesianImpedance::Request&) {
-              ZoneScopedN("CartesianImpedanceCmd");
-              LOG_INFO("--- SetCartesianImpedance");
-              return r::SetCartesianImpedance::Response(r::SetCartesianImpedance::Status::kSuccess);
-            })
-        .spinOnce();
+    try{
+      // Handle init methods from the controls stack
+      MockServer<C>::template waitForCommand<r::GetRobotModel>([this](const typename r::GetRobotModel::Request& /*request*/) {
+           ZoneScopedN("LoadModelCommand");
+           LOG_INFO("--- Receive load model request -> loadModel");
+           LOG_INFO(" ++ GetRobotModel");
+           return r::GetRobotModel::Response(r::GetRobotModel::Status::kSuccess, kUrdf_str_);
+         })
+         .spinOnce()
+         .generic([this](typename MockServer<C>::TCPSocket& tcp_socket, typename MockServer<C>::UDPSocket&) {
+           ZoneScopedN("LoadModelResponse");
+           LOG_INFO(" ++ LoadModelLibrary");
+           r::CommandHeader header;
+           this->template receiveRequest<r::LoadModelLibrary>(tcp_socket, &header);
+           this->template sendResponse<r::LoadModelLibrary>(
+               tcp_socket,
+               r::CommandHeader(
+                   r::Command::kLoadModelLibrary, header.command_id,
+                   sizeof(r::CommandMessage<r::LoadModelLibrary::Response>) + model_buffer_.size()),
+               r::LoadModelLibrary::Response(r::LoadModelLibrary::Status::kSuccess));
+           tcp_socket.sendBytes(model_buffer_.data(), model_buffer_.size());
+         })
+         .spinOnce()
+         .template waitForCommand<r::AutomaticErrorRecovery>(
+             [](const typename r::AutomaticErrorRecovery::Request&) {
+               ZoneScopedN("ErrorRecoveryCmd");
+               LOG_INFO("--- Automatic Error Recovery");
+               return r::AutomaticErrorRecovery::Response(r::AutomaticErrorRecovery::Status::kSuccess);
+             })
+         .spinOnce()
+         .template waitForCommand<r::SetCollisionBehavior>(
+             [](const typename r::SetCollisionBehavior::Request&) {
+               ZoneScopedN("CollisonBehaviorCmd");
+               LOG_INFO("--- SetCollisionBehavior");
+               return r::SetCollisionBehavior::Response(r::SetCollisionBehavior::Status::kSuccess);
+             })
+         .spinOnce()
+         .template waitForCommand<r::SetJointImpedance>([](const typename r::SetJointImpedance::Request&) {
+           ZoneScopedN("JointImpedanceCmd");
+           LOG_INFO("--- SetJointImpedance");
+           return r::SetJointImpedance::Response(r::SetJointImpedance::Status::kSuccess);
+         })
+         .spinOnce()
+         .template waitForCommand<r::SetCartesianImpedance>(
+             [](const typename r::SetCartesianImpedance::Request&) {
+               ZoneScopedN("CartesianImpedanceCmd");
+               LOG_INFO("--- SetCartesianImpedance");
+               return r::SetCartesianImpedance::Response(r::SetCartesianImpedance::Status::kSuccess);
+             })
+         .spinOnce();
+ 
 
-    LOG_INFO("--- Read current state ->readOnce (Handle by update thread)");  // Can miss. Try twice here.
+      LOG_INFO("--- Read current state ->readOnce (Handle by update thread)");  // Can miss. Try twice here.
 
-    LOG_INFO("--- Run control loop ->control");
-    LOG_INFO(" ++ ControlLoop Constructor");
-    LOG_INFO("    -- Handle robot.startMotion()");
-    // Send Move response again for startMotion haven't done a RobotState update yet
-    // and it checks for a Move response. It does not send another request so simply send a response
-    waitForMove().spinOnce().respondMove().spinOnce();
-    LOG_INFO("    -- Handle robot.update() (Handle by update thread)");
-    LOG_INFO(" ++ ControlLoop Constructor DONE");
+      LOG_INFO("--- Run control loop ->control");
+      LOG_INFO(" ++ ControlLoop Constructor");
+      LOG_INFO("    -- Handle robot.startMotion()");
+      // Send Move response again for startMotion haven't done a RobotState update yet
+      // and it checks for a Move response. It does not send another request so simply send a response
 
-    LOG_INFO(" ++ operator()()");
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(2));
-    
-    stateLoop();
+      waitForMove().spinOnce();
+      // Handle extraneous move responses sent.
+      //respondMove().spinOnce();
+      LOG_INFO("    -- Handle robot.update() (Handle by update thread)");
+      LOG_INFO(" ++ ControlLoop Constructor DONE");
 
-    LOG_INFO("    -- Finish control callback loop");
+      LOG_INFO(" ++ operator()()");
 
-    LOG_INFO("    -- Start robot.finishMotion");
-    handleReadOnce()
-        .respondMove()  // No request. Only waiting for response.
-        .spinOnce();
-    LOG_INFO("    -- Finish robot.finishMotion");
+      std::this_thread::sleep_for(std::chrono::milliseconds(2));
 
-    LOG_INFO("--- Stop");
-    MockServer<C>::template waitForCommand<r::StopMove>([](const r::StopMove::Request&) {
-      LOG_INFO(" ++ Received StopMove");
-      return r::StopMove::Response(r::StopMove::Status::kSuccess);
-    }).spinOnce();
-    LOG_INFO("DONE");
-      
+      stop_thread_ = std::thread(&Impl::stopMotionThreadFn, this);
+
+      stateLoop();
+
+      LOG_INFO("    -- Finish control callback loop");
+
+      LOG_INFO("    -- Start robot.finishMotion");
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(4));
+
+      handleReadOnce(true).spinOnce()
+          .respondMove()  // No request. Only waiting for response.
+          .spinOnce()
+          .handleReadOnce(true).spinOnce();
+      LOG_INFO("    -- Finish robot.finishMotion");
+
+      LOG_INFO("Joining Stop Thread");
+      stop_thread_.join();
+
+      MockServer<C>::template waitForCommand<r::StopMove>([this](const r::StopMove::Request&) {
+        ZoneScopedN("StopMove_recv2");
+        LOG_INFO(" ++ Received StopMove 2");
+        return r::StopMove::Response(r::StopMove::Status::kSuccess);
+      }).spinOnce();
+    }
+    catch (const franka::NetworkException& e) {
+      LOG_ERROR("Shutting down mock server, Exception: {}", e.what());
+      stop();
+    }
   }
 
   ~Impl() 
@@ -413,7 +502,7 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
     LOG_INFO("Connected! port: {}", req.udp_port);
     std::unique_lock<std::mutex> lck(mut_);
     connected_ = true;
-    cv_.notify_one();
+    cv_.notify_all();
     return RobotTypes::Connect::Response(RobotTypes::Connect::Status::kSuccess);
   }
 
@@ -461,6 +550,7 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
   bool connected_{false};
   std::thread update_thread_;
   bool stop_update_thread_{false};
+  std::thread stop_thread_;
   bool cmd_timeout_{false};
 };
 

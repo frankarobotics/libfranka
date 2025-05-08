@@ -11,8 +11,6 @@
 #include "mock_server.h"
 #include "logging_macros.h"
 
-#include <franka/exception.h>
-
 #include <sstream>
 
 #include <Poco/Net/DatagramSocket.h>
@@ -46,13 +44,14 @@ void MockServer<C>::Initialize() {
 template <typename C>
 void MockServer<C>::Shutdown() {
   std::unique_lock lock(command_mutex_);
-  if (!shutdown_) {
     shutdown_ = true;
     lock.unlock();
     cv_.notify_one();
-    server_thread_.join();
+    if (server_thread_.joinable()) {
+      server_thread_.join();
 
-    LOG_INFO("Joined server thread");
+      LOG_INFO("Joined server thread");
+    }
 
     if (!commands_.empty()) {
       std::stringstream ss;
@@ -63,7 +62,6 @@ void MockServer<C>::Shutdown() {
       }
       LOG_INFO(ss.str());
     }
-  }
 }
 
 template <typename C>
@@ -77,7 +75,7 @@ MockServer<C>& MockServer<C>::onReceiveRobotCommand(
   ZoneScoped;
 
   std::lock_guard<std::mutex> _(command_mutex_);
-  commands_.emplace_back("onReceiveRobotCommand", [=](Socket&, Socket& udp_socket) {
+  commands_.emplace_back("onReceiveRobotCommand", [=](TCPSocket&, UDPSocket& udp_socket) {
     research_interface::robot::RobotCommand robot_command;
     udp_socket.receiveBytes(&robot_command, sizeof(robot_command));
     if (on_receive_robot_command) {
@@ -93,11 +91,13 @@ MockServer<C>& MockServer<C>::onReceiveRobotCommandSeparateQueue(
   ZoneScoped;
 
   std::lock_guard<std::mutex> _(udp_command_mutex_);
-  udp_commands_.emplace_back("onReceiveRobotCommandSeparateQueue", [=](Socket&, Socket& udp_socket) {
+  udp_commands_.emplace_back("onReceiveRobotCommandSeparateQueue", [=](TCPSocket&, UDPSocket& udp_socket) {
     research_interface::robot::RobotCommand robot_command;
     do {
       ZoneScopedN("RcvOneUDPCommand");
       robot_command.message_id = 0;
+      robot_command.motion.motion_generation_finished = false;
+      // TODO REALLY ZERO OUT OBJECT
       udp_socket.receiveBytes(&robot_command, sizeof(robot_command));
 
       TRACY_MESSAGE(msg, "sequence_number:{},robot_command.message_id:{}", MockServer<C>::sequenceNumber(), robot_command.message_id);
@@ -156,18 +156,41 @@ void MockServer<C>::serverThread() {
   tcp_socket.setBlocking(true);
   tcp_socket.setNoDelay(true);
 
-  Socket tcp_socket_wrapper;
+  TCPSocket tcp_socket_wrapper;
+  tcp_socket_wrapper.socket_impl = tcp_socket;
   tcp_socket_wrapper.sendBytes = [&](const void* data, size_t size) {
+    ZoneScopedN("tcp_send");
     std::lock_guard<std::mutex> _(tcp_mutex_);
-    int rv = tcp_socket.sendBytes(data, size);
+    int rv = 0;
+    try {
+      rv = tcp_socket.sendBytes(data, size);
+    } catch (const Poco::IOException& exc) {
+      LOG_WARN("IOException:");
+      LOG_WARN(exc.what());
+      // Set rv to size + 1 to indicate an error and throw below
+      rv = size + 1;
+    }
+
     if (static_cast<int>(size) != rv) {
+      LOG_WARN("Send error on TCP socket");
       throw franka::NetworkException("Send error on TCP socket");
     }
   };
   tcp_socket_wrapper.receiveBytes = [&](void* data, size_t size) {
+    ZoneScopedN("tcp_receive");
     std::lock_guard<std::mutex> _(tcp_mutex_);
-    int rv = tcp_socket.receiveBytes(data, size);
+    int rv = 0;
+    try {
+      rv = tcp_socket.receiveBytes(data, size);
+    } catch (const Poco::IOException& exc) {
+      LOG_WARN("IOException:");
+      LOG_WARN(exc.what());
+      // Set rv to size + 1 to indicate an error and throw below
+      rv = size + 1;
+    }
+
     if (static_cast<int>(size) != rv) {
+      LOG_WARN("Receive error on TCP socket");
       throw franka::NetworkException("Receive error on TCP socket");
     }
   };
@@ -191,23 +214,46 @@ void MockServer<C>::serverThread() {
     // a packet loss
     udp_socket.setReceiveTimeout(Poco::Timespan(0, 100000));
   }
-  Socket udp_socket_wrapper;
+  UDPSocket udp_socket_wrapper;
   udp_socket_wrapper.sendBytes = [&](const void* data, size_t size) {
+    ZoneScopedN("udp_send");
     std::lock_guard<std::mutex> _(udp_mutex_);
-    int rv = udp_socket.sendTo(data, size, {remote_address.host(), udp_port});
+    int rv = 0;
+    try {
+      rv = udp_socket.sendTo(data, size, {remote_address.host(), udp_port});
+    } catch (const Poco::IOException& exc) {
+      LOG_WARN("IOException:");
+      LOG_WARN(exc.what());
+      // Set rv to size + 1 to indicate an error
+      rv = size + 1;
+    }
+
     if (static_cast<int>(size) != rv) {
+      LOG_WARN("Send error on UDP socket");
       throw franka::NetworkException("Send error on UDP socket");
     }
   };
   udp_socket_wrapper.receiveBytes = [&](void* data, size_t size) {
+    ZoneScopedN("udp_receive");
     std::lock_guard<std::mutex> _(udp_mutex_);
+    int rv = 0;
     try {
-      int rv = udp_socket.receiveFrom(data, size, remote_address);
-    if (static_cast<int>(size) != rv) {
-      throw franka::NetworkException("Receive error on UDP socket");
-    }
+      rv = udp_socket.receiveFrom(data, size, remote_address);
+    } catch (const Poco::IOException& exc) {
+      LOG_WARN("IOException:");
+      LOG_WARN(exc.what());
+      // Set rv to size + 1 to indicate an error
+      rv = size + 1;
     } catch(const Poco::TimeoutException& exc) {
+      // We don't throw an exception on timeouts, the command is identified
+      // as such by the server because command_id == 0, from a zeroed out command message
       std::cout << "Timeout receiving command" << std::endl;
+      return;
+    }
+
+    if (static_cast<int>(size) != rv) {
+      LOG_WARN("Receive error on UDP socket");
+      throw franka::NetworkException("Receive error on UDP socket");
     }
   };
 
@@ -228,7 +274,15 @@ void MockServer<C>::serverThread() {
       auto callback = commands_.front().second;
       commands_.pop_front();
       lock.unlock();
-      callback(tcp_socket_wrapper_, udp_socket_wrapper_);
+      try {
+        callback(tcp_socket_wrapper_, udp_socket_wrapper_);
+      } catch (const franka::NetworkException& exc) {
+        LOG_WARN("Shutting down, TCP command error: {}", exc.what());
+        lock.lock();
+        ignoreUdpBuffer();
+        shutdown_ = true;
+        break;
+      }
       lock.lock();
     }
 
@@ -240,7 +294,9 @@ void MockServer<C>::serverThread() {
   udp_command_mutex_.lock();
   udp_command_mutex_.unlock();
   udp_cv_.notify_one();
-  udp_only_command_thread_.join();
+  if (udp_only_command_thread_.joinable()) {
+    udp_only_command_thread_.join();
+  }
   LOG_INFO("Joined UDP command thread");
 
   if (!ignore_udp_buffer_) {
@@ -255,7 +311,7 @@ void MockServer<C>::serverThread() {
     std::array<uint8_t, 16> buffer;
 
     int rv = tcp_socket.receiveBytes(buffer.data(), buffer.size());
-    if (rv != 0) {
+    if (rv != 0 && ignore_udp_buffer_) { // TODO: Get rid of all of this checking for data left on sockets, we don't care if we got here, we're shutting down
       throw franka::NetworkException("TCP socket still has data");
     }
   }
@@ -264,6 +320,7 @@ void MockServer<C>::serverThread() {
 template <typename C>
 void MockServer<C>::UdpOnlyThread() {
   std::unique_lock<std::mutex> udp_cmd_lck(udp_command_mutex_);
+  std::unique_lock<std::mutex> tcp_cmd_lock(command_mutex_, std::defer_lock);
   while (!shutdown_) {
     ZoneScopedN("UdpOnlyThread");
 
@@ -275,7 +332,18 @@ void MockServer<C>::UdpOnlyThread() {
       auto callback = udp_commands_.front().second;
       udp_commands_.pop_front();
       udp_cmd_lck.unlock();
-      callback(tcp_socket_wrapper_, udp_socket_wrapper_);
+      try {
+        callback(tcp_socket_wrapper_, udp_socket_wrapper_);
+      } catch (const franka::NetworkException& exc) {
+        LOG_WARN("Shutting down, UDP command error: {}", exc.what());
+        // Lock the tcp command lock first, same order as from the tcp server thread
+        tcp_cmd_lock.lock();
+        udp_cmd_lck.lock();
+        shutdown_ = true;
+        ignoreUdpBuffer();
+        tcp_cmd_lock.unlock();
+        break;
+      }
       udp_cmd_lck.lock();
     }
   }
@@ -283,19 +351,22 @@ void MockServer<C>::UdpOnlyThread() {
 
 template <typename C>
 MockServer<C>& MockServer<C>::generic(
-    std::function<void(MockServer<C>::Socket&, MockServer<C>::Socket&)> generic_command) {
+    std::function<void(MockServer<C>::TCPSocket&, MockServer<C>::UDPSocket&)> generic_command) {
   ZoneScoped;
 
   std::lock_guard<std::mutex> _(command_mutex_);
+  if (shutdown_) {
+    throw franka::NetworkException("MockServer is shutting down");
+  }
   commands_.emplace_back("generic", generic_command);
   return *this;
 }
 
 template <typename C>
-void MockServer<C>::sendInitialState(Socket&) {}
+void MockServer<C>::sendInitialState(UDPSocket&) {}
 
 template <>
-void MockServer<RobotTypes>::sendInitialState(Socket& udp_socket) {
+void MockServer<RobotTypes>::sendInitialState(UDPSocket& udp_socket) {
   ZoneScoped;
 
   research_interface::robot::RobotState state{};
@@ -308,6 +379,11 @@ MockServer<C>& MockServer<C>::doForever(std::function<bool()> callback) {
   ZoneScoped;
 
   std::lock_guard<std::mutex> _(command_mutex_);
+
+  if (shutdown_) {
+    throw franka::NetworkException("MockServer is shutting down");
+  }
+
   return doForever(callback, commands_.end());
 }
 
@@ -316,7 +392,7 @@ MockServer<C>& MockServer<C>::doForever(std::function<bool()> callback,
                                         typename decltype(MockServer::commands_)::iterator it) {
   ZoneScoped;
 
-  auto callback_wrapper = [=](Socket&, Socket&) {
+  auto callback_wrapper = [=](TCPSocket&, UDPSocket&) {
     std::unique_lock<std::mutex> lock(command_mutex_);
     if (shutdown_) {
       return;

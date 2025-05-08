@@ -427,6 +427,7 @@ research_interface::robot::ControllerCommand Robot::Impl::createControllerComman
 
 void Robot::Impl::cancelMotion(uint32_t motion_id) {
   ZoneScoped;
+
   if (!network_->isTcpSocketAlive()) {
     logging::logWarn("libfranka robot: TCP connection is closed. Cannot cancel motion.");
     return;
