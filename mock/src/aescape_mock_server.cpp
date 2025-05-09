@@ -230,7 +230,13 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
     // Run without update if we are not in state loop and not stopped
     while (!stop_update_thread_) {
       lck.unlock();
-      handleReadOnce();
+      try {
+        handleReadOnce();
+      } catch (const franka::NetworkException& e) {
+        LOG_ERROR("Errror in update thread Exception: {}", e.what());
+        stop_update_thread_ = true;
+        return;
+      }
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
       lck.lock();
     }
@@ -310,9 +316,9 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
     ZoneScoped;
     std::unique_lock<std::mutex> lck(mut_);
     stop_update_thread_ = true;
-    lck.unlock();
     cv_.notify_all();
     if (update_thread_.joinable()) {
+      lck.unlock();
       update_thread_.join();
     }
   }
