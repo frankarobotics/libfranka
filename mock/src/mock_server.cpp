@@ -30,7 +30,7 @@ MockServer<C>::MockServer(ConnectCallbackT on_connect, uint32_t sequence_number,
 
 template <typename C>
 void MockServer<C>::Initialize() {
-  std::unique_lock<std::mutex> lock(command_mutex_);
+  std::unique_lock lock(command_mutex_);
 
   if (!initialized_) {
     server_thread_ = std::thread(&MockServer<C>::serverThread, this);
@@ -74,7 +74,7 @@ MockServer<C>& MockServer<C>::onReceiveRobotCommand(
     ReceiveRobotCommandCallbackT on_receive_robot_command) {
   ZoneScoped;
 
-  std::lock_guard<std::mutex> _(command_mutex_);
+  std::lock_guard _(command_mutex_);
   commands_.emplace_back("onReceiveRobotCommand", [=](TCPSocket&, UDPSocket& udp_socket) {
     research_interface::robot::RobotCommand robot_command;
     udp_socket.receiveBytes(&robot_command, sizeof(robot_command));
@@ -90,7 +90,7 @@ MockServer<C>& MockServer<C>::onReceiveRobotCommandSeparateQueue(
     ReceiveRobotCommandCallbackT on_receive_robot_command) {
   ZoneScoped;
 
-  std::lock_guard<std::mutex> _(udp_command_mutex_);
+  std::lock_guard _(udp_command_mutex_);
   udp_commands_.emplace_back("onReceiveRobotCommandSeparateQueue", [=](TCPSocket&, UDPSocket& udp_socket) {
     research_interface::robot::RobotCommand robot_command;
     do {
@@ -115,7 +115,7 @@ template <typename C>
 MockServer<C>& MockServer<C>::spinOnce() {
   ZoneScoped;
 
-  std::unique_lock<std::mutex> lock(command_mutex_);
+  std::unique_lock lock(command_mutex_);
   continue_ = true;
   cv_.notify_one();
   if (block_) {
@@ -132,7 +132,7 @@ void MockServer<C>::ignoreUdpBuffer() {
 
 template <typename C>
 void MockServer<C>::serverThread() {
-  std::unique_lock<std::mutex> lock(command_mutex_);
+  std::unique_lock lock(command_mutex_);
 
   const char* kHostname = ip_.c_str();
   Poco::Net::ServerSocket srv;
@@ -319,8 +319,8 @@ void MockServer<C>::serverThread() {
 
 template <typename C>
 void MockServer<C>::UdpOnlyThread() {
-  std::unique_lock<std::mutex> udp_cmd_lck(udp_command_mutex_);
-  std::unique_lock<std::mutex> tcp_cmd_lock(command_mutex_, std::defer_lock);
+  std::unique_lock udp_cmd_lck(udp_command_mutex_);
+  std::unique_lock tcp_cmd_lock(command_mutex_, std::defer_lock);
   while (!shutdown_) {
     ZoneScopedN("UdpOnlyThread");
 
@@ -354,7 +354,7 @@ MockServer<C>& MockServer<C>::generic(
     std::function<void(MockServer<C>::TCPSocket&, MockServer<C>::UDPSocket&)> generic_command) {
   ZoneScoped;
 
-  std::lock_guard<std::mutex> _(command_mutex_);
+  std::lock_guard _(command_mutex_);
   if (shutdown_) {
     throw franka::NetworkException("MockServer is shutting down");
   }
@@ -378,7 +378,7 @@ template <typename C>
 MockServer<C>& MockServer<C>::doForever(std::function<bool()> callback) {
   ZoneScoped;
 
-  std::lock_guard<std::mutex> _(command_mutex_);
+  std::lock_guard _(command_mutex_);
 
   if (shutdown_) {
     throw franka::NetworkException("MockServer is shutting down");
@@ -393,7 +393,7 @@ MockServer<C>& MockServer<C>::doForever(std::function<bool()> callback,
   ZoneScoped;
 
   auto callback_wrapper = [=](TCPSocket&, UDPSocket&) {
-    std::unique_lock<std::mutex> lock(command_mutex_);
+    std::unique_lock lock(command_mutex_);
     if (shutdown_) {
       return;
     }

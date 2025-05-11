@@ -133,9 +133,9 @@ class MockServer {
   MockServer& onSendUDPSeparateQueue(std::function<T()> on_send_udp);
 
   std::condition_variable_any cv_;
-  std::mutex command_mutex_;
+  TracyLockable(std::mutex, command_mutex_);
   std::condition_variable_any udp_cv_;
-  std::mutex udp_command_mutex_;
+  TracyLockable(std::mutex, udp_command_mutex_);
   std::mutex tcp_mutex_;
   std::mutex udp_mutex_;
   std::thread server_thread_;
@@ -169,7 +169,7 @@ MockServer<C>& MockServer<C>::sendResponse(const uint32_t& command_id,
 
   using namespace std::string_literals;
 
-  std::lock_guard<std::mutex> _(command_mutex_);
+  std::lock_guard _(command_mutex_);
 
   if (shutdown_) {
     throw franka::NetworkException("MockServer is shutting down");
@@ -198,7 +198,7 @@ MockServer<C>& MockServer<C>::queueResponse(const uint32_t& command_id,
 
   using namespace std::string_literals;
 
-  std::lock_guard<std::mutex> _(command_mutex_);
+  std::lock_guard _(command_mutex_);
 
   if (shutdown_) {
     throw franka::NetworkException("MockServer is shutting down");
@@ -245,7 +245,7 @@ template <typename T>
 MockServer<C>& MockServer<C>::onSendUDPSeparateQueue(std::function<T()> on_send_udp) {
   ZoneScoped;
 
-  std::lock_guard<std::mutex> _(udp_command_mutex_);
+  std::lock_guard _(udp_command_mutex_);
 
   if (shutdown_) {
     throw franka::NetworkException("MockServer is shutting down");
@@ -346,7 +346,7 @@ MockServer<C>& MockServer<C>::waitForCommand(
 
   using namespace std::string_literals;
 
-  std::lock_guard<std::mutex> _(command_mutex_);
+  std::lock_guard _(command_mutex_);
 
   if (shutdown_) {
     throw franka::NetworkException("MockServer is shutting down");
