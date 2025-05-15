@@ -185,7 +185,7 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
                     magic_enum::enum_name(modes_.motion_mode));
           }
           LOG_INFO("Stopped Update Thread");
-	   // We don't call stopUpdateThread() here because joining a thread that sleeps would potentially block us
+          // We don't call stopUpdateThread() here because joining a thread that sleeps would potentially block us
           // and we want to respond ASAP
           stop_update_thread_ = true;
           state_lck.unlock();
@@ -276,7 +276,7 @@ class AescapeMockServer<C>::Impl : public MockServer<C> {
         TRACY_MESSAGE(msg, "seq_num:{},cmd.message_id:{}", nxt_seq_num, cmd_.message_id);
 
         // Wait until we receive the expected command, or if we get a timeout
-        auto wait_fn = [this, nxt_seq_num, cycles]{return cmd_.message_id == nxt_seq_num || cmd_timeout_ || stopped_;};
+        auto wait_fn = [this, nxt_seq_num, cycles]{return cmd_.message_id >= nxt_seq_num || cmd_timeout_ || stopped_;};
 
         cv_.wait(mut, wait_fn);
       }
