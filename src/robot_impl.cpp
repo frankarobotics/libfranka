@@ -208,7 +208,9 @@ uint32_t Robot::Impl::startMotion(
     const research_interface::robot::Move::Deviation& maximum_path_deviation,
     const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation) {
   if (motionGeneratorRunning() || controllerRunning()) {
-    throw ControlException("libfranka robot: Attempted to start multiple motions!");
+    if (robot_mode_ != research_interface::robot::RobotMode::kReflex) {
+      throw ControlException("libfranka robot: Attempted to start multiple motions!");
+    }
   }
 
   switch (motion_generator_mode) {
