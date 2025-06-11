@@ -1,0 +1,87 @@
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+    "pybind11>=2.6.0",
+    "numpy>=1.19.0",
+    "cmake>=3.16",
+    "patchelf>=0.10",
+    "auditwheel>=6.0.0",
+    "build>=0.10",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pylibfranka"
+version = "0.1.0"
+description = "Python bindings for libfranka with automatic dependency bundling"
+authors = [{name = "Franka Robotics GmbH", email = "info@franka.de"}]
+license = {text = "Apache-2.0"}
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.19.0",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Robotics",
+]
+
+[project.urls]
+Homepage = "https://github.com/frankaemika/pylibfranka"
+Repository = "https://github.com/frankaemika/pylibfranka"
+Issues = "https://github.com/frankaemika/pylibfranka/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=3.3.2",
+    "black>=23.3.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "flake8-docstrings>=1.7.0",
+    "mypy>=1.3.0",
+    "pytest>=7.3.1",
+]
+
+[tool.setuptools]
+packages = ["pylibfranka"]
+zip-safe = false
+
+[tool.setuptools.package-data]
+pylibfranka = ["*.so", "*.pyd", "_pylibfranka*"]
+
+[tool.cibuildwheel]
+# Build only on modern Python versions
+build = "cp38-* cp39-* cp310-* cp311-*"
+skip = "pp* *-manylinux_i686"
+
+# Install system dependencies before building
+before-all = [
+    "yum install -y eigen3-devel poco-devel || true",
+    "apt-get update && apt-get install -y libeigen3-dev libpoco-dev || true",
+    "pip install pybind11 cmake"
+]
+
+# Build requirements
+build-verbosity = 1
+
+[tool.cibuildwheel.linux]
+# Use manylinux2014 for better compatibility
+manylinux-x86_64-image = "manylinux2014"
+manylinux-aarch64-image = "manylinux2014"
+
+# Let auditwheel bundle dependencies automatically
+repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel} --lib-sdir ."
+
+[tool.black]
+line-length = 100
+target-version = ["py38", "py39", "py310", "py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
