@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <sstream>
+#include <cstdlib>
 
 using namespace std::string_literals;  // NOLINT(google-build-using-namespace)
 
@@ -36,7 +37,13 @@ Network::Network(const std::string& franka_address,
     }
 
     udp_socket_.bind({"0.0.0.0", 0});
-    udp_socket_.setReceiveTimeout(Poco::Timespan{1000l * udp_timeout.count()});
+    
+    // Check for environment variable to disable UDP timeout
+    const char* disable_udp_timeout = std::getenv("LIBFRANKA_DISABLE_UDP_TIMEOUT");
+    if (disable_udp_timeout == nullptr || std::string(disable_udp_timeout) != "1") {
+      udp_socket_.setReceiveTimeout(Poco::Timespan{1000l * udp_timeout.count()});
+    }
+    
     udp_port_ = udp_socket_.address().port();
   } catch (const Poco::Net::ConnectionRefusedException& e) {
     throw NetworkException(
