@@ -7,4 +7,4 @@ With this library, you can control research versions of Franka Robotics robots. 
 `libfranka` is licensed under the [Apache 2.0 license][apache-2.0].
 
 [apache-2.0]: https://www.apache.org/licenses/LICENSE-2.0.html
-[fci-docs]: https://frankaemika.github.io/docs
+[fci-docs]: https://frankarobotics.github.io/docs

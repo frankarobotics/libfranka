@@ -30,7 +30,7 @@ jobs:
     - name: Create index.html for redirect
       run: |
         TAG_NAME=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
-        URL="https://frankaemika.github.io/libfranka/${TAG_NAME}/"
+        URL="https://frankarobotics.github.io/libfranka/${TAG_NAME}/"
         echo $URL
         echo "<html><head><meta http-equiv=\"refresh\" content=\"0; url=$URL\"></head></html>" > build/doc/docs/index.html
 
