@@ -59,7 +59,7 @@ sudo apt-get remove "*libfranka*"
 You can clone the repository and choose the version you need by selecting a specific tag:
 
 ```bash
-git clone --recurse-submodules https://github.com/frankaemika/libfranka.git
+git clone --recurse-submodules https://github.com/frankarobotics/libfranka.git
 cd libfranka
 ```
 
@@ -118,7 +118,7 @@ After installation, check the [Minimum System and Network Requirements][requirem
 To run a sample program, navigate to the build folder and execute the following command:
 
 ```bash
-./examples/communication_test <robot-ip> 
+./examples/communication_test <robot-ip>
 ```
 
 ## License
@@ -126,12 +126,12 @@ To run a sample program, navigate to the build folder and execute the following 
 `libfranka` is licensed under the [Apache 2.0 license][apache-2.0].
 
 [stack-of-tasks]: https://stack-of-tasks.github.io/pinocchio/download.html
-[real-time-kernel]: https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel
-[requirements]: https://frankaemika.github.io/docs/requirements.html
-[getting-started]: https://frankaemika.github.io/docs/getting_started.html#
-[compatibility-matrix]: https://frankaemika.github.io/docs/compatibility.html
+[real-time-kernel]: https://frankarobotics.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel
+[requirements]: https://frankarobotics.github.io/docs/requirements.html
+[getting-started]: https://frankarobotics.github.io/docs/getting_started.html#
+[compatibility-matrix]: https://frankarobotics.github.io/docs/compatibility.html
 [apache-2.0]: https://www.apache.org/licenses/LICENSE-2.0.html
-[api-docs]: https://frankaemika.github.io/libfranka/0.15.0
-[fci-docs]: https://frankaemika.github.io/docs
-[codecov-status]: https://codecov.io/gh/frankaemika/libfranka/branch/master/graph/badge.svg
-[codecov]: https://codecov.io/gh/frankaemika/libfranka
+[api-docs]: https://frankarobotics.github.io/libfranka/0.15.0
+[fci-docs]: https://frankarobotics.github.io/docs
+[codecov-status]: https://codecov.io/gh/frankarobotics/libfranka/branch/master/graph/badge.svg
+[codecov]: https://codecov.io/gh/frankarobotics/libfranka

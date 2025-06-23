@@ -167,7 +167,7 @@ pipeline {
           }
           stage('Check Github Sync') {
             steps {
-              sh '.ci/checkgithistory.sh https://github.com/frankaemika/libfranka.git develop'
+              sh '.ci/checkgithistory.sh https://github.com/frankarobotics/libfranka.git develop'
             }
           }
           stage('Publish') {
