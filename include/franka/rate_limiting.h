@@ -111,7 +111,7 @@ constexpr double kMaxElbowVelocity =
  * Computes the maximum joint velocity based on joint position
  *
  * @note The implementation is based on
- * https://frankaemika.github.io/docs/control_parameters.html#limits-for-franka-research-3.
+ * https://frankarobotics.github.io/docs/control_parameters.html#limits-for-franka-research-3.
  *
  * @param[in] q joint position.
  *
@@ -140,7 +140,7 @@ inline std::array<double, 7> computeUpperLimitsJointVelocity(const std::array<do
  * Computes the minimum joint velocity based on joint position
  *
  * @note The implementation is based on
- * https://frankaemika.github.io/docs/control_parameters.html#limits-for-franka-research-3.
+ * https://frankarobotics.github.io/docs/control_parameters.html#limits-for-franka-research-3.
  *
  * @param[in] q joint position.
  *

@@ -10,8 +10,8 @@
   <license>Apache 2.0</license>
 
   <url type="website">http://wiki.ros.org/libfranka</url>
-  <url type="repository">https://github.com/frankaemika/libfranka</url>
-  <url type="bugtracker">https://github.com/frankaemika/libfranka/issues</url>
+  <url type="repository">https://github.com/frankarobotics/libfranka</url>
+  <url type="bugtracker">https://github.com/frankarobotics/libfranka/issues</url>
   <author>Franka Robotics GmbH</author>
 
   <buildtool_depend>cmake</buildtool_depend>
