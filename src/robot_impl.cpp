@@ -227,29 +227,32 @@ uint32_t Robot::Impl::startMotion(
     research_interface::robot::Move::ControllerMode controller_mode,
     research_interface::robot::Move::MotionGeneratorMode motion_generator_mode,
     const research_interface::robot::Move::Deviation& maximum_path_deviation,
-    const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation) {
+    const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation,
+    bool use_async_motion_generator,
+    const std::optional<std::vector<double>>& maximum_velocities) {
   if (motionGeneratorRunning() || controllerRunning()) {
     throw ControlException("libfranka robot: Attempted to start multiple motions!");
   }
 
+  using MotionGeneratorMode = research_interface::robot::Move::MotionGeneratorMode;
   switch (motion_generator_mode) {
-    case decltype(motion_generator_mode)::kJointPosition:
+    case MotionGeneratorMode::kJointPosition:
       current_move_motion_generator_mode_ =
           decltype(current_move_motion_generator_mode_)::kJointPosition;
       break;
-    case decltype(motion_generator_mode)::kJointVelocity:
+    case MotionGeneratorMode::kJointVelocity:
       current_move_motion_generator_mode_ =
           decltype(current_move_motion_generator_mode_)::kJointVelocity;
       break;
-    case decltype(motion_generator_mode)::kCartesianPosition:
+    case MotionGeneratorMode::kCartesianPosition:
       current_move_motion_generator_mode_ =
           decltype(current_move_motion_generator_mode_)::kCartesianPosition;
       break;
-    case decltype(motion_generator_mode)::kCartesianVelocity:
+    case MotionGeneratorMode::kCartesianVelocity:
       current_move_motion_generator_mode_ =
           decltype(current_move_motion_generator_mode_)::kCartesianVelocity;
       break;
-    case decltype(motion_generator_mode)::kNone:
+    case MotionGeneratorMode::kNone:
       current_move_motion_generator_mode_ = decltype(current_move_motion_generator_mode_)::kNone;
       break;
     default:
@@ -271,7 +274,8 @@ uint32_t Robot::Impl::startMotion(
   }
 
   const uint32_t move_command_id = executeCommand<research_interface::robot::Move>(
-      controller_mode, motion_generator_mode, maximum_path_deviation, maximum_goal_pose_deviation);
+      controller_mode, motion_generator_mode, maximum_path_deviation, maximum_goal_pose_deviation,
+      use_async_motion_generator, maximum_velocities);
 
   RobotState robot_state{};
   while (motion_generator_mode_ != current_move_motion_generator_mode_ ||

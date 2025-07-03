@@ -27,13 +27,18 @@ class RobotControl {
    * @param motion_generator_mode The motion generator mode to use for the motion.
    * @param maximum_path_deviation The maximum allowed deviation from the path.
    * @param maximum_goal_pose_deviation The maximum allowed deviation from the goal pose.
+   * @param maximum_velocities Optional maximum velocities for the motion generator.
+   *   Only supported for:
+   *   - VariableRateJointPositionControl
    * @return uint32_t The ID of the started motion.
    */
   virtual uint32_t startMotion(
       research_interface::robot::Move::ControllerMode controller_mode,
       research_interface::robot::Move::MotionGeneratorMode motion_generator_mode,
       const research_interface::robot::Move::Deviation& maximum_path_deviation,
-      const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation) = 0;
+      const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation,
+      bool use_async_motion_generator,
+      const std::optional<std::vector<double>>& maximum_velocities) = 0;
 
   /**
    * Receives the new motion/control command to send to the robot while updating the robot state.

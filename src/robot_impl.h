@@ -43,7 +43,9 @@ class Robot::Impl : public RobotControl {
   auto startMotion(research_interface::robot::Move::ControllerMode controller_mode,
                    research_interface::robot::Move::MotionGeneratorMode motion_generator_mode,
                    const research_interface::robot::Move::Deviation& maximum_path_deviation,
-                   const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation)
+                   const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation,
+                   bool use_async_motion_generator,
+                   const std::optional<std::vector<double>>& maximum_velocities)
       -> uint32_t override;
   auto cancelMotion(uint32_t motion_id) -> void override;
   auto finishMotion(

@@ -35,10 +35,11 @@ ControlLoop<MotionControlType>::ControlLoop(RobotControl& robot,
     throw std::invalid_argument("libfranka: Got no motion or control callback.");
   }
 
+  // Don't use the variable rate motion generator for control loops
   motion_id_ =
       robot.startMotion(research_interface::robot::Move::ControllerMode::kExternalController,
                         MotionGeneratorTraits<MotionControlType>::kMotionGeneratorMode,
-                        kDefaultDeviation, kDefaultDeviation);
+                        kDefaultDeviation, kDefaultDeviation, false, std::nullopt);
 }
 
 template <typename MotionControlType>
@@ -55,10 +56,11 @@ ControlLoop<MotionControlType>::ControlLoop(RobotControl& robot,
     throw std::invalid_argument("libfranka: Invalid control callback given.");
   }
 
+  // Don't use the variable rate motion generator for control loops
   motion_id_ =
       robot.startMotion(research_interface::robot::Move::ControllerMode::kExternalController,
                         research_interface::robot::Move::MotionGeneratorMode::kNone,
-                        kDefaultDeviation, kDefaultDeviation);
+                        kDefaultDeviation, kDefaultDeviation, false, std::nullopt);
 }
 
 template <typename MotionControlType>
@@ -88,9 +90,11 @@ ControlLoop<MotionControlType>::ControlLoop(RobotControl& robot,
       logging::logError("libfranka: Invalid controller mode given.");
       throw std::invalid_argument("libfranka: Invalid controller mode given.");
   }
+
+  // Don't use the variable rate motion generator for control loops
   motion_id_ =
       robot.startMotion(mode, MotionGeneratorTraits<MotionControlType>::kMotionGeneratorMode,
-                        kDefaultDeviation, kDefaultDeviation);
+                        kDefaultDeviation, kDefaultDeviation, false, std::nullopt);
 }
 
 template <typename MotionControlType>
