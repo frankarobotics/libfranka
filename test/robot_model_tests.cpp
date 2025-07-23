@@ -70,6 +70,16 @@ TEST_F(RobotModelTest, TestCoriolis) {
   }
 }
 
+TEST_F(RobotModelTest, TestCoriolisWithGravity) {
+  std::array<double, 7> c_ne;
+
+  model->coriolis(q, dq, i_total, m_total, f_x_ctotal, g_earth, c_ne);
+
+  for (double i : c_ne) {
+    ASSERT_EQ(i, 0.0);
+  }
+}
+
 TEST_F(RobotModelTest, TestGravity) {
   std::array<double, 3> g_earth = {0, 0, -9.81};
   std::array<double, 7> g_ne;
