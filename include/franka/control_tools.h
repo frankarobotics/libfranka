@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cmath>
+#include <string>
 
 /**
  * @file control_tools.h
