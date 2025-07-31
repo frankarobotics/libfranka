@@ -232,6 +232,9 @@ class Model {
    * Calculates the Coriolis force vector (state-space equation): \f$ c= C \times
    * dq\f$, in \f$[Nm]\f$.
    *
+   * @deprecated This overload is deprecated. Use coriolis(q, dq, i_total, m_total, f_x_ctotal,
+   * g_earth) for better performance.
+   *
    * @param[in] q Joint position.
    * @param[in] dq Joint velocity.
    * @param[in] I_total Inertia of the attached total load including end effector, relative to
@@ -243,13 +246,39 @@ class Model {
    *
    * @return Coriolis force vector.
    */
+  [[deprecated(
+      "Use coriolis(q, dq, i_total, m_total, f_x_ctotal, g_earth) instead")]] std::array<double, 7>
+  coriolis(const std::array<double, 7>& q,
+           const std::array<double, 7>& dq,
+           const std::array<double, 9>& I_total,  // NOLINT(readability-identifier-naming)
+           double m_total,
+           const std::array<double, 3>& F_x_Ctotal)  // NOLINT(readability-identifier-naming)
+      const noexcept;
+
+  /**
+   * Calculates the Coriolis force vector with gravity (faster implementation).
+   * Unit: \f$[Nm]\f$.
+   *
+   * @param[in] q Joint position.
+   * @param[in] dq Joint velocity.
+   * @param[in] I_total Inertia of the attached total load including end effector, relative to
+   * center of mass, given as vectorized 3x3 column-major matrix. Unit: \f$[kg \times m^2]\f$.
+   * @param[in] m_total Weight of the attached total load including end effector.
+   * Unit: \f$[kg]\f$.
+   * @param[in] F_x_Ctotal Translation from flange to center of mass of the attached total
+   load.
+   * Unit: \f$[m]\f$.
+   * @param[in] gravity_earth Earth's gravity vector. Unit: \f$\frac{m}{s^2}\f$.
+   *
+   * @return Coriolis force vector.
+   */
   std::array<double, 7> coriolis(
       const std::array<double, 7>& q,
       const std::array<double, 7>& dq,
       const std::array<double, 9>& I_total,  // NOLINT(readability-identifier-naming)
       double m_total,
-      const std::array<double, 3>& F_x_Ctotal)  // NOLINT(readability-identifier-naming)
-      const noexcept;
+      const std::array<double, 3>& F_x_Ctotal,  // NOLINT(readability-identifier-naming)
+      const std::array<double, 3>& gravity_earth) const noexcept;
 
   /**
    * Calculates the gravity vector. Unit: \f$[Nm]\f$.

@@ -36,6 +36,14 @@ class MockRobotModel : public RobotModelBase {
                     const double,
                     const std::array<double, 3>&,
                     std::array<double, 7>&));
+  MOCK_METHOD7(coriolis,
+               void(const std::array<double, 7>&,
+                    const std::array<double, 7>&,
+                    const std::array<double, 9>&,
+                    const double,
+                    const std::array<double, 3>&,
+                    const std::array<double, 3>&,
+                    std::array<double, 7>&));
   MOCK_METHOD5(gravity,
                void(const std::array<double, 7>&,
                     const std::array<double, 3>&,
