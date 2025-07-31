@@ -1,0 +1,14 @@
+<map id="include/franka/gripper_state.h" name="include/franka/gripper_state.h">
+<area shape="rect" id="Node000001" title="Contains the franka::GripperState type." alt="" coords="5,5,169,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="35,167,102,192"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,47,52,69,39,94,37,110,40,125,54,154,49,157,35,127,32,110,34,93,48,66,65,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="49,93,125,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="90,46,90,79,85,79,85,46"/>
+<area shape="rect" id="Node000004" href="$duration_8h.html" title="Contains the franka::Duration type." alt="" coords="150,93,283,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="120,43,187,84,185,88,117,48"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="194,121,106,163,104,158,192,116"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="141,167,207,192"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="212,120,190,156,186,154,207,118"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="232,167,284,192"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="226,118,247,153,242,156,221,120"/>
+</map>
