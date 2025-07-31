@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.15.3 - 2025-07-31
+
+* Fix outdated Emika links
+
 ## 0.15.2 - 2025-07-24
 
 * Optimize robot model computation
