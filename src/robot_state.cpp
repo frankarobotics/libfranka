@@ -79,6 +79,12 @@ std::ostream& operator<<(std::ostream& ostream, const franka::RobotState& robot_
           << ", \"O_dP_EE_c\": " << robot_state.O_dP_EE_c
           << ", \"O_ddP_EE_c\": " << robot_state.O_ddP_EE_c << ", \"theta\": " << robot_state.theta
           << ", \"dtheta\": " << robot_state.dtheta
+          << ", \"accelerometer_top_x\": " << robot_state.accelerometer_top_x
+          << ", \"accelerometer_top_y\": " << robot_state.accelerometer_top_y
+          << ", \"accelerometer_top_z\": " << robot_state.accelerometer_top_z
+          << ", \"accelerometer_bottom_x\": " << robot_state.accelerometer_bottom_x
+          << ", \"accelerometer_bottom_y\": " << robot_state.accelerometer_bottom_y
+          << ", \"accelerometer_bottom_z\": " << robot_state.accelerometer_bottom_z
           << ", \"current_errors\": " << robot_state.current_errors
           << ", \"last_motion_errors\": " << robot_state.last_motion_errors
           << ", \"control_command_success_rate\": " << robot_state.control_command_success_rate

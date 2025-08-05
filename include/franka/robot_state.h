@@ -369,6 +369,42 @@ struct RobotState {
   std::array<double, 7> dtheta{};
 
   /**
+   * \f$\dot{x}\f$
+   * Data from the top accelerometer in x direction. Unit: \f$[\frac{m}{s^2}]\f$
+   */
+  std::array<double, 7> accelerometer_top_x{};
+
+  /**
+   * \f$\dot{y}\f$
+   * Data from the top accelerometer in y direction. Unit: \f$[\frac{m}{s^2}]\f$
+   */
+  std::array<double, 7> accelerometer_top_y{};
+
+  /**
+   * \f$\dot{z}\f$
+   * Data from the top accelerometer in z direction. Unit: \f$[\frac{m}{s^2}]\f$
+   */
+  std::array<double, 7> accelerometer_top_z{};
+
+  /**
+   * \f$\dot{x}\f$
+   * Data from the bottom accelerometer in x direction. Unit: \f$[\frac{m}{s^2}]\f$
+   */
+  std::array<double, 7> accelerometer_bottom_x{};
+
+  /**
+   * \f$\dot{y}\f$
+   * Data from the bottom accelerometer in y direction. Unit: \f$[\frac{m}{s^2}]\f$
+   */
+  std::array<double, 7> accelerometer_bottom_y{};
+
+  /**
+   * \f$\dot{z}\f$
+   * Data from the bottom accelerometer in z direction. Unit: \f$[\frac{m}{s^2}]\f$
+   */
+  std::array<double, 7> accelerometer_bottom_z{};
+
+  /**
    * Current error state.
    */
   Errors current_errors{};
