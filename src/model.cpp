@@ -165,8 +165,8 @@ std::array<double, 49> franka::Model::mass(
   return output;
 }
 
-std::array<double, 7> franka::Model::coriolis(const franka::RobotState& robot_state) const
-    noexcept {
+std::array<double, 7> franka::Model::coriolis(
+    const franka::RobotState& robot_state) const noexcept {
   return coriolis(robot_state.q, robot_state.dq, robot_state.I_total, robot_state.m_total,
                   robot_state.F_x_Ctotal);
 }
@@ -184,9 +184,9 @@ std::array<double, 7> franka::Model::coriolis(
   return output;
 }
 
-std::array<double, 7> franka::Model::gravity(const franka::RobotState& robot_state,
-                                             const std::array<double, 3>& gravity_earth) const
-    noexcept {
+std::array<double, 7> franka::Model::gravity(
+    const franka::RobotState& robot_state,
+    const std::array<double, 3>& gravity_earth) const noexcept {
   return gravity(robot_state.q, robot_state.m_total, robot_state.F_x_Ctotal, gravity_earth);
 };
 
