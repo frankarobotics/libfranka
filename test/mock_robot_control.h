@@ -19,7 +19,9 @@ class MockRobotControl : public franka::RobotControl {
               (research_interface::robot::Move::ControllerMode,
                research_interface::robot::Move::MotionGeneratorMode,
                const research_interface::robot::Move::Deviation&,
-               const research_interface::robot::Move::Deviation&),
+               const research_interface::robot::Move::Deviation&,
+               bool,
+               const std::optional<std::vector<double>>&),
               (override));
   MOCK_METHOD(franka::RobotState,
               updateMotion,

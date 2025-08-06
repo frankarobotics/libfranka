@@ -19,6 +19,9 @@ using namespace research_interface::robot;
 using franka::ControlException;
 using franka::NetworkException;
 
+constexpr bool kUseNoAsyncMotionGenerator = false;
+const std::optional<std::vector<double>> kNoMaximumVelocities = std::nullopt;
+
 struct Robot : public ::franka::Robot {
   struct Impl : public ::franka::Robot::Impl {
     using ::franka::Robot::Impl::controllerRunning;
@@ -118,7 +121,8 @@ TEST_F(RobotImplTests, CanStartMotion) {
 
   EXPECT_NO_THROW(default_robot.startMotion(Move::ControllerMode::kJointImpedance,
                                             Move::MotionGeneratorMode::kJointPosition,
-                                            maximum_path_deviation, maximum_goal_pose_deviation));
+                                            maximum_path_deviation, maximum_goal_pose_deviation,
+                                            kUseNoAsyncMotionGenerator, kNoMaximumVelocities));
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
   EXPECT_FALSE(default_robot.controllerRunning());
 
@@ -179,7 +183,8 @@ TEST_F(RobotImplTests, CanStartMotionWithController) {
 
   EXPECT_NO_THROW(default_robot.startMotion(Move::ControllerMode::kExternalController,
                                             Move::MotionGeneratorMode::kCartesianPosition,
-                                            maximum_path_deviation, maximum_goal_pose_deviation));
+                                            maximum_path_deviation, maximum_goal_pose_deviation,
+                                            kUseNoAsyncMotionGenerator, kNoMaximumVelocities));
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
   EXPECT_TRUE(default_robot.controllerRunning());
 
@@ -221,7 +226,8 @@ TEST_F(RobotImplTests, CanStartExternalControllerMotion) {
 
   EXPECT_NO_THROW(default_robot.startMotion(Move::ControllerMode::kExternalController,
                                             Move::MotionGeneratorMode::kNone,
-                                            maximum_path_deviation, maximum_goal_pose_deviation));
+                                            maximum_path_deviation, maximum_goal_pose_deviation,
+                                            kUseNoAsyncMotionGenerator, kNoMaximumVelocities));
   ASSERT_FALSE(default_robot.motionGeneratorRunning());
   ASSERT_TRUE(default_robot.controllerRunning());
 
@@ -286,14 +292,17 @@ TEST_F(RobotImplTests, CanNotStartMultipleMotions) {
 
   EXPECT_NO_THROW(default_robot.startMotion(Move::ControllerMode::kJointImpedance,
                                             Move::MotionGeneratorMode::kJointVelocity,
-                                            maximum_path_deviation, maximum_goal_pose_deviation));
+                                            maximum_path_deviation, maximum_goal_pose_deviation,
+                                            kUseNoAsyncMotionGenerator, kNoMaximumVelocities));
   EXPECT_THROW(default_robot.startMotion(Move::ControllerMode::kCartesianImpedance,
                                          Move::MotionGeneratorMode::kJointPosition,
-                                         maximum_path_deviation, maximum_goal_pose_deviation),
+                                         maximum_path_deviation, maximum_goal_pose_deviation,
+                                         kUseNoAsyncMotionGenerator, kNoMaximumVelocities),
                ControlException);
   EXPECT_THROW(default_robot.startMotion(Move::ControllerMode::kExternalController,
                                          Move::MotionGeneratorMode::kJointVelocity,
-                                         maximum_path_deviation, maximum_goal_pose_deviation),
+                                         maximum_path_deviation, maximum_goal_pose_deviation,
+                                         kUseNoAsyncMotionGenerator, kNoMaximumVelocities),
                ControlException);
 }
 
@@ -319,7 +328,8 @@ TEST_F(RobotImplTests, CanSendMotionGeneratorCommand) {
 
   default_robot.startMotion(Move::ControllerMode::kJointImpedance,
                             Move::MotionGeneratorMode::kJointVelocity, maximum_path_deviation,
-                            maximum_goal_pose_deviation);
+                            maximum_goal_pose_deviation, kUseNoAsyncMotionGenerator,
+                            kNoMaximumVelocities);
 
   default_server
       .onSendUDP<RobotState>([=](RobotState& robot_state) {
@@ -366,7 +376,8 @@ TEST_F(RobotImplTests, CanSendControllerCommand) {
 
   EXPECT_NO_THROW(default_robot.startMotion(Move::ControllerMode::kExternalController,
                                             Move::MotionGeneratorMode::kJointVelocity,
-                                            maximum_path_deviation, maximum_goal_pose_deviation));
+                                            maximum_path_deviation, maximum_goal_pose_deviation,
+                                            kUseNoAsyncMotionGenerator, kNoMaximumVelocities));
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
   EXPECT_TRUE(default_robot.controllerRunning());
 
@@ -410,7 +421,8 @@ TEST_F(RobotImplTests, CanSendMotionGeneratorAndControlCommand) {
 
   default_robot.startMotion(Move::ControllerMode::kExternalController,
                             Move::MotionGeneratorMode::kCartesianPosition, maximum_path_deviation,
-                            maximum_goal_pose_deviation);
+                            maximum_goal_pose_deviation, kUseNoAsyncMotionGenerator,
+                            kNoMaximumVelocities);
 
   default_server
       .onSendUDP<RobotState>([=](RobotState& robot_state) {
@@ -472,7 +484,8 @@ TEST(RobotImplTest, CanReceiveMotionRejected) {
 
     EXPECT_THROW(robot.startMotion(Move::ControllerMode::kCartesianImpedance,
                                    Move::MotionGeneratorMode::kCartesianVelocity,
-                                   maximum_path_deviation, maximum_goal_pose_deviation),
+                                   maximum_path_deviation, maximum_goal_pose_deviation,
+                                   kUseNoAsyncMotionGenerator, kNoMaximumVelocities),
                  ControlException);
     send.clear();
     EXPECT_FALSE(robot.motionGeneratorRunning());
@@ -502,7 +515,8 @@ TEST_F(RobotImplTests, CanStopMotion) {
 
   auto id = default_robot.startMotion(Move::ControllerMode::kCartesianImpedance,
                                       Move::MotionGeneratorMode::kCartesianVelocity,
-                                      maximum_path_deviation, maximum_goal_pose_deviation);
+                                      maximum_path_deviation, maximum_goal_pose_deviation,
+                                      kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
 
   default_server
@@ -557,7 +571,8 @@ TEST_F(RobotImplTests, StopMotionErrorThrowsControlException) {
 
   auto id = default_robot.startMotion(Move::ControllerMode::kCartesianImpedance,
                                       Move::MotionGeneratorMode::kCartesianVelocity,
-                                      maximum_path_deviation, maximum_goal_pose_deviation);
+                                      maximum_path_deviation, maximum_goal_pose_deviation,
+                                      kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
 
   default_server
@@ -609,7 +624,8 @@ TEST_F(RobotImplTests, CanCancelMotion) {
 
   auto id = default_robot.startMotion(Move::ControllerMode::kCartesianImpedance,
                                       Move::MotionGeneratorMode::kCartesianVelocity,
-                                      maximum_path_deviation, maximum_goal_pose_deviation);
+                                      maximum_path_deviation, maximum_goal_pose_deviation,
+                                      kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
 
   default_server
@@ -654,7 +670,8 @@ TEST(RobotImplTest, CancelMotionErrorThrowsControlException) {
 
   auto id = robot.startMotion(Move::ControllerMode::kCartesianImpedance,
                               Move::MotionGeneratorMode::kCartesianVelocity, maximum_path_deviation,
-                              maximum_goal_pose_deviation);
+                              maximum_goal_pose_deviation, kUseNoAsyncMotionGenerator,
+                              kNoMaximumVelocities);
   EXPECT_TRUE(robot.motionGeneratorRunning());
 
   server
@@ -691,7 +708,8 @@ TEST_F(RobotImplTests, CanStopMotionWithController) {
 
   auto id = default_robot.startMotion(Move::ControllerMode::kExternalController,
                                       Move::MotionGeneratorMode::kCartesianVelocity,
-                                      maximum_path_deviation, maximum_goal_pose_deviation);
+                                      maximum_path_deviation, maximum_goal_pose_deviation,
+                                      kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
   EXPECT_TRUE(default_robot.controllerRunning());
 
@@ -747,7 +765,8 @@ TEST_F(RobotImplTests, ThrowsDuringMotionIfErrorReceived) {
 
   auto id = default_robot.startMotion(Move::ControllerMode::kJointImpedance,
                                       Move::MotionGeneratorMode::kJointPosition,
-                                      maximum_path_deviation, maximum_goal_pose_deviation);
+                                      maximum_path_deviation, maximum_goal_pose_deviation,
+                                      kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
 
   auto motion_command = std::optional<MotionGeneratorCommand>{MotionGeneratorCommand{}};
@@ -796,7 +815,8 @@ TEST_F(RobotImplTests, ThrowsDuringControlIfErrorReceived) {
 
   auto id = default_robot.startMotion(Move::ControllerMode::kExternalController,
                                       Move::MotionGeneratorMode::kJointVelocity,
-                                      maximum_path_deviation, maximum_goal_pose_deviation);
+                                      maximum_path_deviation, maximum_goal_pose_deviation,
+                                      kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
   EXPECT_TRUE(default_robot.controllerRunning());
 
@@ -843,7 +863,8 @@ TEST_F(RobotImplTests, CanStartConsecutiveMotion) {
     EXPECT_FALSE(default_robot.motionGeneratorRunning());
     auto id = default_robot.startMotion(Move::ControllerMode::kCartesianImpedance,
                                         Move::MotionGeneratorMode::kCartesianVelocity,
-                                        maximum_path_deviation, maximum_goal_pose_deviation);
+                                        maximum_path_deviation, maximum_goal_pose_deviation,
+                                        kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
     EXPECT_TRUE(default_robot.motionGeneratorRunning());
 
     default_server
@@ -896,7 +917,8 @@ TEST_F(RobotImplTests, CanStartConsecutiveMotionAfterError) {
 
   auto id = default_robot.startMotion(Move::ControllerMode::kJointImpedance,
                                       Move::MotionGeneratorMode::kJointPosition,
-                                      maximum_path_deviation, maximum_goal_pose_deviation);
+                                      maximum_path_deviation, maximum_goal_pose_deviation,
+                                      kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
 
   auto motion_command = std::optional<MotionGeneratorCommand>{MotionGeneratorCommand{}};
@@ -929,7 +951,8 @@ TEST_F(RobotImplTests, CanStartConsecutiveMotionAfterError) {
 
   default_robot.startMotion(Move::ControllerMode::kJointImpedance,
                             Move::MotionGeneratorMode::kJointPosition, maximum_path_deviation,
-                            maximum_goal_pose_deviation);
+                            maximum_goal_pose_deviation, kUseNoAsyncMotionGenerator,
+                            kNoMaximumVelocities);
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
 }
 
@@ -955,7 +978,8 @@ TEST_F(RobotImplTests, CanStartConsecutiveControlAfterError) {
 
   auto id = default_robot.startMotion(Move::ControllerMode::kExternalController,
                                       Move::MotionGeneratorMode::kCartesianVelocity,
-                                      maximum_path_deviation, maximum_goal_pose_deviation);
+                                      maximum_path_deviation, maximum_goal_pose_deviation,
+                                      kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
   EXPECT_TRUE(default_robot.controllerRunning());
 
@@ -993,7 +1017,8 @@ TEST_F(RobotImplTests, CanStartConsecutiveControlAfterError) {
 
   default_robot.startMotion(Move::ControllerMode::kExternalController,
                             Move::MotionGeneratorMode::kCartesianVelocity, maximum_path_deviation,
-                            maximum_goal_pose_deviation);
+                            maximum_goal_pose_deviation, kUseNoAsyncMotionGenerator,
+                            kNoMaximumVelocities);
   EXPECT_TRUE(default_robot.motionGeneratorRunning());
   EXPECT_TRUE(default_robot.controllerRunning());
 }
@@ -1050,7 +1075,8 @@ TEST(RobotImplLoggingTests, LogMadeIfErrorReceived) {
 
   auto id = robot_with_logs.startMotion(Move::ControllerMode::kExternalController,
                                         Move::MotionGeneratorMode::kJointPosition,
-                                        maximum_path_deviation, maximum_goal_pose_deviation);
+                                        maximum_path_deviation, maximum_goal_pose_deviation,
+                                        kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   ASSERT_TRUE(robot_with_logs.motionGeneratorRunning());
 
   for (size_t i = 0; i < commands_sent_in_loop; i++) {
@@ -1149,7 +1175,8 @@ TEST(RobotImplLoggingTests, LogShowsOnlyTheLastMotion) {
 
   auto id = robot_with_logs.startMotion(Move::ControllerMode::kExternalController,
                                         Move::MotionGeneratorMode::kJointPosition,
-                                        maximum_path_deviation, maximum_goal_pose_deviation);
+                                        maximum_path_deviation, maximum_goal_pose_deviation,
+                                        kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   ASSERT_TRUE(robot_with_logs.motionGeneratorRunning());
   for (size_t i = 0; i < commands_sent_first_loop; i++) {
     server
@@ -1205,7 +1232,8 @@ TEST(RobotImplLoggingTests, LogShowsOnlyTheLastMotion) {
 
   id = robot_with_logs.startMotion(Move::ControllerMode::kExternalController,
                                    Move::MotionGeneratorMode::kJointPosition,
-                                   maximum_path_deviation, maximum_goal_pose_deviation);
+                                   maximum_path_deviation, maximum_goal_pose_deviation,
+                                   kUseNoAsyncMotionGenerator, kNoMaximumVelocities);
   ASSERT_TRUE(robot_with_logs.motionGeneratorRunning());
 
   for (size_t i = 0; i < commands_sent_second_loop; i++) {
