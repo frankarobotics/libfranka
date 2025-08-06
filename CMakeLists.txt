@@ -227,13 +227,11 @@ include(CPack)
 file(GLOB_RECURSE SOURCES
   src/*.cpp
   examples/*.cpp
-  common/*.cpp
 )
 file(GLOB_RECURSE HEADERS
   include/*.h
   src/*.h
   examples/*.h
-  common/*.h
 )
 file(GLOB_RECURSE TEST_FILES
   test/*.h

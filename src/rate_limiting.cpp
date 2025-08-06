@@ -60,7 +60,7 @@ std::array<double, 7> limitRate(const std::array<double, 7>& max_derivatives,
                                 const std::array<double, 7>& commanded_values,
                                 const std::array<double, 7>& last_commanded_values) {
   if (!std::all_of(commanded_values.begin(), commanded_values.end(),
-                   [](double d) { return std::isfinite(d); })) {
+                   [](double commanded_value) { return std::isfinite(commanded_value); })) {
     throw std::invalid_argument("Commanding value is infinite or NaN.");
   }
   std::array<double, 7> limited_values{};
@@ -132,7 +132,7 @@ std::array<double, 7> limitRate(const std::array<double, 7>& upper_limits_veloci
                                 const std::array<double, 7>& last_commanded_velocities,
                                 const std::array<double, 7>& last_commanded_accelerations) {
   if (!std::all_of(commanded_velocities.begin(), commanded_velocities.end(),
-                   [](double d) { return std::isfinite(d); })) {
+                   [](double commanded_value) { return std::isfinite(commanded_value); })) {
     throw std::invalid_argument("commanded_velocities is infinite or NaN.");
   }
   std::array<double, 7> limited_commanded_velocities{};
@@ -154,7 +154,7 @@ std::array<double, 7> limitRate(const std::array<double, 7>& upper_limits_veloci
                                 const std::array<double, 7>& last_commanded_velocities,
                                 const std::array<double, 7>& last_commanded_accelerations) {
   if (!std::all_of(commanded_positions.begin(), commanded_positions.end(),
-                   [](double d) { return std::isfinite(d); })) {
+                   [](double commanded_value) { return std::isfinite(commanded_value); })) {
     throw std::invalid_argument("commanded_positions is infinite or NaN.");
   }
   std::array<double, 7> limited_commanded_positions{};
@@ -177,10 +177,11 @@ std::array<double, 6> limitRate(
     const std::array<double, 6>& O_dP_EE_c,          // NOLINT(readability-identifier-naming)
     const std::array<double, 6>& last_O_dP_EE_c,     // NOLINT(readability-identifier-naming)
     const std::array<double, 6>& last_O_ddP_EE_c) {  // NOLINT(readability-identifier-naming)
-  if (!std::all_of(O_dP_EE_c.begin(), O_dP_EE_c.end(), [](double d) { return std::isfinite(d); })) {
+  if (!std::all_of(O_dP_EE_c.begin(), O_dP_EE_c.end(),
+                   [](double commanded_value) { return std::isfinite(commanded_value); })) {
     throw std::invalid_argument("O_dP_EE_c is infinite or NaN.");
   }
-  Eigen::Matrix<double, 6, 1> dx(O_dP_EE_c.data());
+  Eigen::Matrix<double, 6, 1> dx(O_dP_EE_c.data());  // NOLINT(readability-identifier-length)
   Eigen::Matrix<double, 6, 1> last_dx(last_O_dP_EE_c.data());
   Eigen::Matrix<double, 6, 1> last_ddx(last_O_ddP_EE_c.data());
 
@@ -190,7 +191,7 @@ std::array<double, 6> limitRate(
                           dx.tail(3), last_dx.tail(3), last_ddx.tail(3));
 
   std::array<double, 6> limited_values{};
-  Eigen::Map<Eigen::Matrix<double, 6, 1>>(&limited_values[0], 6, 1) = dx;
+  Eigen::Map<Eigen::Matrix<double, 6, 1>>(limited_values.data(), 6, 1) = dx;
   return limited_values;
 }
 
@@ -205,14 +206,15 @@ std::array<double, 16> limitRate(
     const std::array<double, 16>& last_O_T_EE_c,     // NOLINT(readability-identifier-naming)
     const std::array<double, 6>& last_O_dP_EE_c,     // NOLINT(readability-identifier-naming)
     const std::array<double, 6>& last_O_ddP_EE_c) {  // NOLINT(readability-identifier-naming)
-  if (!std::all_of(O_T_EE_c.begin(), O_T_EE_c.end(), [](double d) { return std::isfinite(d); })) {
+  if (!std::all_of(O_T_EE_c.begin(), O_T_EE_c.end(),
+                   [](double value) { return std::isfinite(value); })) {
     throw std::invalid_argument("O_T_EE_c is infinite or NaN.");
   }
   if (!isHomogeneousTransformation(O_T_EE_c)) {
     throw std::invalid_argument(
         "O_T_EE_c is invalid transformation matrix. Has to be column major!");
   }
-  Eigen::Matrix<double, 6, 1> dx;
+  Eigen::Matrix<double, 6, 1> dx;  // NOLINT(readability-identifier-length)
   Eigen::Affine3d commanded_pose(Eigen::Matrix4d::Map(O_T_EE_c.data()));
   Eigen::Affine3d limited_commanded_pose = Eigen::Affine3d::Identity();
   Eigen::Affine3d last_commanded_pose(Eigen::Matrix4d::Map(last_O_T_EE_c.data()));
@@ -227,7 +229,7 @@ std::array<double, 16> limitRate(
 
   // Limit the rate of the twist
   std::array<double, 6> commanded_O_dP_EE_c{};  // NOLINT(readability-identifier-naming)
-  Eigen::Map<Eigen::Matrix<double, 6, 1>>(&commanded_O_dP_EE_c[0], 6, 1) = dx;
+  Eigen::Map<Eigen::Matrix<double, 6, 1>>(commanded_O_dP_EE_c.data(), 6, 1) = dx;
   commanded_O_dP_EE_c =
       limitRate(max_translational_velocity, max_translational_acceleration, max_translational_jerk,
                 kFactorCartesianRotationPoseInterface * max_rotational_velocity,
@@ -245,13 +247,13 @@ std::array<double, 16> limitRate(
     double theta = kDeltaT * dx.tail(3).norm();
     omega_skew << 0, -w_norm(2), w_norm(1), w_norm(2), 0, -w_norm(0), -w_norm(1), w_norm(0), 0;
     // NOLINTNEXTLINE(readability-identifier-naming)
-    Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + sin(theta) * omega_skew +
-                        (1.0 - cos(theta)) * (omega_skew * omega_skew);
-    limited_commanded_pose.linear() << R * last_commanded_pose.rotation();
+    Eigen::Matrix3d rotation = Eigen::Matrix3d::Identity() + sin(theta) * omega_skew +
+                               (1.0 - cos(theta)) * (omega_skew * omega_skew);
+    limited_commanded_pose.linear() << rotation * last_commanded_pose.rotation();
   }
 
   std::array<double, 16> limited_values{};
-  Eigen::Map<Eigen::Matrix4d>(&limited_values[0], 4, 4) = limited_commanded_pose.matrix();
+  Eigen::Map<Eigen::Matrix4d>(limited_values.data(), 4, 4) = limited_commanded_pose.matrix();
   return limited_values;
 }
 

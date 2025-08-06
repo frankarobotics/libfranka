@@ -5,10 +5,10 @@
 
 #include <franka/logging/logger.hpp>
 
-namespace franka {
-namespace logging {
+namespace franka::logging {
 
-std::map<std::string, std::shared_ptr<LoggingSinkInterface>> loggers;
+std::map<std::string, std::shared_ptr<LoggingSinkInterface>>
+    loggers;  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 auto addLogger(const std::shared_ptr<LoggingSinkInterface>& logger) -> void {
   loggers.emplace(logger->getName(), logger);
@@ -40,5 +40,4 @@ auto logError(const std::string& message) -> void {
   }
 }
 
-}  // namespace logging
-}  // namespace franka
+}  // namespace franka::logging

@@ -205,24 +205,24 @@ class Robot::Impl : public RobotControl {
    * @param urdf_model the stringified URDF model
    * @return Model the loaded model
    */
-  Model loadModel(const std::string& urdf_model) const;
+  static Model loadModel(const std::string& urdf_model);
 
   // for the unit tests
-  Model loadModel(std::unique_ptr<RobotModelBase> robot_model) const;
+  static Model loadModel(std::unique_ptr<RobotModelBase> robot_model);
 
-  research_interface::robot::ControllerCommand createControllerCommand(
+  static research_interface::robot::ControllerCommand createControllerCommand(
       const Torques& control_input);
 
-  research_interface::robot::MotionGeneratorCommand createMotionCommand(
+  static research_interface::robot::MotionGeneratorCommand createMotionCommand(
       const JointPositions& motion_input);
 
-  research_interface::robot::MotionGeneratorCommand createMotionCommand(
+  static research_interface::robot::MotionGeneratorCommand createMotionCommand(
       const JointVelocities& motion_input);
 
-  research_interface::robot::MotionGeneratorCommand createMotionCommand(
+  static research_interface::robot::MotionGeneratorCommand createMotionCommand(
       const CartesianPose& motion_input);
 
-  research_interface::robot::MotionGeneratorCommand createMotionCommand(
+  static research_interface::robot::MotionGeneratorCommand createMotionCommand(
       const CartesianVelocities& motion_input);
 
  protected:
@@ -239,13 +239,13 @@ class Robot::Impl : public RobotControl {
   void writeOnce(const MotionGeneratorType& motion_generator_input, const Torques& control_input);
 
   std::string commandNotPossibleMsg() const {
-    std::stringstream ss;
-    ss << " command rejected: command not possible in the current mode ("
-       << static_cast<franka::RobotMode>(robot_mode_) << ")!";
+    std::stringstream stringstream;
+    stringstream << " command rejected: command not possible in the current mode ("
+                 << static_cast<franka::RobotMode>(robot_mode_) << ")!";
     if (robot_mode_ == research_interface::robot::RobotMode::kOther) {
-      ss << " Did you open the brakes?";
+      stringstream << " Did you open the brakes?";
     }
-    return ss.str();
+    return stringstream.str();
   }
 
   template <typename T>

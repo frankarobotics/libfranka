@@ -87,7 +87,7 @@ class ActiveControl : public ActiveControlBase {
   std::unique_lock<std::mutex> control_lock;
 
   /// flag indicating if control process is finished
-  bool control_finished;
+  bool control_finished{false};
 
   /// duration to last read access
   std::optional<Duration> last_read_access;

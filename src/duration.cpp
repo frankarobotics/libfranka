@@ -4,7 +4,7 @@
 
 namespace franka {
 
-Duration::Duration() noexcept : duration_{0u} {}
+Duration::Duration() noexcept : duration_{0U} {}
 
 Duration::Duration(std::chrono::duration<uint64_t, std::milli> duration) noexcept
     : duration_{duration} {}

@@ -33,7 +33,8 @@ int main(int argc, char** argv) {
   // Compliance parameters
   const double translational_stiffness{150.0};
   const double rotational_stiffness{10.0};
-  Eigen::MatrixXd stiffness(6, 6), damping(6, 6);
+  Eigen::MatrixXd stiffness(6, 6);
+  Eigen::MatrixXd damping(6, 6);
   stiffness.setZero();
   stiffness.topLeftCorner(3, 3) << translational_stiffness * Eigen::MatrixXd::Identity(3, 3);
   stiffness.bottomRightCorner(3, 3) << rotational_stiffness * Eigen::MatrixXd::Identity(3, 3);
@@ -75,8 +76,7 @@ int main(int argc, char** argv) {
       // convert to Eigen
       Eigen::Map<const Eigen::Matrix<double, 7, 1>> coriolis(coriolis_array.data());
       Eigen::Map<const Eigen::Matrix<double, 6, 7>> jacobian(jacobian_array.data());
-      Eigen::Map<const Eigen::Matrix<double, 7, 1>> q(robot_state.q.data());
-      Eigen::Map<const Eigen::Matrix<double, 7, 1>> dq(robot_state.dq.data());
+      Eigen::Map<const Eigen::Matrix<double, 7, 1>> joint_velocity(robot_state.dq.data());
       Eigen::Affine3d transform(Eigen::Matrix4d::Map(robot_state.O_T_EE.data()));
       Eigen::Vector3d position(transform.translation());
       Eigen::Quaterniond orientation(transform.rotation());
@@ -98,14 +98,16 @@ int main(int argc, char** argv) {
       error.tail(3) << -transform.rotation() * error.tail(3);
 
       // compute control
-      Eigen::VectorXd tau_task(7), tau_d(7);
+      Eigen::VectorXd tau_task(7);
+      Eigen::VectorXd tau_d(7);
 
       // Spring damper system with damping ratio=1
-      tau_task << jacobian.transpose() * (-stiffness * error - damping * (jacobian * dq));
+      tau_task << jacobian.transpose() *
+                      (-stiffness * error - damping * (jacobian * joint_velocity));
       tau_d << tau_task + coriolis;
 
       std::array<double, 7> tau_d_array{};
-      Eigen::VectorXd::Map(&tau_d_array[0], 7) = tau_d;
+      Eigen::VectorXd::Map(tau_d_array.data(), 7) = tau_d;
       return tau_d_array;
     };
 

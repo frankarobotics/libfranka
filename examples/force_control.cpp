@@ -49,7 +49,8 @@ int main(int argc, char** argv) {
 
     franka::RobotState initial_state = robot.readOnce();
 
-    Eigen::VectorXd initial_tau_ext(7), tau_error_integral(7);
+    Eigen::VectorXd initial_tau_ext(7);
+    Eigen::VectorXd tau_error_integral(7);
     // Bias torque sensor
     std::array<double, 7> gravity_array = model.gravity(initial_state);
     Eigen::Map<Eigen::Matrix<double, 7, 1>> initial_tau_measured(initial_state.tau_J.data());
@@ -86,7 +87,10 @@ int main(int argc, char** argv) {
       Eigen::Map<const Eigen::Matrix<double, 7, 1>> tau_measured(robot_state.tau_J.data());
       Eigen::Map<const Eigen::Matrix<double, 7, 1>> gravity(gravity_array.data());
 
-      Eigen::VectorXd tau_d(7), desired_force_torque(6), tau_cmd(7), tau_ext(7);
+      Eigen::VectorXd tau_d(7);
+      Eigen::VectorXd desired_force_torque(6);
+      Eigen::VectorXd tau_cmd(7);
+      Eigen::VectorXd tau_ext(7);
       desired_force_torque.setZero();
       desired_force_torque(2) = desired_mass * -9.81;
       tau_ext << tau_measured - gravity - initial_tau_ext;
@@ -99,7 +103,7 @@ int main(int argc, char** argv) {
       desired_mass = filter_gain * target_mass + (1 - filter_gain) * desired_mass;
 
       std::array<double, 7> tau_d_array{};
-      Eigen::VectorXd::Map(&tau_d_array[0], 7) = tau_cmd;
+      Eigen::VectorXd::Map(tau_d_array.data(), 7) = tau_cmd;
       return tau_d_array;
     };
     std::cout << "WARNING: Make sure sure that no endeffector is mounted and that the robot's last "

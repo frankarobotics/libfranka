@@ -15,7 +15,7 @@ Network::Network(const std::string& franka_address,
                  std::chrono::milliseconds udp_timeout,
                  std::tuple<bool, int, int, int> tcp_keepalive) {
   try {
-    Poco::Timespan poco_timeout(1000l * tcp_timeout.count());
+    Poco::Timespan poco_timeout(1000L * tcp_timeout.count());
     Poco::Net::SocketAddress address(franka_address, franka_port);
 
     tcp_socket_.connect(address, poco_timeout);
@@ -34,7 +34,7 @@ Network::Network(const std::string& franka_address,
     }
 
     udp_socket_.bind({"0.0.0.0", 0});
-    udp_socket_.setReceiveTimeout(Poco::Timespan{1000l * udp_timeout.count()});
+    udp_socket_.setReceiveTimeout(Poco::Timespan{1000L * udp_timeout.count()});
     udp_port_ = udp_socket_.address().port();
   } catch (const Poco::Net::ConnectionRefusedException& e) {
     throw NetworkException(
@@ -71,9 +71,10 @@ void Network::tcpThrowIfConnectionClosed() try {
   }
   if (tcp_socket_.poll(0, Poco::Net::Socket::SELECT_READ)) {
     std::array<uint8_t, 1> buffer;
-    int rv = tcp_socket_.receiveBytes(buffer.data(), static_cast<int>(buffer.size()), MSG_PEEK);
+    int received_bytes =
+        tcp_socket_.receiveBytes(buffer.data(), static_cast<int>(buffer.size()), MSG_PEEK);
 
-    if (rv == 0) {
+    if (received_bytes == 0) {
       throw NetworkException("libfranka: server closed connection");
     }
   }

@@ -38,7 +38,7 @@ std::ostream& operator<<(std::ostream& ostream, const std::array<T, N>& array) {
  * thread to avoid blocking print functions in the real-time loop.
  */
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) {  // NOLINT(readability-function-cognitive-complexity)
   // Check whether the required arguments were passed.
   if (argc != 2) {
     std::cerr << "Usage: " << argv[0] << " <robot-hostname>" << std::endl;

@@ -78,7 +78,7 @@ ControlLoop<MotionControlType>::ControlLoop(RobotControl& robot,
     throw std::invalid_argument("libfranka: Invalid motion callback given.");
   }
 
-  research_interface::robot::Move::ControllerMode mode;
+  research_interface::robot::Move::ControllerMode mode{};
   switch (controller_mode) {
     case ControllerMode::kJointImpedance:
       mode = decltype(mode)::kJointImpedance;
@@ -276,9 +276,9 @@ void ControlLoop<CartesianPose>::convertMotion(
           lowpassFilter(kDeltaT, command.elbow_c[0], previous_elbow_pose[0], cutoff_frequency_);
     }
     if (limit_rate_) {
-      command.elbow_c[0] =
-          limitRate(kMaxElbowVelocity, kMaxElbowAcceleration, kMaxElbowJerk, command.elbow_c[0],
-                    robot_state.elbow_c[0], robot_state.delbow_c[0], robot_state.ddelbow_c[0]);
+      command.elbow_c[0] = limitRate(kMaxElbowVelocity, kMinElbowVelocity, kMaxElbowAcceleration,
+                                     kMaxElbowJerk, command.elbow_c[0], robot_state.elbow_c[0],
+                                     robot_state.delbow_c[0], robot_state.ddelbow_c[0]);
     }
     checkElbow(command.elbow_c);
   } else {
@@ -315,9 +315,9 @@ void ControlLoop<CartesianVelocities>::convertMotion(
           lowpassFilter(kDeltaT, command.elbow_c[0], robot_state.elbow_c[0], cutoff_frequency_);
     }
     if (limit_rate_) {
-      command.elbow_c[0] =
-          limitRate(kMaxElbowVelocity, kMaxElbowAcceleration, kMaxElbowJerk, command.elbow_c[0],
-                    robot_state.elbow_c[0], robot_state.delbow_c[0], robot_state.ddelbow_c[0]);
+      command.elbow_c[0] = limitRate(kMaxElbowVelocity, kMinElbowVelocity, kMaxElbowAcceleration,
+                                     kMaxElbowJerk, command.elbow_c[0], robot_state.elbow_c[0],
+                                     robot_state.delbow_c[0], robot_state.ddelbow_c[0]);
     }
     checkElbow(command.elbow_c);
   } else {

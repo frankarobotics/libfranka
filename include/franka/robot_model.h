@@ -29,43 +29,58 @@ namespace franka {
 class RobotModel : public RobotModelBase {
  public:
   RobotModel(const std::string& urdf);
-  void coriolis(const std::array<double, 7>& q,
-                const std::array<double, 7>& dq,
+  void coriolis(const std::array<double, 7>& q,   // NOLINT(readability-identifier-length)
+                const std::array<double, 7>& dq,  // NOLINT(readability-identifier-length)
                 const std::array<double, 9>& i_total,
                 double m_total,
                 const std::array<double, 3>& f_x_ctotal,
                 std::array<double, 7>& c_ne) override;
-  void gravity(const std::array<double, 7>& q,
+  void gravity(const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
                const std::array<double, 3>& g_earth,
                double m_total,
                const std::array<double, 3>& f_x_ctotal,
                std::array<double, 7>& g_ne) override;
-  void mass(const std::array<double, 7>& q,
+  void mass(const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
             const std::array<double, 9>& i_total,
             double m_total,
             const std::array<double, 3>& f_x_ctotal,
             std::array<double, 49>& m_ne) override;
-  std::array<double, 16> pose(const std::array<double, 7>& q, int joint_index) override;
-  std::array<double, 16> poseEe(const std::array<double, 7>& q,
-                                const std::array<double, 16>& f_t_ee) override;
-  std::array<double, 16> poseFlange(const std::array<double, 7>& q) override;
-  std::array<double, 16> poseStiffness(const std::array<double, 7>& q,
-                                       const std::array<double, 16>& f_t_ee,
-                                       const std::array<double, 16>& ee_t_k) override;
-  std::array<double, 42> bodyJacobian(const std::array<double, 7>& q, int joint_index) override;
-  std::array<double, 42> bodyJacobianFlange(const std::array<double, 7>& q) override;
-  std::array<double, 42> bodyJacobianEe(const std::array<double, 7>& q,
-                                        const std::array<double, 16>& f_t_ee) override;
-  std::array<double, 42> bodyJacobianStiffness(const std::array<double, 7>& q,
-                                               const std::array<double, 16>& f_t_ee,
-                                               const std::array<double, 16>& ee_t_k) override;
-  std::array<double, 42> zeroJacobian(const std::array<double, 7>& q, int joint_index) override;
-  std::array<double, 42> zeroJacobianFlange(const std::array<double, 7>& q) override;
-  std::array<double, 42> zeroJacobianEe(const std::array<double, 7>& q,
-                                        const std::array<double, 16>& f_t_ee) override;
-  std::array<double, 42> zeroJacobianStiffness(const std::array<double, 7>& q,
-                                               const std::array<double, 16>& f_t_ee,
-                                               const std::array<double, 16>& ee_t_k) override;
+  std::array<double, 16> pose(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      int joint_index) override;
+  std::array<double, 16> poseEe(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee) override;
+  std::array<double, 16> poseFlange(
+      const std::array<double, 7>& q) override;  // NOLINT(readability-identifier-length)
+  std::array<double, 16> poseStiffness(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee,
+      const std::array<double, 16>& ee_t_k) override;
+  std::array<double, 42> bodyJacobian(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      int joint_index) override;
+  std::array<double, 42> bodyJacobianFlange(
+      const std::array<double, 7>& q) override;  // NOLINT(readability-identifier-length)
+  std::array<double, 42> bodyJacobianEe(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee) override;
+  std::array<double, 42> bodyJacobianStiffness(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee,
+      const std::array<double, 16>& ee_t_k) override;
+  std::array<double, 42> zeroJacobian(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      int joint_index) override;
+  std::array<double, 42> zeroJacobianFlange(
+      const std::array<double, 7>& q) override;  // NOLINT(readability-identifier-length)
+  std::array<double, 42> zeroJacobianEe(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee) override;
+  std::array<double, 42> zeroJacobianStiffness(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee,
+      const std::array<double, 16>& ee_t_k) override;
 
  private:
   /**
@@ -91,21 +106,22 @@ class RobotModel : public RobotModelBase {
    * @param q Joint positions
    * @return Pinocchio data object with forward kinematics results
    */
-  pinocchio::Data computeForwardKinematics(const std::array<double, 7>& q) const;
+  pinocchio::Data computeForwardKinematics(
+      const std::array<double, 7>& q) const;  // NOLINT(readability-identifier-length)
 
   /**
    * @brief Helper function to convert Eigen Matrix4d to std::array<double, 16>
    * @param matrix The Eigen matrix to convert
    * @return Array representation of the matrix
    */
-  std::array<double, 16> eigenToArray(const Eigen::Matrix4d& matrix) const;
+  static std::array<double, 16> eigenToArray(const Eigen::Matrix4d& matrix);
 
   /**
    * @brief Helper function to convert Eigen Matrix6x7d to std::array<double, 42>
    * @param matrix The Eigen matrix to convert
    * @return Array representation of the matrix
    */
-  std::array<double, 42> eigenToArray(const Eigen::Matrix<double, 6, 7>& matrix) const;
+  static std::array<double, 42> eigenToArray(const Eigen::Matrix<double, 6, 7>& matrix);
 
   /**
    * @brief Adds a new frame to the Pinocchio model
@@ -126,10 +142,11 @@ class RobotModel : public RobotModelBase {
    * @param reference_frame The reference frame type (LOCAL or LOCAL_WORLD_ALIGNED)
    * @return The computed Jacobian as a std::array<double, 42>
    */
-  std::array<double, 42> computeJacobian(const std::array<double, 7>& q,
-                                         int frame_or_joint_index,
-                                         bool is_joint,
-                                         pinocchio::ReferenceFrame reference_frame);
+  std::array<double, 42> computeJacobian(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      int frame_or_joint_index,
+      bool is_joint,
+      pinocchio::ReferenceFrame reference_frame);
 
   /**
    * @brief Prepares and computes a Jacobian for the end-effector frame
@@ -138,9 +155,10 @@ class RobotModel : public RobotModelBase {
    * @param reference_frame The reference frame type (LOCAL or LOCAL_WORLD_ALIGNED)
    * @return The computed Jacobian as a std::array<double, 42>
    */
-  std::array<double, 42> computeEeJacobian(const std::array<double, 7>& q,
-                                           const std::array<double, 16>& f_t_ee,
-                                           pinocchio::ReferenceFrame reference_frame);
+  std::array<double, 42> computeEeJacobian(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee,
+      pinocchio::ReferenceFrame reference_frame);
 
   /**
    * @brief Prepares and computes a Jacobian for the stiffness frame
@@ -150,10 +168,11 @@ class RobotModel : public RobotModelBase {
    * @param reference_frame The reference frame type (LOCAL or LOCAL_WORLD_ALIGNED)
    * @return The computed Jacobian as a std::array<double, 42>
    */
-  std::array<double, 42> computeStiffnessJacobian(const std::array<double, 7>& q,
-                                                  const std::array<double, 16>& f_t_ee,
-                                                  const std::array<double, 16>& ee_t_k,
-                                                  pinocchio::ReferenceFrame reference_frame);
+  std::array<double, 42> computeStiffnessJacobian(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee,
+      const std::array<double, 16>& ee_t_k,
+      pinocchio::ReferenceFrame reference_frame);
 
   /**
    * @brief Updates the placement of frames based on transforms

@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
       std::tie(robot_state, period) = rw_interface->readOnce();
 
       time += period.toMSec();
-      if (time == 0.0) {
+      if (time == 0) {
         rw_interface->writeOnce(zero_torques);
         continue;
       }
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  avg_success_rate = avg_success_rate / counter;
+  avg_success_rate = avg_success_rate / static_cast<double>(counter);
 
   std::cout << std::endl
             << std::endl

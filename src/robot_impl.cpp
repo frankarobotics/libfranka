@@ -282,9 +282,9 @@ uint32_t Robot::Impl::startMotion(
          controller_mode_ != current_move_controller_mode_) {
     try {
       if (network_->tcpReceiveResponse<research_interface::robot::Move>(
-              move_command_id,
-              std::bind(&Robot::Impl::handleCommandResponse<research_interface::robot::Move>, this,
-                        std::placeholders::_1))) {
+              move_command_id, [this](const auto& response) {
+                return this->handleCommandResponse<research_interface::robot::Move>(response);
+              })) {
         break;
       }
     } catch (const CommandException& e) {
@@ -450,12 +450,12 @@ void Robot::Impl::cancelMotion(uint32_t motion_id) {
   current_move_controller_mode_ = research_interface::robot::ControllerMode::kOther;
 }
 
-Model Robot::Impl::loadModel(const std::string& urdf_model) const {
+Model Robot::Impl::loadModel(const std::string& urdf_model) {
   return Model(urdf_model);
 }
 
 // for the tests
-Model Robot::Impl::loadModel(std::unique_ptr<RobotModelBase> robot_model) const {
+Model Robot::Impl::loadModel(std::unique_ptr<RobotModelBase> robot_model) {
   return Model(std::move(robot_model));
 }
 

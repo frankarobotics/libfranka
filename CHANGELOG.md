@@ -7,6 +7,9 @@
 - Feat: use pinocchio to compute forward kinematics
 - Feat: use pinocchio to compute jacobians
 - Chore: remove dynamic library loading from model constructor
+- Bumped: clang version from 6 to 14
+- Fix: Fixed the elbow limit rating taking the wrong values
+- Breaking: Added the 'async position motion generator' control scheme, which allows for asynchronous position control of the robot
 
 ## 0.15.0 - 2025-01-16
 

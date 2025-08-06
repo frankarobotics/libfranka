@@ -21,14 +21,21 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
+# Add LLVM repository for newer clang versions
+RUN apt-get update && \
+    apt-get install -y wget gnupg lsb-release software-properties-common && \
+    wget https://apt.llvm.org/llvm.sh && \
+    chmod +x llvm.sh && \
+    ./llvm.sh 14
+
 # Install necessary packages
 RUN apt-get update \
     && apt-get install -y \
     bash-completion \
     build-essential \
-    clang-6.0 \
-    clang-format-6.0 \
-    clang-tidy-6.0 \
+    clang-14 \
+    clang-format-14 \
+    clang-tidy-14 \
     cmake \
     doxygen \
     graphviz \
@@ -53,8 +60,8 @@ RUN apt-get update \
     wget \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \
-    && ln -s $(which clang-tidy-6.0) /usr/bin/clang-tidy \
-    && ln -s $(which clang-format-6.0) /usr/bin/clang-format
+    && ln -s $(which clang-tidy-14) /usr/bin/clang-tidy \
+    && ln -s $(which clang-format-14) /usr/bin/clang-format
 
 # Install Pinocchio
 RUN mkdir -p /etc/apt/keyrings && \

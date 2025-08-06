@@ -31,9 +31,8 @@ Robot::Robot(const std::string& franka_address, RealtimeConfig realtime_config, 
 // Has to be declared here, as the Impl type is incomplete in the header.
 Robot::~Robot() noexcept = default;
 
-Robot::Robot(Robot&& other) noexcept {
-  std::lock_guard<std::mutex> _(other.control_mutex_);
-  impl_ = std::move(other.impl_);
+Robot::Robot(Robot&& other) noexcept : impl_(std::move(other.impl_)) {
+  std::lock_guard<std::mutex> mutex(other.control_mutex_);
 }
 
 Robot& Robot::operator=(Robot&& other) noexcept {
