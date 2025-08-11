@@ -101,7 +101,7 @@ Errors::Errors(const std::array<bool, 41>& errors)  // NOLINT(modernize-pass-by-
           errors_[static_cast<size_t>(Error::kBaseAccelerationInvalidReading)]) {}
 
 Errors::operator bool() const noexcept {
-  return std::any_of(errors_.cbegin(), errors_.cend(), [](bool x) { return x; });
+  return std::any_of(errors_.cbegin(), errors_.cend(), [](bool is_error) { return is_error; });
 }
 
 Errors::operator std::string() const {

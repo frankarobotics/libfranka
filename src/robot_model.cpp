@@ -7,7 +7,8 @@ namespace franka {
 RobotModel::RobotModel(const std::string& urdf) {
   pinocchio::urdf::buildModelFromXML(urdf, pinocchio_model_);
 
-  last_joint_index_ = pinocchio_model_.joints.back().id();
+  last_joint_index_ =  // NOLINT(cppcoreguidelines-prefer-member-initializer)
+      pinocchio_model_.joints.back().id();
   last_link_frame_index_ = pinocchio_model_.getFrameId(pinocchio_model_.frames.back().name);
 
   initial_last_link_inertia_ = pinocchio_model_.inertias[last_joint_index_];
@@ -57,8 +58,8 @@ void RobotModel::addInertiaToLastLink(const std::array<double, 9>& i_total,
       pinocchio_model_.frames[last_link_frame_index_].placement.act(inertia);
 }
 
-void RobotModel::coriolis(const std::array<double, 7>& q,
-                          const std::array<double, 7>& dq,
+void RobotModel::coriolis(const std::array<double, 7>& q,   // NOLINT(readability-identifier-length)
+                          const std::array<double, 7>& dq,  // NOLINT(readability-identifier-length)
                           const std::array<double, 9>& i_total,
                           double m_total,
                           const std::array<double, 3>& f_x_ctotal,
@@ -80,7 +81,7 @@ void RobotModel::coriolis(const std::array<double, 7>& q,
   std::copy(coriolis.data(), coriolis.data() + coriolis.rows(), c_ne.begin());
 }
 
-void RobotModel::gravity(const std::array<double, 7>& q,
+void RobotModel::gravity(const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
                          const std::array<double, 3>& g_earth,
                          double m_total,
                          const std::array<double, 3>& f_x_ctotal,
@@ -103,7 +104,7 @@ void RobotModel::gravity(const std::array<double, 7>& q,
   std::copy(g_ne_vec.data(), g_ne_vec.data() + g_ne_vec.size(), g_ne.begin());
 }
 
-void RobotModel::mass(const std::array<double, 7>& q,
+void RobotModel::mass(const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
                       const std::array<double, 9>& i_total,
                       double m_total,
                       const std::array<double, 3>& f_x_ctotal,
@@ -124,12 +125,14 @@ void RobotModel::mass(const std::array<double, 7>& q,
 }
 
 // Helper method to perform forward kinematics calculation
-pinocchio::Data RobotModel::computeForwardKinematics(const std::array<double, 7>& q) const {
+pinocchio::Data RobotModel::computeForwardKinematics(
+    const std::array<double, 7>& q) const {  // NOLINT(readability-identifier-length)
   // Create Pinocchio data object
   pinocchio::Data data(pinocchio_model_);
 
   // Convert joint positions array to Eigen vector
-  Eigen::VectorXd q_vec = Eigen::Map<const Eigen::VectorXd>(q.data(), last_joint_index_);
+  Eigen::VectorXd q_vec =
+      Eigen::Map<const Eigen::VectorXd>(q.data(), static_cast<Eigen::Index>(last_joint_index_));
 
   // Perform forward kinematics
   pinocchio::forwardKinematics(pinocchio_model_, data, q_vec);
@@ -138,14 +141,14 @@ pinocchio::Data RobotModel::computeForwardKinematics(const std::array<double, 7>
 }
 
 // Helper function to convert Eigen Matrix4d to std::array<double, 16>
-std::array<double, 16> RobotModel::eigenToArray(const Eigen::Matrix4d& matrix) const {
+std::array<double, 16> RobotModel::eigenToArray(const Eigen::Matrix4d& matrix) {
   std::array<double, 16> result;
   std::copy(matrix.data(), matrix.data() + 16, result.begin());
   return result;
 }
 
 // Helper function to convert Eigen Matrix<double, 6, 7> to std::array<double, 42>
-std::array<double, 42> RobotModel::eigenToArray(const Eigen::Matrix<double, 6, 7>& matrix) const {
+std::array<double, 42> RobotModel::eigenToArray(const Eigen::Matrix<double, 6, 7>& matrix) {
   std::array<double, 42> result;
   std::copy(matrix.data(), matrix.data() + 42, result.begin());
   return result;
@@ -183,10 +186,11 @@ void RobotModel::updateFramePlacements(const std::array<double, 16>& f_t_ee,
 }
 
 // Generic helper function to compute Jacobians
-std::array<double, 42> RobotModel::computeJacobian(const std::array<double, 7>& q,
-                                                   int frame_or_joint_index,
-                                                   bool is_joint,
-                                                   pinocchio::ReferenceFrame reference_frame) {
+std::array<double, 42> RobotModel::computeJacobian(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    int frame_or_joint_index,
+    bool is_joint,
+    pinocchio::ReferenceFrame reference_frame) {
   // Validate index if it's a joint
   if (is_joint && (frame_or_joint_index < 1 ||
                    static_cast<pinocchio::JointIndex>(frame_or_joint_index) > last_joint_index_)) {
@@ -230,24 +234,25 @@ std::array<double, 42> RobotModel::computeJacobian(const std::array<double, 7>& 
 }
 
 // Helper function to compute EE Jacobian
-std::array<double, 42> RobotModel::computeEeJacobian(const std::array<double, 7>& q,
-                                                     const std::array<double, 16>& f_t_ee,
-                                                     pinocchio::ReferenceFrame reference_frame) {
+std::array<double, 42> RobotModel::computeEeJacobian(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    const std::array<double, 16>& f_t_ee,
+    pinocchio::ReferenceFrame reference_frame) {
   // If there's no end effector transformation, compute for the flange
   if (f_t_ee == std::array<double, 16>{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}) {
-    return computeJacobian(q, last_link_frame_index_, false, reference_frame);
+    return computeJacobian(q, static_cast<int>(last_link_frame_index_), false, reference_frame);
   }
 
   // Update the end-effector frame placement
   updateFramePlacements(f_t_ee);
 
   // Compute the Jacobian for the EE frame
-  return computeJacobian(q, ee_frame_index_, false, reference_frame);
+  return computeJacobian(q, static_cast<int>(ee_frame_index_), false, reference_frame);
 }
 
 // Helper function to compute Stiffness Jacobian
 std::array<double, 42> RobotModel::computeStiffnessJacobian(
-    const std::array<double, 7>& q,
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
     const std::array<double, 16>& f_t_ee,
     const std::array<double, 16>& ee_t_k,
     pinocchio::ReferenceFrame reference_frame) {
@@ -259,17 +264,19 @@ std::array<double, 42> RobotModel::computeStiffnessJacobian(
   // If both transforms are identity, compute for the flange
   if (f_t_ee == std::array<double, 16>{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1} &&
       ee_t_k == std::array<double, 16>{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}) {
-    return computeJacobian(q, last_link_frame_index_, false, reference_frame);
+    return computeJacobian(q, static_cast<int>(last_link_frame_index_), false, reference_frame);
   }
 
   // Update both the EE and stiffness frame placements
   updateFramePlacements(f_t_ee, ee_t_k, true);
 
   // Compute the Jacobian for the stiffness frame
-  return computeJacobian(q, stiffness_frame_index_, false, reference_frame);
+  return computeJacobian(q, static_cast<int>(stiffness_frame_index_), false, reference_frame);
 }
 
-std::array<double, 16> RobotModel::pose(const std::array<double, 7>& q, int joint_index) {
+std::array<double, 16> RobotModel::pose(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    int joint_index) {
   // Validate joint_index to prevent segmentation fault
   if (joint_index < 1 || joint_index > static_cast<int>(last_joint_index_)) {
     throw std::runtime_error("Joint index out of bounds: " + std::to_string(joint_index) +
@@ -286,8 +293,9 @@ std::array<double, 16> RobotModel::pose(const std::array<double, 7>& q, int join
   return eigenToArray(homogeneous_transform);
 }
 
-std::array<double, 16> RobotModel::poseEe(const std::array<double, 7>& q,
-                                          const std::array<double, 16>& f_t_ee) {
+std::array<double, 16> RobotModel::poseEe(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    const std::array<double, 16>& f_t_ee) {
   // Get the flange pose
   std::array<double, 16> flange_transform = poseFlange(q);
 
@@ -299,7 +307,8 @@ std::array<double, 16> RobotModel::poseEe(const std::array<double, 7>& q,
   return eigenToArray(ee_transform);
 }
 
-std::array<double, 16> RobotModel::poseFlange(const std::array<double, 7>& q) {
+std::array<double, 16> RobotModel::poseFlange(
+    const std::array<double, 7>& q) {  // NOLINT(readability-identifier-length)
   // Compute forward kinematics
   pinocchio::Data data = computeForwardKinematics(q);
 
@@ -313,9 +322,10 @@ std::array<double, 16> RobotModel::poseFlange(const std::array<double, 7>& q) {
   return eigenToArray(flange_transform);
 }
 
-std::array<double, 16> RobotModel::poseStiffness(const std::array<double, 7>& q,
-                                                 const std::array<double, 16>& f_t_ee,
-                                                 const std::array<double, 16>& ee_t_k) {
+std::array<double, 16> RobotModel::poseStiffness(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    const std::array<double, 16>& f_t_ee,
+    const std::array<double, 16>& ee_t_k) {
   // Get the end-effector pose
   std::array<double, 16> ee_pose = poseEe(q, f_t_ee);
 
@@ -327,42 +337,53 @@ std::array<double, 16> RobotModel::poseStiffness(const std::array<double, 7>& q,
   return eigenToArray(stiffness_transform);
 }
 
-std::array<double, 42> RobotModel::bodyJacobian(const std::array<double, 7>& q, int joint_index) {
+std::array<double, 42> RobotModel::bodyJacobian(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    int joint_index) {
   return computeJacobian(q, joint_index, true, pinocchio::ReferenceFrame::LOCAL);
 }
 
-std::array<double, 42> RobotModel::bodyJacobianFlange(const std::array<double, 7>& q) {
-  return computeJacobian(q, last_link_frame_index_, false, pinocchio::ReferenceFrame::LOCAL);
+std::array<double, 42> RobotModel::bodyJacobianFlange(
+    const std::array<double, 7>& q) {  // NOLINT(readability-identifier-length)
+  return computeJacobian(q, static_cast<int>(last_link_frame_index_), false,
+                         pinocchio::ReferenceFrame::LOCAL);
 }
 
-std::array<double, 42> RobotModel::bodyJacobianEe(const std::array<double, 7>& q,
-                                                  const std::array<double, 16>& f_t_ee) {
+std::array<double, 42> RobotModel::bodyJacobianEe(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    const std::array<double, 16>& f_t_ee) {
   return computeEeJacobian(q, f_t_ee, pinocchio::ReferenceFrame::LOCAL);
 }
 
-std::array<double, 42> RobotModel::bodyJacobianStiffness(const std::array<double, 7>& q,
-                                                         const std::array<double, 16>& f_t_ee,
-                                                         const std::array<double, 16>& ee_t_k) {
+std::array<double, 42> RobotModel::bodyJacobianStiffness(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    const std::array<double, 16>& f_t_ee,
+    const std::array<double, 16>& ee_t_k) {
   return computeStiffnessJacobian(q, f_t_ee, ee_t_k, pinocchio::ReferenceFrame::LOCAL);
 }
 
-std::array<double, 42> RobotModel::zeroJacobian(const std::array<double, 7>& q, int joint_index) {
+std::array<double, 42> RobotModel::zeroJacobian(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    int joint_index) {
   return computeJacobian(q, joint_index, true, pinocchio::ReferenceFrame::LOCAL_WORLD_ALIGNED);
 }
 
-std::array<double, 42> RobotModel::zeroJacobianFlange(const std::array<double, 7>& q) {
-  return computeJacobian(q, last_link_frame_index_, false,
+std::array<double, 42> RobotModel::zeroJacobianFlange(
+    const std::array<double, 7>& q) {  // NOLINT(readability-identifier-length)
+  return computeJacobian(q, static_cast<int>(last_link_frame_index_), false,
                          pinocchio::ReferenceFrame::LOCAL_WORLD_ALIGNED);
 }
 
-std::array<double, 42> RobotModel::zeroJacobianEe(const std::array<double, 7>& q,
-                                                  const std::array<double, 16>& f_t_ee) {
+std::array<double, 42> RobotModel::zeroJacobianEe(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    const std::array<double, 16>& f_t_ee) {
   return computeEeJacobian(q, f_t_ee, pinocchio::ReferenceFrame::LOCAL_WORLD_ALIGNED);
 }
 
-std::array<double, 42> RobotModel::zeroJacobianStiffness(const std::array<double, 7>& q,
-                                                         const std::array<double, 16>& f_t_ee,
-                                                         const std::array<double, 16>& ee_t_k) {
+std::array<double, 42> RobotModel::zeroJacobianStiffness(
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+    const std::array<double, 16>& f_t_ee,
+    const std::array<double, 16>& ee_t_k) {
   return computeStiffnessJacobian(q, f_t_ee, ee_t_k,
                                   pinocchio::ReferenceFrame::LOCAL_WORLD_ALIGNED);
 }

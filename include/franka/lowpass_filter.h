@@ -23,30 +23,33 @@ constexpr double kDefaultCutoffFrequency = 100.0;
  * Applies a first-order low-pass filter
  *
  * @param[in] sample_time Sample time constant
- * @param[in] y Current value of the signal to be filtered
- * @param[in] y_last Value of the signal to be filtered in the previous time step
+ * @param[in] current_signal_value Current value of the signal to be filtered
+ * @param[in] last_signal_value Value of the signal to be filtered in the previous time step
  * @param[in] cutoff_frequency Cutoff frequency of the low-pass filter
  *
- * @throw std::invalid_argument if y is infinite or NaN.
- * @throw std::invalid_argument if y_last is infinite or NaN.
+ * @throw std::invalid_argument if current_signal_value is infinite or NaN.
+ * @throw std::invalid_argument if last_signal_value is infinite or NaN.
  * @throw std::invalid_argument if cutoff_frequency is zero, negative, infinite or NaN.
  * @throw std::invalid_argument if sample_time is negative, infinite or NaN.
  *
  * @return Filtered value.
  */
-double lowpassFilter(double sample_time, double y, double y_last, double cutoff_frequency);
+double lowpassFilter(double sample_time,
+                     double current_signal_value,
+                     double last_signal_value,
+                     double cutoff_frequency);
 
 /**
  * Applies a first-order low-pass filter to the translation and spherical linear interpolation
  * to the rotation of a transformation matrix which represents a Cartesian Motion.
  *
  * @param[in] sample_time Sample time constant
- * @param[in] y Current Cartesian transformation matrix to be filtered
- * @param[in] y_last Cartesian transformation matrix from the previous time step
+ * @param[in] current_signal_value Current Cartesian transformation matrix to be filtered
+ * @param[in] last_signal_value Cartesian transformation matrix from the previous time step
  * @param[in] cutoff_frequency Cutoff frequency of the low-pass filter
  *
- * @throw std::invalid_argument if elements of y is infinite or NaN.
- * @throw std::invalid_argument if elements of y_last is infinite or NaN.
+ * @throw std::invalid_argument if elements of current_signal_value is infinite or NaN.
+ * @throw std::invalid_argument if elements of last_signal_value is infinite or NaN.
  * @throw std::invalid_argument if cutoff_frequency is zero, negative, infinite or NaN.
  * @throw std::invalid_argument if sample_time is negative, infinite or NaN.
  *
@@ -54,7 +57,7 @@ double lowpassFilter(double sample_time, double y, double y_last, double cutoff_
  */
 
 std::array<double, 16> cartesianLowpassFilter(double sample_time,
-                                              std::array<double, 16> y,
-                                              std::array<double, 16> y_last,
+                                              std::array<double, 16> current_signal_value,
+                                              std::array<double, 16> last_signal_value,
                                               double cutoff_frequency);
 }  // namespace franka

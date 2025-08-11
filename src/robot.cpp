@@ -31,9 +31,8 @@ Robot::Robot(const std::string& franka_address, RealtimeConfig realtime_config, 
 // Has to be declared here, as the Impl type is incomplete in the header.
 Robot::~Robot() noexcept = default;
 
-Robot::Robot(Robot&& other) noexcept {
-  std::lock_guard<std::mutex> _(other.control_mutex_);
-  impl_ = std::move(other.impl_);
+Robot::Robot(Robot&& other) noexcept : impl_(std::move(other.impl_)) {
+  std::lock_guard<std::mutex> mutex(other.control_mutex_);
 }
 
 Robot& Robot::operator=(Robot&& other) noexcept {
@@ -262,9 +261,26 @@ std::unique_ptr<ActiveControlBase> Robot::startControl(
   research_interface::robot::Move::MotionGeneratorMode motion_generator_mode =
       MotionGeneratorTraits<MotionGeneratorType>::kMotionGeneratorMode;
 
-  uint32_t motion_id = impl_->startMotion(controller_type, motion_generator_mode,
-                                          ControlLoop<MotionGeneratorType>::kDefaultDeviation,
-                                          ControlLoop<MotionGeneratorType>::kDefaultDeviation);
+  uint32_t motion_id = impl_->startMotion(
+      controller_type, motion_generator_mode, ControlLoop<MotionGeneratorType>::kDefaultDeviation,
+      ControlLoop<MotionGeneratorType>::kDefaultDeviation, false, std::nullopt);
+  return std::unique_ptr<ActiveControlBase>(new ActiveMotionGenerator<MotionGeneratorType>(
+      impl_, motion_id, std::move(control_lock), controller_type));
+}
+
+template <typename MotionGeneratorType>
+auto Robot::startAsyncControl(
+    const research_interface::robot::Move::ControllerMode& controller_type,
+    const std::vector<double>& maximum_velocities) -> std::unique_ptr<ActiveControlBase> {
+  std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
+  assertOwningLock(control_lock);
+
+  research_interface::robot::Move::MotionGeneratorMode motion_generator_mode =
+      MotionGeneratorTraits<MotionGeneratorType>::kMotionGeneratorMode;
+
+  uint32_t motion_id = impl_->startMotion(
+      controller_type, motion_generator_mode, ControlLoop<MotionGeneratorType>::kDefaultDeviation,
+      ControlLoop<MotionGeneratorType>::kDefaultDeviation, true, maximum_velocities);
   return std::unique_ptr<ActiveControlBase>(new ActiveMotionGenerator<MotionGeneratorType>(
       impl_, motion_id, std::move(control_lock), controller_type));
 }
@@ -273,12 +289,12 @@ std::unique_ptr<ActiveControlBase> Robot::startTorqueControl() {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
-  // hint: there is no startMotion implementation for Torques, so JointVelocities is used instead
+  // Torque control has no variable rate at the moment
   uint32_t motion_id =
       impl_->startMotion(research_interface::robot::Move::ControllerMode::kExternalController,
                          research_interface::robot::Move::MotionGeneratorMode::kNone,
                          ControlLoop<JointVelocities>::kDefaultDeviation,
-                         ControlLoop<JointVelocities>::kDefaultDeviation);
+                         ControlLoop<JointVelocities>::kDefaultDeviation, false, std::nullopt);
 
   return std::unique_ptr<ActiveControlBase>(
       new ActiveTorqueControl(impl_, motion_id, std::move(control_lock)));
@@ -287,6 +303,12 @@ std::unique_ptr<ActiveControlBase> Robot::startTorqueControl() {
 std::unique_ptr<ActiveControlBase> Robot::startJointPositionControl(
     const research_interface::robot::Move::ControllerMode& control_type) {
   return startControl<JointPositions>(control_type);
+}
+
+std::unique_ptr<ActiveControlBase> Robot::startAsyncJointPositionControl(
+    const research_interface::robot::Move::ControllerMode& control_type,
+    const std::vector<double>& maximum_velocities) {
+  return startAsyncControl<JointPositions>(control_type, maximum_velocities);
 }
 
 std::unique_ptr<ActiveControlBase> Robot::startJointVelocityControl(

@@ -115,7 +115,7 @@ class Network {
 
 template <typename T>
 bool Network::udpReceive(T* data) {
-  std::lock_guard<std::mutex> _(udp_mutex_);
+  std::lock_guard<std::mutex> mutex(udp_mutex_);
 
   if (udp_socket_.available() >= static_cast<int>(sizeof(T))) {
     *data = udpBlockingReceiveUnsafe<T>();
@@ -126,7 +126,7 @@ bool Network::udpReceive(T* data) {
 
 template <typename T>
 T Network::udpBlockingReceive() {
-  std::lock_guard<std::mutex> _(udp_mutex_);
+  std::lock_guard<std::mutex> mutex(udp_mutex_);
   return udpBlockingReceiveUnsafe<T>();
 }
 
@@ -150,7 +150,7 @@ T Network::udpBlockingReceiveUnsafe() try {
 
 template <typename T>
 void Network::udpSend(const T& data) try {
-  std::lock_guard<std::mutex> _(udp_mutex_);
+  std::lock_guard<std::mutex> mutex(udp_mutex_);
 
   int bytes_sent = udp_socket_.sendTo(&data, sizeof(data), udp_server_address_);
   if (bytes_sent != sizeof(data)) {
@@ -203,7 +203,7 @@ void Network::tcpReadFromBuffer(std::chrono::microseconds timeout) try {
 
 template <typename T, typename... TArgs>
 uint32_t Network::tcpSendRequest(TArgs&&... args) try {
-  std::lock_guard<std::mutex> _(tcp_mutex_);
+  std::lock_guard<std::mutex> mutex(tcp_mutex_);
 
   typename T::template Message<typename T::Request> message(
       typename T::Header(T::kCommand, command_id_++,
@@ -234,15 +234,15 @@ bool Network::tcpReceiveResponse(uint32_t command_id,
   }
 
   tcpReadFromBuffer<T>(0us);
-  auto it = received_responses_.find(command_id);
-  if (it != received_responses_.end()) {
+  auto received_response = received_responses_.find(command_id);
+  if (received_response != received_responses_.end()) {
     auto message = reinterpret_cast<const typename T::template Message<typename T::Response>*>(
-        it->second.data());
+        received_response->second.data());
     if (message->header.size < sizeof(message)) {
       throw ProtocolException("libfranka: Incorrect TCP message size.");
     }
     handler(message->getInstance());
-    received_responses_.erase(it);
+    received_responses_.erase(received_response);
     return true;
   }
   return false;
@@ -253,17 +253,17 @@ typename T::Response Network::tcpBlockingReceiveResponse(uint32_t command_id,
                                                          std::vector<uint8_t>* vl_buffer) {
   using namespace std::literals::chrono_literals;  // NOLINT(google-build-using-namespace)
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::defer_lock);
-  decltype(received_responses_)::const_iterator it;
+  decltype(received_responses_)::const_iterator received_response;
   do {
     lock.lock();
     tcpReadFromBuffer<T>(kTimeout);
-    it = received_responses_.find(command_id);
+    received_response = received_responses_.find(command_id);
     lock.unlock();
     std::this_thread::yield();
-  } while (it == received_responses_.end());
+  } while (received_response == received_responses_.end());
 
   auto message = *reinterpret_cast<const typename T::template Message<typename T::Response>*>(
-      it->second.data());
+      received_response->second.data());
   if (message.header.size < sizeof(message)) {
     throw ProtocolException("libfranka: Incorrect TCP message size.");
   }
@@ -271,11 +271,11 @@ typename T::Response Network::tcpBlockingReceiveResponse(uint32_t command_id,
   if (vl_buffer != nullptr && message.header.size != sizeof(message)) {
     size_t data_size = message.header.size - sizeof(message);
     std::vector<uint8_t> data_buffer(data_size);
-    std::memcpy(data_buffer.data(), &it->second[sizeof(message)], data_size);
+    std::memcpy(data_buffer.data(), &received_response->second[sizeof(message)], data_size);
     *vl_buffer = data_buffer;
   }
 
-  received_responses_.erase(it);
+  received_responses_.erase(received_response);
   return message.getInstance();
 }
 
@@ -283,24 +283,25 @@ template <>
 inline research_interface::robot::GetRobotModel::Response
 Network::tcpBlockingReceiveResponse<research_interface::robot::GetRobotModel>(
     uint32_t command_id,
-    std::vector<uint8_t>* /*vl_buffer*/) {
+    std::vector<uint8_t>* /*vl_buffer*/) {         // NOLINT(misc-unused-parameters)
   using namespace std::literals::chrono_literals;  // NOLINT(google-build-using-namespace)
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::defer_lock);
-  decltype(received_responses_)::const_iterator it;
+  decltype(received_responses_)::const_iterator received_response;
   do {
     lock.lock();
     tcpReadFromBuffer<research_interface::robot::GetRobotModel>(kTimeout);
-    it = received_responses_.find(command_id);
+    received_response = received_responses_.find(command_id);
     lock.unlock();
     std::this_thread::yield();
-  } while (it == received_responses_.end());
+  } while (received_response == received_responses_.end());
 
   auto get_robot_model =
       research_interface::robot::GetRobotModel::Message<
-          research_interface::robot::GetRobotModel::Response>::deserialize(it->second)
+          research_interface::robot::GetRobotModel::Response>::deserialize(received_response
+                                                                               ->second)
           .getInstance();
 
-  received_responses_.erase(it);
+  received_responses_.erase(received_response);
   return get_robot_model;
 }
 

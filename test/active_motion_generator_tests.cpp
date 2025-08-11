@@ -51,7 +51,8 @@ class ActiveMotionGeneratorTest : public ::testing::Test {
 template <>
 std::unique_ptr<ActiveControlBase> ActiveMotionGeneratorTest<JointPositions>::startControl(
     research_interface::robot::Move::ControllerMode controller_mode) {
-  EXPECT_CALL(*robot_impl_mock_, startMotion(testing::_, testing::_, testing::_, testing::_))
+  EXPECT_CALL(*robot_impl_mock_,
+              startMotion(testing::_, testing::_, testing::_, testing::_, testing::_, testing::_))
       .Times(1)
       .WillOnce(::testing::Return(default_motion_id));
 
@@ -61,7 +62,8 @@ std::unique_ptr<ActiveControlBase> ActiveMotionGeneratorTest<JointPositions>::st
 template <>
 std::unique_ptr<ActiveControlBase> ActiveMotionGeneratorTest<JointVelocities>::startControl(
     research_interface::robot::Move::ControllerMode controller_mode) {
-  EXPECT_CALL(*robot_impl_mock_, startMotion(testing::_, testing::_, testing::_, testing::_))
+  EXPECT_CALL(*robot_impl_mock_,
+              startMotion(testing::_, testing::_, testing::_, testing::_, testing::_, testing::_))
       .Times(1)
       .WillOnce(::testing::Return(default_motion_id));
 
@@ -71,7 +73,8 @@ std::unique_ptr<ActiveControlBase> ActiveMotionGeneratorTest<JointVelocities>::s
 template <>
 std::unique_ptr<ActiveControlBase> ActiveMotionGeneratorTest<CartesianPose>::startControl(
     research_interface::robot::Move::ControllerMode controller_mode) {
-  EXPECT_CALL(*robot_impl_mock_, startMotion(testing::_, testing::_, testing::_, testing::_))
+  EXPECT_CALL(*robot_impl_mock_,
+              startMotion(testing::_, testing::_, testing::_, testing::_, testing::_, testing::_))
       .Times(1)
       .WillOnce(::testing::Return(default_motion_id));
 
@@ -81,7 +84,8 @@ std::unique_ptr<ActiveControlBase> ActiveMotionGeneratorTest<CartesianPose>::sta
 template <>
 std::unique_ptr<ActiveControlBase> ActiveMotionGeneratorTest<CartesianVelocities>::startControl(
     research_interface::robot::Move::ControllerMode controller_mode) {
-  EXPECT_CALL(*robot_impl_mock_, startMotion(testing::_, testing::_, testing::_, testing::_))
+  EXPECT_CALL(*robot_impl_mock_,
+              startMotion(testing::_, testing::_, testing::_, testing::_, testing::_, testing::_))
       .Times(1)
       .WillOnce(::testing::Return(default_motion_id));
 

@@ -43,7 +43,9 @@ class Robot::Impl : public RobotControl {
   auto startMotion(research_interface::robot::Move::ControllerMode controller_mode,
                    research_interface::robot::Move::MotionGeneratorMode motion_generator_mode,
                    const research_interface::robot::Move::Deviation& maximum_path_deviation,
-                   const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation)
+                   const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation,
+                   bool use_async_motion_generator,
+                   const std::optional<std::vector<double>>& maximum_velocities)
       -> uint32_t override;
   auto cancelMotion(uint32_t motion_id) -> void override;
   auto finishMotion(
@@ -203,24 +205,24 @@ class Robot::Impl : public RobotControl {
    * @param urdf_model the stringified URDF model
    * @return Model the loaded model
    */
-  Model loadModel(const std::string& urdf_model) const;
+  static Model loadModel(const std::string& urdf_model);
 
   // for the unit tests
-  Model loadModel(std::unique_ptr<RobotModelBase> robot_model) const;
+  static Model loadModel(std::unique_ptr<RobotModelBase> robot_model);
 
-  research_interface::robot::ControllerCommand createControllerCommand(
+  static research_interface::robot::ControllerCommand createControllerCommand(
       const Torques& control_input);
 
-  research_interface::robot::MotionGeneratorCommand createMotionCommand(
+  static research_interface::robot::MotionGeneratorCommand createMotionCommand(
       const JointPositions& motion_input);
 
-  research_interface::robot::MotionGeneratorCommand createMotionCommand(
+  static research_interface::robot::MotionGeneratorCommand createMotionCommand(
       const JointVelocities& motion_input);
 
-  research_interface::robot::MotionGeneratorCommand createMotionCommand(
+  static research_interface::robot::MotionGeneratorCommand createMotionCommand(
       const CartesianPose& motion_input);
 
-  research_interface::robot::MotionGeneratorCommand createMotionCommand(
+  static research_interface::robot::MotionGeneratorCommand createMotionCommand(
       const CartesianVelocities& motion_input);
 
  protected:
@@ -237,13 +239,13 @@ class Robot::Impl : public RobotControl {
   void writeOnce(const MotionGeneratorType& motion_generator_input, const Torques& control_input);
 
   std::string commandNotPossibleMsg() const {
-    std::stringstream ss;
-    ss << " command rejected: command not possible in the current mode ("
-       << static_cast<franka::RobotMode>(robot_mode_) << ")!";
+    std::stringstream stringstream;
+    stringstream << " command rejected: command not possible in the current mode ("
+                 << static_cast<franka::RobotMode>(robot_mode_) << ")!";
     if (robot_mode_ == research_interface::robot::RobotMode::kOther) {
-      ss << " Did you open the brakes?";
+      stringstream << " Did you open the brakes?";
     }
-    return ss.str();
+    return stringstream.str();
   }
 
   template <typename T>

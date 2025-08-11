@@ -35,10 +35,11 @@ ControlLoop<MotionControlType>::ControlLoop(RobotControl& robot,
     throw std::invalid_argument("libfranka: Got no motion or control callback.");
   }
 
+  // Don't use the variable rate motion generator for control loops
   motion_id_ =
       robot.startMotion(research_interface::robot::Move::ControllerMode::kExternalController,
                         MotionGeneratorTraits<MotionControlType>::kMotionGeneratorMode,
-                        kDefaultDeviation, kDefaultDeviation);
+                        kDefaultDeviation, kDefaultDeviation, false, std::nullopt);
 }
 
 template <typename MotionControlType>
@@ -55,10 +56,11 @@ ControlLoop<MotionControlType>::ControlLoop(RobotControl& robot,
     throw std::invalid_argument("libfranka: Invalid control callback given.");
   }
 
+  // Don't use the variable rate motion generator for control loops
   motion_id_ =
       robot.startMotion(research_interface::robot::Move::ControllerMode::kExternalController,
                         research_interface::robot::Move::MotionGeneratorMode::kNone,
-                        kDefaultDeviation, kDefaultDeviation);
+                        kDefaultDeviation, kDefaultDeviation, false, std::nullopt);
 }
 
 template <typename MotionControlType>
@@ -76,7 +78,7 @@ ControlLoop<MotionControlType>::ControlLoop(RobotControl& robot,
     throw std::invalid_argument("libfranka: Invalid motion callback given.");
   }
 
-  research_interface::robot::Move::ControllerMode mode;
+  research_interface::robot::Move::ControllerMode mode{};
   switch (controller_mode) {
     case ControllerMode::kJointImpedance:
       mode = decltype(mode)::kJointImpedance;
@@ -88,9 +90,11 @@ ControlLoop<MotionControlType>::ControlLoop(RobotControl& robot,
       logging::logError("libfranka: Invalid controller mode given.");
       throw std::invalid_argument("libfranka: Invalid controller mode given.");
   }
+
+  // Don't use the variable rate motion generator for control loops
   motion_id_ =
       robot.startMotion(mode, MotionGeneratorTraits<MotionControlType>::kMotionGeneratorMode,
-                        kDefaultDeviation, kDefaultDeviation);
+                        kDefaultDeviation, kDefaultDeviation, false, std::nullopt);
 }
 
 template <typename MotionControlType>
@@ -272,9 +276,9 @@ void ControlLoop<CartesianPose>::convertMotion(
           lowpassFilter(kDeltaT, command.elbow_c[0], previous_elbow_pose[0], cutoff_frequency_);
     }
     if (limit_rate_) {
-      command.elbow_c[0] =
-          limitRate(kMaxElbowVelocity, kMaxElbowAcceleration, kMaxElbowJerk, command.elbow_c[0],
-                    robot_state.elbow_c[0], robot_state.delbow_c[0], robot_state.ddelbow_c[0]);
+      command.elbow_c[0] = limitRate(kMaxElbowVelocity, kMinElbowVelocity, kMaxElbowAcceleration,
+                                     kMaxElbowJerk, command.elbow_c[0], robot_state.elbow_c[0],
+                                     robot_state.delbow_c[0], robot_state.ddelbow_c[0]);
     }
     checkElbow(command.elbow_c);
   } else {
@@ -311,9 +315,9 @@ void ControlLoop<CartesianVelocities>::convertMotion(
           lowpassFilter(kDeltaT, command.elbow_c[0], robot_state.elbow_c[0], cutoff_frequency_);
     }
     if (limit_rate_) {
-      command.elbow_c[0] =
-          limitRate(kMaxElbowVelocity, kMaxElbowAcceleration, kMaxElbowJerk, command.elbow_c[0],
-                    robot_state.elbow_c[0], robot_state.delbow_c[0], robot_state.ddelbow_c[0]);
+      command.elbow_c[0] = limitRate(kMaxElbowVelocity, kMinElbowVelocity, kMaxElbowAcceleration,
+                                     kMaxElbowJerk, command.elbow_c[0], robot_state.elbow_c[0],
+                                     robot_state.delbow_c[0], robot_state.ddelbow_c[0]);
     }
     checkElbow(command.elbow_c);
   } else {

@@ -79,7 +79,7 @@ VacuumGripper::ServerVersion VacuumGripper::serverVersion() const noexcept {
 bool VacuumGripper::vacuum(uint8_t vacuum,
                            std::chrono::milliseconds timeout,
                            ProductionSetupProfile profile) const {
-  research_interface::vacuum_gripper::Profile converted_profile;
+  research_interface::vacuum_gripper::Profile converted_profile{};
   switch (profile) {
     case ProductionSetupProfile::kP0:
       converted_profile = research_interface::vacuum_gripper::Profile::kP0;

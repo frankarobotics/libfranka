@@ -30,8 +30,8 @@ class RobotModelBase {
    * Unit: \f$[m]\f$.
    * @param[out] c_ne Coriolis force vector. Unit: \f$[Nm]\f$.
    */
-  virtual void coriolis(const std::array<double, 7>& q,
-                        const std::array<double, 7>& dq,
+  virtual void coriolis(const std::array<double, 7>& q,   // NOLINT(readability-identifier-length)
+                        const std::array<double, 7>& dq,  // NOLINT(readability-identifier-length)
                         const std::array<double, 9>& i_total,
                         double m_total,
                         const std::array<double, 3>& f_x_ctotal,
@@ -46,7 +46,7 @@ class RobotModelBase {
    * @param[in] f_x_Ctotal Translation from flange to center of mass of the attached total load.
    * @param[out] g_ne Gravity vector. Unit: \f$[Nm]\f$.
    */
-  virtual void gravity(const std::array<double, 7>& q,
+  virtual void gravity(const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
                        const std::array<double, 3>& g_earth,
                        double m_total,
                        const std::array<double, 3>& f_x_ctotal,
@@ -64,7 +64,7 @@ class RobotModelBase {
    * Unit: \f$[m]\f$.
    * @param[out] m_ne Vectorized 7x7 mass matrix, column-major.
    */
-  virtual void mass(const std::array<double, 7>& q,
+  virtual void mass(const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
                     const std::array<double, 9>& i_total,
                     double m_total,
                     const std::array<double, 3>& f_x_ctotal,
@@ -77,7 +77,9 @@ class RobotModelBase {
    * @param[in] joint_index The index of the joint/link for which to calculate the pose.
    * @return Homogeneous transformation matrix (4x4) in column-major order.
    */
-  virtual std::array<double, 16> pose(const std::array<double, 7>& q, int joint_index) = 0;
+  virtual std::array<double, 16> pose(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      int joint_index) = 0;
 
   /**
    * Calculates the homogeneous transformation matrix for the end effector, applying
@@ -87,8 +89,9 @@ class RobotModelBase {
    * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
    * @return Homogeneous transformation matrix (4x4) in column-major order.
    */
-  virtual std::array<double, 16> poseEe(const std::array<double, 7>& q,
-                                        const std::array<double, 16>& f_t_ee) = 0;
+  virtual std::array<double, 16> poseEe(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee) = 0;
 
   /**
    * Calculates the homogeneous transformation matrix for the flange.
@@ -96,7 +99,8 @@ class RobotModelBase {
    * @param[in] q Joint position.
    * @return Homogeneous transformation matrix (4x4) in column-major order.
    */
-  virtual std::array<double, 16> poseFlange(const std::array<double, 7>& q) = 0;
+  virtual std::array<double, 16> poseFlange(
+      const std::array<double, 7>& q) = 0;  // NOLINT(readability-identifier-length)
 
   /**
    * Calculates the homogeneous transformation matrix for the stiffness frame.
@@ -107,9 +111,10 @@ class RobotModelBase {
    * column-major).
    * @return Homogeneous transformation matrix (4x4) in column-major order.
    */
-  virtual std::array<double, 16> poseStiffness(const std::array<double, 7>& q,
-                                               const std::array<double, 16>& f_t_ee,
-                                               const std::array<double, 16>& ee_t_k) = 0;
+  virtual std::array<double, 16> poseStiffness(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee,
+      const std::array<double, 16>& ee_t_k) = 0;
   /**
    * Calculates the 6x7 body Jacobian for the given joint, relative to that joint's frame.
    *
@@ -117,7 +122,9 @@ class RobotModelBase {
    * @param[in] joint_index The index of the joint/link for which to calculate the Jacobian.
    * @return Vectorized 6x7 Jacobian, column-major.
    */
-  virtual std::array<double, 42> bodyJacobian(const std::array<double, 7>& q, int joint_index) = 0;
+  virtual std::array<double, 42> bodyJacobian(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      int joint_index) = 0;
 
   /**
    * Calculates the 6x7 body Jacobian for the flange frame, relative to that frame.
@@ -125,7 +132,8 @@ class RobotModelBase {
    * @param[in] q Joint position.
    * @return Vectorized 6x7 Jacobian, column-major.
    */
-  virtual std::array<double, 42> bodyJacobianFlange(const std::array<double, 7>& q) = 0;
+  virtual std::array<double, 42> bodyJacobianFlange(
+      const std::array<double, 7>& q) = 0;  // NOLINT(readability-identifier-length)
 
   /**
    * Calculates the 6x7 body Jacobian for the end effector frame, relative to that frame.
@@ -134,8 +142,9 @@ class RobotModelBase {
    * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
    * @return Vectorized 6x7 Jacobian, column-major.
    */
-  virtual std::array<double, 42> bodyJacobianEe(const std::array<double, 7>& q,
-                                                const std::array<double, 16>& f_t_ee) = 0;
+  virtual std::array<double, 42> bodyJacobianEe(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee) = 0;
 
   /**
    * Calculates the 6x7 body Jacobian for the stiffness frame, relative to that frame.
@@ -146,9 +155,10 @@ class RobotModelBase {
    * column-major).
    * @return Vectorized 6x7 Jacobian, column-major.
    */
-  virtual std::array<double, 42> bodyJacobianStiffness(const std::array<double, 7>& q,
-                                                       const std::array<double, 16>& f_t_ee,
-                                                       const std::array<double, 16>& ee_t_k) = 0;
+  virtual std::array<double, 42> bodyJacobianStiffness(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee,
+      const std::array<double, 16>& ee_t_k) = 0;
 
   /**
    * Calculates the 6x7 zero Jacobian for the given joint, relative to the base frame.
@@ -157,7 +167,9 @@ class RobotModelBase {
    * @param[in] joint_index The index of the joint/link for which to calculate the Jacobian.
    * @return Vectorized 6x7 Jacobian, column-major.
    */
-  virtual std::array<double, 42> zeroJacobian(const std::array<double, 7>& q, int joint_index) = 0;
+  virtual std::array<double, 42> zeroJacobian(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      int joint_index) = 0;
 
   /**
    * Calculates the 6x7 zero Jacobian for the flange frame, relative to the base frame.
@@ -165,7 +177,8 @@ class RobotModelBase {
    * @param[in] q Joint position.
    * @return Vectorized 6x7 Jacobian, column-major.
    */
-  virtual std::array<double, 42> zeroJacobianFlange(const std::array<double, 7>& q) = 0;
+  virtual std::array<double, 42> zeroJacobianFlange(
+      const std::array<double, 7>& q) = 0;  // NOLINT(readability-identifier-length)
 
   /**
    * Calculates the 6x7 zero Jacobian for the end effector frame, relative to the base frame.
@@ -174,8 +187,9 @@ class RobotModelBase {
    * @param[in] f_t_ee The transformation from flange to end effector (4x4 matrix, column-major).
    * @return Vectorized 6x7 Jacobian, column-major.
    */
-  virtual std::array<double, 42> zeroJacobianEe(const std::array<double, 7>& q,
-                                                const std::array<double, 16>& f_t_ee) = 0;
+  virtual std::array<double, 42> zeroJacobianEe(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee) = 0;
 
   /**
    * Calculates the 6x7 zero Jacobian for the stiffness frame, relative to the base frame.
@@ -186,7 +200,8 @@ class RobotModelBase {
    * column-major).
    * @return Vectorized 6x7 Jacobian, column-major.
    */
-  virtual std::array<double, 42> zeroJacobianStiffness(const std::array<double, 7>& q,
-                                                       const std::array<double, 16>& f_t_ee,
-                                                       const std::array<double, 16>& ee_t_k) = 0;
+  virtual std::array<double, 42> zeroJacobianStiffness(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 16>& f_t_ee,
+      const std::array<double, 16>& ee_t_k) = 0;
 };

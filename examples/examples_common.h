@@ -36,7 +36,7 @@ class MotionGenerator {
    * @param[in] speed_factor General speed factor in range [0, 1].
    * @param[in] q_goal Target joint positions.
    */
-  MotionGenerator(double speed_factor, const std::array<double, 7> q_goal);
+  MotionGenerator(double speed_factor, const std::array<double, 7>& q_goal);
 
   /**
    * Sends joint position calculations
@@ -52,11 +52,11 @@ class MotionGenerator {
   using Vector7d = Eigen::Matrix<double, 7, 1, Eigen::ColMajor>;
   using Vector7i = Eigen::Matrix<int, 7, 1, Eigen::ColMajor>;
 
-  bool calculateDesiredValues(double t, Vector7d* delta_q_d) const;
+  bool calculateDesiredValues(double time, Vector7d* delta_q_d) const;
   void calculateSynchronizedValues();
 
   static constexpr double kDeltaQMotionFinished = 1e-6;
-  const Vector7d q_goal_;
+  Vector7d q_goal_;
 
   Vector7d q_start_;
   Vector7d delta_q_;

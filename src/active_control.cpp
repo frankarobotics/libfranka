@@ -18,8 +18,7 @@ ActiveControl::ActiveControl(std::shared_ptr<Robot::Impl> robot_impl,
                              std::unique_lock<std::mutex> control_lock)
     : robot_impl(std::move(robot_impl)),
       motion_id(motion_id),
-      control_lock(std::move(control_lock)),
-      control_finished(false) {}
+      control_lock(std::move(control_lock)) {}
 
 ActiveControl::~ActiveControl() {
   if (!control_finished) {

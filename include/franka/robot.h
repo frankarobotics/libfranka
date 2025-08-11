@@ -665,7 +665,7 @@ class Robot {
    * Starts a new joint position motion generator
    *
    * @param control_type research_interface::robot::Move::ControllerMode control type for the
-   * operation
+   *   operation
    * @return unique_ptr of ActiveMotionGenerator for the started motion
    *
    * @throw ControlException if an error related to torque control or motion generation
@@ -676,6 +676,24 @@ class Robot {
    */
   virtual std::unique_ptr<ActiveControlBase> startJointPositionControl(
       const research_interface::robot::Move::ControllerMode& control_type);
+
+  /**
+   * Starts a new async joint position motion generator
+   *
+   * @param control_type research_interface::robot::Move::ControllerMode control type for the
+   *   operation
+   * @param maximum_velocities Maximum joint velocities for the motion generator
+   * @return unique_ptr of ActiveMotionGenerator for the started motion
+   *
+   * @throw ControlException if an error related to torque control or motion generation
+   *   occurred.
+   * @throw InvalidOperationException if a conflicting operation is already running.
+   * @throw NetworkException if the connection is lost, e.g. after a timeout.
+   * @throw std::invalid_argument if joint-level torque commands are NaN or infinity.
+   */
+  virtual std::unique_ptr<ActiveControlBase> startAsyncJointPositionControl(
+      const research_interface::robot::Move::ControllerMode& control_type,
+      const std::vector<double>& maximum_velocities);
 
   /**
    * Starts a new joint velocity motion generator
@@ -782,23 +800,42 @@ class Robot {
   /**
    * Starts a new motion generator and controller
    *
-   * @tparam T the franka control type
+   * @tparam MotionGeneratorType the franka control type
    * @param control_mode defines the type of motion / control that shall be started
    * @param controller_mode the controller-mode that shall be used
    * @return unique_ptr of ActiveMotionGenerator for the started motion
    *
    * @throw ControlException if an error related to torque control or motion generation
-   occurred.
+   *   occurred.
    * @throw InvalidOperationException if a conflicting operation is already running.*
    * @throw NetworkException if the connection is lost,e.g.after a timeout.
    * @throw std::invalid_argument if joint - level torque commands are NaN or infinity.
    */
-  template <typename T>
+  template <typename MotionGeneratorType>
   std::unique_ptr<ActiveControlBase> startControl(
       const research_interface::robot::Move::ControllerMode& controller_type);
 
   std::shared_ptr<Impl> impl_;
   std::mutex control_mutex_;
+
+  /**
+   * Starts a new async motion generator and controller
+   *
+   * @tparam MotionGeneratorType the franka control type
+   * @param controller_type defines the type of motion / control that shall be started
+   * @param maximum_velocities maximum joint velocities for the motion generator
+   * @return unique_ptr of ActiveMotionGenerator for the started motion
+   *
+   * @throw ControlException if an error related to torque control or motion generation
+   *   occurred.
+   * @throw InvalidOperationException if a conflicting operation is already running.*
+   * @throw NetworkException if the connection is lost,e.g.after a timeout.
+   * @throw std::invalid_argument if joint - level torque commands are NaN or infinity.
+   */
+  template <typename MotionGeneratorType>
+  auto startAsyncControl(const research_interface::robot::Move::ControllerMode& controller_type,
+                         const std::vector<double>& maximum_velocities)
+      -> std::unique_ptr<ActiveControlBase>;
 };
 
 }  // namespace franka

@@ -101,11 +101,17 @@ constexpr double kMaxElbowJerk = 5000 - kLimitEps;
  * Maximum elbow acceleration
  */
 constexpr double kMaxElbowAcceleration = 10.0000 - kLimitEps;
+
 /**
  * Maximum elbow velocity
  */
 constexpr double kMaxElbowVelocity =
     1.5000 - kLimitEps - kTolNumberPacketsLost * kDeltaT * kMaxElbowAcceleration;
+
+/**
+ * Minimum elbow velocity
+ */
+constexpr double kMinElbowVelocity = -kMaxElbowVelocity;
 
 /**
  * Computes the maximum joint velocity based on joint position
@@ -117,7 +123,8 @@ constexpr double kMaxElbowVelocity =
  *
  * @return Upper limits of joint velocity at the given joint position.
  */
-inline std::array<double, 7> computeUpperLimitsJointVelocity(const std::array<double, 7>& q) {
+inline std::array<double, 7> computeUpperLimitsJointVelocity(
+    const std::array<double, 7>& q) {  // NOLINT(readability-identifier-length)
   return std::array<double, 7>{
       std::min(2.62, std::max(0.0, -0.30 + std::sqrt(std::max(0.0, 12.0 * (2.75010 - q[0]))))) -
           kJointVelocityLimitsTolerance[0],
@@ -146,7 +153,8 @@ inline std::array<double, 7> computeUpperLimitsJointVelocity(const std::array<do
  *
  * @return Lower limits of joint velocity at the given joint position.
  */
-inline std::array<double, 7> computeLowerLimitsJointVelocity(const std::array<double, 7>& q) {
+inline std::array<double, 7> computeLowerLimitsJointVelocity(
+    const std::array<double, 7>& q) {  // NOLINT(readability-identifier-length)
   return std::array<double, 7>{
       std::max(-2.62, std::min(0.0, 0.30 - std::sqrt(std::max(0.0, 12.0 * (2.750100 + q[0]))))) +
           kJointVelocityLimitsTolerance[0],

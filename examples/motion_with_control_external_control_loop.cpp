@@ -35,10 +35,9 @@ class Controller {
   Controller(size_t dq_filter_size,
              const std::array<double, 7>& K_P,  // NOLINT(readability-identifier-naming)
              const std::array<double, 7>& K_D)  // NOLINT(readability-identifier-naming)
-      : dq_current_filter_position_(0), dq_filter_size_(dq_filter_size), K_P_(K_P), K_D_(K_D) {
+      : dq_filter_size_(dq_filter_size), K_P_(K_P), K_D_(K_D) {
     std::fill(dq_d_.begin(), dq_d_.end(), 0);
-    dq_buffer_ = std::make_unique<double[]>(dq_filter_size_ * 7);
-    std::fill(&dq_buffer_.get()[0], &dq_buffer_.get()[dq_filter_size_ * 7], 0);
+    dq_buffer_ = std::vector<double>(dq_filter_size_ * 7, 0.0);
   }
 
   inline franka::Torques step(const franka::RobotState& state) {
@@ -53,7 +52,7 @@ class Controller {
 
   void updateDQFilter(const franka::RobotState& state) {
     for (size_t i = 0; i < 7; i++) {
-      dq_buffer_.get()[dq_current_filter_position_ * 7 + i] = state.dq[i];
+      dq_buffer_[dq_current_filter_position_ * 7 + i] = state.dq[i];
     }
     dq_current_filter_position_ = (dq_current_filter_position_ + 1) % dq_filter_size_;
   }
@@ -61,20 +60,20 @@ class Controller {
   double getDQFiltered(size_t index) const {
     double value = 0;
     for (size_t i = index; i < 7 * dq_filter_size_; i += 7) {
-      value += dq_buffer_.get()[i];
+      value += dq_buffer_[i];
     }
-    return value / dq_filter_size_;
+    return value / static_cast<double>(dq_filter_size_);
   }
 
  private:
-  size_t dq_current_filter_position_;
+  size_t dq_current_filter_position_{0};
   size_t dq_filter_size_;
 
   const std::array<double, 7> K_P_;  // NOLINT(readability-identifier-naming)
   const std::array<double, 7> K_D_;  // NOLINT(readability-identifier-naming)
 
   std::array<double, 7> dq_d_;
-  std::unique_ptr<double[]> dq_buffer_;
+  std::vector<double> dq_buffer_;
 };
 
 std::vector<double> generateTrajectory(double a_max) {
@@ -86,22 +85,22 @@ std::vector<double> generateTrajectory(double a_max) {
   constexpr double kConstantVelocityTime = 1;  // time spend with constant speed [s]
   // obtained during the speed up
   // and slow down [rad/s^2]
-  double a = 0;  // [rad/s^2]
-  double v = 0;  // [rad/s]
-  double t = 0;  // [s]
-  while (t < (2 * kAccelerationTime + kConstantVelocityTime)) {
-    if (t <= kAccelerationTime) {
-      a = pow(sin(t * M_PI / kAccelerationTime), 2) * a_max;
-    } else if (t <= (kAccelerationTime + kConstantVelocityTime)) {
-      a = 0;
+  double acceleration = 0;  // [rad/s^2]
+  double velocity = 0;      // [rad/s]
+  double time = 0;          // [s]
+  while (time < (2 * kAccelerationTime + kConstantVelocityTime)) {
+    if (time <= kAccelerationTime) {
+      acceleration = pow(sin(time * M_PI / kAccelerationTime), 2) * a_max;
+    } else if (time <= (kAccelerationTime + kConstantVelocityTime)) {
+      acceleration = 0;
     } else {
-      const double deceleration_time =
-          (kAccelerationTime + kConstantVelocityTime) - t;  // time spent in the deceleration phase
-      a = -pow(sin(deceleration_time * M_PI / kAccelerationTime), 2) * a_max;
+      const double deceleration_time = (kAccelerationTime + kConstantVelocityTime) -
+                                       time;  // time spent in the deceleration phase
+      acceleration = -pow(sin(deceleration_time * M_PI / kAccelerationTime), 2) * a_max;
     }
-    v += a * kTimeStep;
-    t += kTimeStep;
-    trajectory.push_back(v);
+    velocity += acceleration * kTimeStep;
+    time += kTimeStep;
+    trajectory.push_back(velocity);
   }
   return trajectory;
 }

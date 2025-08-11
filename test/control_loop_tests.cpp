@@ -31,6 +31,9 @@ using research_interface::robot::RobotCommand;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
+constexpr bool kUseNoAsyncMotionGenerator = false;
+const std::optional<std::vector<double>> kNoMaximumVelocities = std::nullopt;
+
 class MockControlCallback {
  public:
   MOCK_METHOD2(invoke, Torques(const RobotState&, Duration));
@@ -743,14 +746,14 @@ TYPED_TEST_CASE(ControlLoops, MotionTypes);
 TYPED_TEST(ControlLoops, CanNotConstructWithoutMotionCallback) {
   StrictMock<MockRobotControl> robot;
 
-  EXPECT_THROW(
-      typename TestFixture::Loop loop(robot,
-                                      [](const RobotState&, Duration) {
-                                        return Torques({0, 1, 2, 3, 4, 5, 6});
-                                      },
-                                      typename TestFixture::MotionGeneratorCallback(),
-                                      TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter)),
-      std::invalid_argument);
+  EXPECT_THROW(typename TestFixture::Loop loop(
+                   robot,
+                   [](const RobotState&, Duration) {
+                     return Torques({0, 1, 2, 3, 4, 5, 6});
+                   },
+                   typename TestFixture::MotionGeneratorCallback(), TestFixture::kLimitRate,
+                   getCutoffFreq(TestFixture::kFilter)),
+               std::invalid_argument);
 
   EXPECT_THROW(
       typename TestFixture::Loop loop(robot, ControllerMode::kCartesianImpedance,
@@ -771,25 +774,27 @@ TYPED_TEST(ControlLoops, CanNotConstructWithoutControlCallback) {
 
 TYPED_TEST(ControlLoops, CanConstructWithMotionAndControllerCallback) {
   MockRobotControl robot;
-  EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                 this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
-                                 TestFixture::Loop::kDefaultDeviation))
+  EXPECT_CALL(
+      robot, startMotion(Move::ControllerMode::kExternalController, this->kMotionGeneratorMode,
+                         TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
+                         kUseNoAsyncMotionGenerator, kNoMaximumVelocities))
       .WillOnce(Return(100));
 
-  EXPECT_NO_THROW(typename TestFixture::Loop(robot,
-                                             [](const RobotState&, Duration) {
-                                               return Torques({0, 1, 2, 3, 4, 5, 6});
-                                             },
-                                             std::bind(&TestFixture::createMotion, this),
-                                             TestFixture::kLimitRate,
-                                             getCutoffFreq(TestFixture::kFilter)));
+  EXPECT_NO_THROW(typename TestFixture::Loop(
+      robot,
+      [](const RobotState&, Duration) {
+        return Torques({0, 1, 2, 3, 4, 5, 6});
+      },
+      std::bind(&TestFixture::createMotion, this), TestFixture::kLimitRate,
+      getCutoffFreq(TestFixture::kFilter)));
 }
 
 TYPED_TEST(ControlLoops, CanConstructWithMotionCallbackAndControllerMode) {
   MockRobotControl robot;
-  EXPECT_CALL(robot, startMotion(Move::ControllerMode::kCartesianImpedance,
-                                 this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
-                                 TestFixture::Loop::kDefaultDeviation))
+  EXPECT_CALL(
+      robot, startMotion(Move::ControllerMode::kCartesianImpedance, this->kMotionGeneratorMode,
+                         TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
+                         kUseNoAsyncMotionGenerator, kNoMaximumVelocities))
       .WillOnce(Return(200));
 
   EXPECT_NO_THROW(typename TestFixture::Loop(
@@ -802,22 +807,24 @@ TYPED_TEST(ControlLoops, CanConstructWithControlCallback) {
   EXPECT_CALL(
       robot,
       startMotion(Move::ControllerMode::kExternalController, Move::MotionGeneratorMode::kNone,
-                  TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation))
+                  TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
+                  kUseNoAsyncMotionGenerator, kNoMaximumVelocities))
       .WillOnce(Return(200));
 
-  EXPECT_NO_THROW(typename TestFixture::Loop(robot,
-                                             [](const RobotState&, Duration) {
-                                               return Torques({0, 1, 2, 3, 4, 5, 6});
-                                             },
-                                             TestFixture::kLimitRate,
-                                             getCutoffFreq(TestFixture::kFilter)));
+  EXPECT_NO_THROW(typename TestFixture::Loop(
+      robot,
+      [](const RobotState&, Duration) {
+        return Torques({0, 1, 2, 3, 4, 5, 6});
+      },
+      TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter)));
 }
 
 TYPED_TEST(ControlLoops, SpinOnceWithMotionCallbackAndControllerMode) {
   StrictMock<MockRobotControl> robot;
-  EXPECT_CALL(robot, startMotion(Move::ControllerMode::kJointImpedance, this->kMotionGeneratorMode,
-                                 TestFixture::Loop::kDefaultDeviation,
-                                 TestFixture::Loop::kDefaultDeviation))
+  EXPECT_CALL(
+      robot, startMotion(Move::ControllerMode::kJointImpedance, this->kMotionGeneratorMode,
+                         TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
+                         kUseNoAsyncMotionGenerator, kNoMaximumVelocities))
       .WillOnce(Return(200));
 
   MockMotionCallback<typename TestFixture::TMotion> motion_callback;
@@ -840,9 +847,10 @@ TYPED_TEST(ControlLoops, SpinOnceWithMotionCallbackAndControllerMode) {
 
 TYPED_TEST(ControlLoops, SpinOnceWithMotionAndControllerCallback) {
   StrictMock<MockRobotControl> robot;
-  EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                 this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
-                                 TestFixture::Loop::kDefaultDeviation))
+  EXPECT_CALL(
+      robot, startMotion(Move::ControllerMode::kExternalController, this->kMotionGeneratorMode,
+                         TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
+                         kUseNoAsyncMotionGenerator, kNoMaximumVelocities))
       .WillOnce(Return(200));
 
   MockControlCallback control_callback;
@@ -896,7 +904,8 @@ TYPED_TEST(ControlLoops, SpinOnceWithInvalidMotionAndControllerCallback) {
     StrictMock<MockRobotControl> robot;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
                                    this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
-                                   TestFixture::Loop::kDefaultDeviation))
+                                   TestFixture::Loop::kDefaultDeviation, kUseNoAsyncMotionGenerator,
+                                   kNoMaximumVelocities))
         .WillOnce(Return(200));
     MockControlCallback control_callback;
     MockMotionCallback<typename TestFixture::TMotion> motion_callback;
@@ -928,7 +937,8 @@ TYPED_TEST(ControlLoops, SpinOnceWithFinishingMotionCallback) {
     InSequence s;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
                                    this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
-                                   TestFixture::Loop::kDefaultDeviation))
+                                   TestFixture::Loop::kDefaultDeviation, kUseNoAsyncMotionGenerator,
+                                   kNoMaximumVelocities))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, finishMotion(200, _, _));
   }
@@ -969,7 +979,8 @@ TYPED_TEST(ControlLoops, LoopWithThrowingMotionCallback) {
     InSequence s;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
                                    this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
-                                   TestFixture::Loop::kDefaultDeviation))
+                                   TestFixture::Loop::kDefaultDeviation, kUseNoAsyncMotionGenerator,
+                                   kNoMaximumVelocities))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, cancelMotion(200));
   }
@@ -998,7 +1009,8 @@ TYPED_TEST(ControlLoops, SpinOnceWithFinishingMotionCallbackAndControllerMode) {
     auto motion_id = 200;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kCartesianImpedance,
                                    this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
-                                   TestFixture::Loop::kDefaultDeviation))
+                                   TestFixture::Loop::kDefaultDeviation, kUseNoAsyncMotionGenerator,
+                                   kNoMaximumVelocities))
         .WillOnce(Return(motion_id));
     EXPECT_CALL(robot, finishMotion(motion_id, _, testing::Eq(std::nullopt)));
   }
@@ -1031,7 +1043,8 @@ TYPED_TEST(ControlLoops, LoopWithThrowingMotionCallbackAndControllerMode) {
     InSequence s;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kJointImpedance,
                                    this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
-                                   TestFixture::Loop::kDefaultDeviation))
+                                   TestFixture::Loop::kDefaultDeviation, kUseNoAsyncMotionGenerator,
+                                   kNoMaximumVelocities))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, cancelMotion(200));
   }
@@ -1057,7 +1070,8 @@ TYPED_TEST(ControlLoops, SpinOnceWithFinishingControlCallback) {
     EXPECT_CALL(
         robot,
         startMotion(Move::ControllerMode::kExternalController, Move::MotionGeneratorMode::kNone,
-                    TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation))
+                    TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
+                    kUseNoAsyncMotionGenerator, kNoMaximumVelocities))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, finishMotion(200, _, _));
   }
@@ -1090,7 +1104,8 @@ TYPED_TEST(ControlLoops, LoopWithThrowingControlCallback) {
     EXPECT_CALL(
         robot,
         startMotion(Move::ControllerMode::kExternalController, Move::MotionGeneratorMode::kNone,
-                    TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation))
+                    TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
+                    kUseNoAsyncMotionGenerator, kNoMaximumVelocities))
         .WillOnce(Return(200));
     EXPECT_CALL(robot, cancelMotion(200));
   }
@@ -1244,9 +1259,10 @@ TYPED_TEST_CASE(ControlLoopWithTransformationMatrix, CartesianPoseMotionTypes);
 
 TYPED_TEST(ControlLoopWithTransformationMatrix, SpinOnceWithInvalidTransformationMatrix) {
   StrictMock<MockRobotControl> robot;
-  EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
-                                 this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
-                                 TestFixture::Loop::kDefaultDeviation))
+  EXPECT_CALL(
+      robot, startMotion(Move::ControllerMode::kExternalController, this->kMotionGeneratorMode,
+                         TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
+                         kUseNoAsyncMotionGenerator, kNoMaximumVelocities))
       .WillOnce(Return(200));
   MockControlCallback control_callback;
   MockMotionCallback<typename TestFixture::TMotion> motion_callback;
@@ -1289,7 +1305,8 @@ TYPED_TEST(ControlLoopWithElbow, SpinOnceWithInvalidElbowCallback) {
     StrictMock<MockRobotControl> robot;
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
                                    this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
-                                   TestFixture::Loop::kDefaultDeviation))
+                                   TestFixture::Loop::kDefaultDeviation, kUseNoAsyncMotionGenerator,
+                                   kNoMaximumVelocities))
         .WillOnce(Return(200));
     MockControlCallback control_callback;
     MockMotionCallback<typename TestFixture::TMotion> motion_callback;

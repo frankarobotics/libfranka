@@ -118,7 +118,7 @@ class Model {
    */
   std::array<double, 16> pose(
       Frame frame,
-      const std::array<double, 7>& q,
+      const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
       const std::array<double, 16>& F_T_EE,  // NOLINT(readability-identifier-naming)
       const std::array<double, 16>& EE_T_K)  // NOLINT(readability-identifier-naming)
       const;
@@ -149,7 +149,7 @@ class Model {
    */
   std::array<double, 42> bodyJacobian(
       Frame frame,
-      const std::array<double, 7>& q,
+      const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
       const std::array<double, 16>& F_T_EE,  // NOLINT(readability-identifier-naming)
       const std::array<double, 16>& EE_T_K)  // NOLINT(readability-identifier-naming)
       const;
@@ -180,7 +180,7 @@ class Model {
    */
   std::array<double, 42> zeroJacobian(
       Frame frame,
-      const std::array<double, 7>& q,
+      const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
       const std::array<double, 16>& F_T_EE,  // NOLINT(readability-identifier-naming)
       const std::array<double, 16>& EE_T_K)  // NOLINT(readability-identifier-naming)
       const;
@@ -208,7 +208,7 @@ class Model {
    * @return Vectorized 7x7 mass matrix, column-major.
    */
   std::array<double, 49> mass(
-      const std::array<double, 7>& q,
+      const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
       const std::array<double, 9>& I_total,  // NOLINT(readability-identifier-naming)
       double m_total,
       const std::array<double, 3>& F_x_Ctotal)  // NOLINT(readability-identifier-naming)
@@ -240,8 +240,8 @@ class Model {
    * @return Coriolis force vector.
    */
   std::array<double, 7> coriolis(
-      const std::array<double, 7>& q,
-      const std::array<double, 7>& dq,
+      const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
+      const std::array<double, 7>& dq,       // NOLINT(readability-identifier-length)
       const std::array<double, 9>& I_total,  // NOLINT(readability-identifier-naming)
       double m_total,
       const std::array<double, 3>& F_x_Ctotal)  // NOLINT(readability-identifier-naming)
@@ -261,7 +261,7 @@ class Model {
    * @return Gravity vector.
    */
   std::array<double, 7> gravity(
-      const std::array<double, 7>& q,
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
       double m_total,
       const std::array<double, 3>& F_x_Ctotal,  // NOLINT(readability-identifier-naming)
       const std::array<double, 3>& gravity_earth = {{0., 0., -9.81}}) const noexcept;

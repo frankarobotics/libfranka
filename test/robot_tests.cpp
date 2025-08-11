@@ -32,6 +32,9 @@ using namespace research_interface;
 using namespace franka;
 using namespace std::chrono_literals;
 
+constexpr bool kUseNoAsyncMotionGenerator = false;
+const std::optional<std::vector<double>> kNoMaximumVelocities = std::nullopt;
+
 class RobotTests : public ::testing::Test {
  public:
   RobotTests() : default_robot("127.0.0.1", RealtimeConfig::kIgnore) {}
@@ -475,8 +478,9 @@ TEST(RobotMultipleControlTests, CanStartOnlyOneControl) {
   auto motion_generator_mode = Move::MotionGeneratorMode::kNone;
   auto controller_mode = Move::ControllerMode::kExternalController;
 
-  EXPECT_CALL(*robot_impl_mock, startMotion(controller_mode, motion_generator_mode,
-                                            kDefaultDeviation, kDefaultDeviation))
+  EXPECT_CALL(*robot_impl_mock,
+              startMotion(controller_mode, motion_generator_mode, kDefaultDeviation,
+                          kDefaultDeviation, kUseNoAsyncMotionGenerator, kNoMaximumVelocities))
       .Times(2)
       .WillRepeatedly(::testing::Return(100));
 

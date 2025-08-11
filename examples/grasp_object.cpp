@@ -23,9 +23,9 @@ int main(int argc, char** argv) {
     franka::Gripper gripper(argv[1]);
     double grasping_width = std::stod(argv[3]);
 
-    std::stringstream ss(argv[2]);
-    bool homing;
-    if (!(ss >> homing)) {
+    std::stringstream string_stream(argv[2]);
+    bool homing{};
+    if (!(string_stream >> homing)) {
       std::cerr << "<homing> can be 0 or 1." << std::endl;
       return -1;
     }

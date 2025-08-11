@@ -27,9 +27,7 @@ Model::Model(const std::string& urdf_model) {
 }
 
 // for the tests
-Model::Model(std::unique_ptr<RobotModelBase> robot_model) {
-  robot_model_ = std::move(robot_model);
-}
+Model::Model(std::unique_ptr<RobotModelBase> robot_model) : robot_model_(std::move(robot_model)) {}
 
 // Has to be declared here for proper destruction of robot_model_
 Model::~Model() noexcept = default;
@@ -42,7 +40,7 @@ std::array<double, 16> Model::pose(Frame frame, const franka::RobotState& robot_
 
 std::array<double, 16> Model::pose(
     Frame frame,
-    const std::array<double, 7>& q,
+    const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
     const std::array<double, 16>& F_T_EE,  // NOLINT(readability-identifier-naming)
     const std::array<double, 16>& EE_T_K)  // NOLINT(readability-identifier-naming)
     const {
@@ -82,7 +80,7 @@ std::array<double, 42> Model::bodyJacobian(Frame frame,
 
 std::array<double, 42> Model::bodyJacobian(
     Frame frame,
-    const std::array<double, 7>& q,
+    const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
     const std::array<double, 16>& F_T_EE,  // NOLINT(readability-identifier-naming)
     const std::array<double, 16>& EE_T_K)  // NOLINT(readability-identifier-naming)
     const {
@@ -119,7 +117,7 @@ std::array<double, 42> Model::zeroJacobian(Frame frame,
 
 std::array<double, 42> Model::zeroJacobian(
     Frame frame,
-    const std::array<double, 7>& q,
+    const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
     const std::array<double, 16>& F_T_EE,  // NOLINT(readability-identifier-naming)
     const std::array<double, 16>& EE_T_K)  // NOLINT(readability-identifier-naming)
     const {
@@ -154,7 +152,7 @@ std::array<double, 49> franka::Model::mass(const franka::RobotState& robot_state
 }
 
 std::array<double, 49> franka::Model::mass(
-    const std::array<double, 7>& q,
+    const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
     const std::array<double, 9>& I_total,  // NOLINT(readability-identifier-naming)
     double m_total,
     const std::array<double, 3>& F_x_Ctotal)  // NOLINT(readability-identifier-naming)
@@ -165,15 +163,15 @@ std::array<double, 49> franka::Model::mass(
   return output;
 }
 
-std::array<double, 7> franka::Model::coriolis(const franka::RobotState& robot_state) const
-    noexcept {
+std::array<double, 7> franka::Model::coriolis(
+    const franka::RobotState& robot_state) const noexcept {
   return coriolis(robot_state.q, robot_state.dq, robot_state.I_total, robot_state.m_total,
                   robot_state.F_x_Ctotal);
 }
 
 std::array<double, 7> franka::Model::coriolis(
-    const std::array<double, 7>& q,
-    const std::array<double, 7>& dq,
+    const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
+    const std::array<double, 7>& dq,       // NOLINT(readability-identifier-length)
     const std::array<double, 9>& I_total,  // NOLINT(readability-identifier-naming)
     double m_total,
     const std::array<double, 3>& F_x_Ctotal)  // NOLINT(readability-identifier-naming)
@@ -184,9 +182,9 @@ std::array<double, 7> franka::Model::coriolis(
   return output;
 }
 
-std::array<double, 7> franka::Model::gravity(const franka::RobotState& robot_state,
-                                             const std::array<double, 3>& gravity_earth) const
-    noexcept {
+std::array<double, 7> franka::Model::gravity(
+    const franka::RobotState& robot_state,
+    const std::array<double, 3>& gravity_earth) const noexcept {
   return gravity(robot_state.q, robot_state.m_total, robot_state.F_x_Ctotal, gravity_earth);
 };
 
@@ -195,7 +193,7 @@ std::array<double, 7> franka::Model::gravity(const franka::RobotState& robot_sta
 };
 
 std::array<double, 7> franka::Model::gravity(
-    const std::array<double, 7>& q,
+    const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
     double m_total,
     const std::array<double, 3>& F_x_Ctotal,  // NOLINT(readability-identifier-naming)
     const std::array<double, 3>& gravity_earth) const noexcept {
