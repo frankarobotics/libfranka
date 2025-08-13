@@ -148,11 +148,13 @@ pipeline {
           stage('Test') {
             steps {
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                dir("build-debug.${env.DISTRO}") {
-                  sh 'ctest -V'
-                }
-                dir("build-release.${env.DISTRO}") {
-                  sh 'ctest -V'
+                timeout(time: 150, unit: 'SECONDS') {
+                  dir("build-debug.${env.DISTRO}") {
+                    sh 'ctest -V'
+                  }
+                  dir("build-release.${env.DISTRO}") {
+                    sh 'ctest -V'
+                  }
                 }
               }
             }
