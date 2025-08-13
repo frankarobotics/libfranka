@@ -369,40 +369,18 @@ struct RobotState {
   std::array<double, 7> dtheta{};
 
   /**
-   * \f$\dot{x}\f$
-   * Data from the top accelerometer in x direction. Unit: \f$[\frac{m}{s^2}]\f$
+   * \f$\ddot{x}\f$
+   * Translational acceleration data from the accelerometers located on the top of the PCB
+   * of Joint 1 through Joint 6 (no accelerometers in the last joint). Unit: \f$[\frac{m}{s^2}]\f$
    */
-  std::array<double, 7> accelerometer_top_x{};
+  std::array<std::array<float, 3>, 6> accelerometer_top{};
 
   /**
-   * \f$\dot{y}\f$
-   * Data from the top accelerometer in y direction. Unit: \f$[\frac{m}{s^2}]\f$
+   * \f$\ddot{x}\f$
+   * Translational acceleration data from the accelerometers located on the bottom of the PCB
+   * of Joint 1 through Joint 6 (no accelerometers in the last joint). Unit: \f$[\frac{m}{s^2}]\f$
    */
-  std::array<double, 7> accelerometer_top_y{};
-
-  /**
-   * \f$\dot{z}\f$
-   * Data from the top accelerometer in z direction. Unit: \f$[\frac{m}{s^2}]\f$
-   */
-  std::array<double, 7> accelerometer_top_z{};
-
-  /**
-   * \f$\dot{x}\f$
-   * Data from the bottom accelerometer in x direction. Unit: \f$[\frac{m}{s^2}]\f$
-   */
-  std::array<double, 7> accelerometer_bottom_x{};
-
-  /**
-   * \f$\dot{y}\f$
-   * Data from the bottom accelerometer in y direction. Unit: \f$[\frac{m}{s^2}]\f$
-   */
-  std::array<double, 7> accelerometer_bottom_y{};
-
-  /**
-   * \f$\dot{z}\f$
-   * Data from the bottom accelerometer in z direction. Unit: \f$[\frac{m}{s^2}]\f$
-   */
-  std::array<double, 7> accelerometer_bottom_z{};
+  std::array<std::array<float, 3>, 6> accelerometer_bottom{};
 
   /**
    * Current error state.
