@@ -27,7 +27,11 @@ MockServer<C>::MockServer(ConnectCallbackT on_connect, uint32_t sequence_number)
 
 template <typename C>
 MockServer<C>::~MockServer() {
-  shutdown_ = true;
+  {
+    // Make sure that nothing else can be in some between state while we set shutdown to true
+    std::lock_guard<std::mutex> lock(command_mutex_);
+    shutdown_ = true;
+  }
   cv_.notify_one();
   server_thread_.join();
 

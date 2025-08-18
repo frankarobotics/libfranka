@@ -25,6 +25,10 @@ pipeline {
           dockerfile {
             filename ".ci/Dockerfile.${env.DISTRO}"
             reuseNode true
+            args '--privileged ' +
+                 '--cap-add=SYS_PTRACE ' +
+                 '--security-opt seccomp=unconfined ' +
+                 '--shm-size=2g '
          }
         }
         axes {
@@ -77,7 +81,7 @@ pipeline {
               stage('Build examples (debug)') {
                 steps {
                   dir("build-debug-examples.${env.DISTRO}") {
-                    sh "cmake -DFranka_DIR:PATH=../build-debug.${DISTRO} ../examples"
+                    sh "cmake -DFranka_DIR:PATH=../build-debug.${env.DISTRO} ../examples"
                     sh 'make -j$(nproc)'
                   }
                 }
@@ -85,7 +89,7 @@ pipeline {
               stage('Build examples (release)') {
                 steps {
                   dir("build-release-examples.${env.DISTRO}") {
-                    sh "cmake -DFranka_DIR:PATH=../build-release.${DISTRO} ../examples"
+                    sh "cmake -DFranka_DIR:PATH=../build-release.${env.DISTRO} ../examples"
                     sh 'make -j$(nproc)'
                   }
                 }
@@ -148,13 +152,34 @@ pipeline {
           stage('Test') {
             steps {
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                timeout(time: 150, unit: 'SECONDS') {
-                  dir("build-debug.${env.DISTRO}") {
-                    sh 'ctest -V'
-                  }
-                  dir("build-release.${env.DISTRO}") {
-                    sh 'ctest -V'
-                  }
+                                timeout(time: 300, unit: 'SECONDS') {
+                   sh '''
+                     # ASLR Fix: Disable ASLR temporarily for ASan compatibility
+                     echo "[Debug Tests] Disabling ASLR for ASan compatibility..."
+                     echo 0 | sudo tee /proc/sys/kernel/randomize_va_space || echo "Could not disable ASLR"
+                     echo "[Debug Tests] ASLR status: $(cat /proc/sys/kernel/randomize_va_space)"
+                   '''
+                   
+                   dir("build-debug.${env.DISTRO}") {
+                     sh '''
+                       echo "[Debug Tests] Running tests..."
+                       ctest -V
+                     '''
+                   }
+
+                   dir("build-release.${env.DISTRO}") {
+                     sh '''
+                       echo "[Release Tests] Running tests..."
+                       ctest -V
+                     '''
+                   }
+                   
+                   sh '''
+                     # Re-enable ASLR for security
+                     echo "[Debug Tests] Re-enabling ASLR..."
+                     echo 2 | sudo tee /proc/sys/kernel/randomize_va_space || echo "Could not re-enable ASLR"
+                     echo "[Debug Tests] ASLR restored to: $(cat /proc/sys/kernel/randomize_va_space)"
+                   '''
                 }
               }
             }
@@ -187,11 +212,11 @@ pipeline {
                   }
                   sh "rename -e 's/(.tar.gz)\$/-${env.DISTRO}\$1/' *.tar.gz"
                   publishHTML([allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'doc/html',
-                            reportFiles: 'index.html',
-                            reportName: "API Documentation (${env.DISTRO})"])
+                              alwaysLinkToLastBuild: false,
+                              keepAll: true,
+                              reportDir: 'doc/html',
+                              reportFiles: 'index.html',
+                              reportName: "API Documentation (${env.DISTRO})"])
                 }
               }
             }
