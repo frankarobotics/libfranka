@@ -1,7 +1,8 @@
-// Copyright (c) 2024 Franka Robotics GmbH
+// Copyright (c) 2025 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
+#include <array>
 #include <pinocchio/algorithm/centroidal.hpp>
 #include <pinocchio/algorithm/compute-all-terms.hpp>
 #include <pinocchio/algorithm/crba.hpp>
@@ -24,22 +25,33 @@
 namespace franka {
 
 /**
- * Implements RobotModelBase using Pinocchio.
+ * Implements of RobotModelBase using Pinocchio.
  */
 class RobotModel : public RobotModelBase {
  public:
   RobotModel(const std::string& urdf);
+
   void coriolis(const std::array<double, 7>& q,   // NOLINT(readability-identifier-length)
                 const std::array<double, 7>& dq,  // NOLINT(readability-identifier-length)
                 const std::array<double, 9>& i_total,
                 double m_total,
                 const std::array<double, 3>& f_x_ctotal,
                 std::array<double, 7>& c_ne) override;
+
+  void coriolis(const std::array<double, 7>& q,   // NOLINT(readability-identifier-length)
+                const std::array<double, 7>& dq,  // NOLINT(readability-identifier-length)
+                const std::array<double, 9>& i_total,
+                double m_total,
+                const std::array<double, 3>& f_x_ctotal,
+                const std::array<double, 3>& g_earth,
+                std::array<double, 7>& c_ne) override;
+
   void gravity(const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
                const std::array<double, 3>& g_earth,
                double m_total,
                const std::array<double, 3>& f_x_ctotal,
                std::array<double, 7>& g_ne) override;
+
   void mass(const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
             const std::array<double, 9>& i_total,
             double m_total,
@@ -83,24 +95,22 @@ class RobotModel : public RobotModelBase {
       const std::array<double, 16>& ee_t_k) override;
 
  private:
-  /**
-   * @brief Adds the inertia of the attached total load including end effector to the last link of
-   * the robot.
-   */
-  void addInertiaToLastLink(const std::array<double, 9>& i_total,
-                            double m_total,
-                            const std::array<double, 3>& f_x_ctotal);
-  /**
-   * @brief Computes the dynamics of the robot using the given function.
-   *        Adds the inertia of the load and restores it after the computation.
-   */
-  void computeDynamics(
-      const std::array<double, 9>& i_total,
-      double m_total,
-      const std::array<double, 3>& f_x_ctotal,
-      pinocchio::Data& data,
-      const std::function<void(pinocchio::Model&, pinocchio::Data&)>& compute_func);
+  mutable pinocchio::Data data_;
+  mutable pinocchio::Data data_gravity_;
 
+  mutable Eigen::Matrix<double, 7, 1> q_eigen_;
+  mutable Eigen::Matrix<double, 7, 1> dq_eigen_;
+  mutable Eigen::Matrix<double, 7, 1> tau_eigen_;
+  mutable Eigen::Matrix<double, 7, 1> ddq_temp_eigen_;
+  mutable Eigen::Vector3d com_eigen_;
+  mutable Eigen::Matrix3d inertia_eigen_;
+
+  mutable std::array<double, 9> cached_i_total_;
+  mutable double cached_m_total_{-1.0};
+  mutable std::array<double, 3> cached_f_x_ctotal_;
+  mutable bool inertia_cache_valid_{false};
+
+  mutable pinocchio::Model pinocchio_model_;
   /**
    * @brief Helper method to perform forward kinematics calculation
    * @param q Joint positions
@@ -122,6 +132,13 @@ class RobotModel : public RobotModelBase {
    * @return Array representation of the matrix
    */
   static std::array<double, 42> eigenToArray(const Eigen::Matrix<double, 6, 7>& matrix);
+
+  /**
+   * @brief Initializes the Pinocchio model from URDF and returns Data object
+   * @param urdf URDF string to build model from
+   * @return Pinocchio Data object for the initialized model
+   */
+  pinocchio::Data initializeModelAndReturnData(const std::string& urdf);
 
   /**
    * @brief Adds a new frame to the Pinocchio model
@@ -185,10 +202,40 @@ class RobotModel : public RobotModelBase {
                                                                      1, 0, 0, 0, 0, 1},
                              bool update_stiffness = false);
 
-  pinocchio::Model pinocchio_model_;
+  /**
+   * @brief Updates the inertia if different from the current inertia parameters
+   * @param i_total Inertia of the last link
+   * @param m_total Total mass of the last link
+   * @param f_x_ctotal Center of mass of the last link
+   */
+  void updateInertiaIfNeeded(const std::array<double, 9>& i_total,
+                             double m_total,
+                             const std::array<double, 3>& f_x_ctotal) const;
+
+  /**
+   * @brief Restores the original inertia
+   */
+  void restoreOriginalInertia() const;
+
+  /**
+   * @brief Computes the gravity vector
+   * @param q Joint positions
+   * @param g_earth Gravity vector
+   * @param g_ne Gravity vector in the end-effector frame
+   */
+  void computeGravityVector(
+      const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
+      const std::array<double, 3>& g_earth,
+      std::array<double, 7>& g_ne) const;
+
   pinocchio::Inertia initial_last_link_inertia_;
   pinocchio::FrameIndex last_link_frame_index_;
   pinocchio::JointIndex last_joint_index_;
+  void copyToEigenQ(const std::array<double, 7>& q) const;  // NOLINT(readability-identifier-length)
+  void copyToEigenDQ(
+      const std::array<double, 7>& dq) const;  // NOLINT(readability-identifier-length)
+  static void copyFromEigen(const Eigen::VectorXd& src, std::array<double, 7>& dst);
+  static void copyFromEigenMatrix(const Eigen::MatrixXd& src, std::array<double, 49>& dst);
   pinocchio::FrameIndex ee_frame_index_;
   pinocchio::FrameIndex stiffness_frame_index_;
 };

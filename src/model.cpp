@@ -163,11 +163,16 @@ std::array<double, 49> franka::Model::mass(
   return output;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 std::array<double, 7> franka::Model::coriolis(
     const franka::RobotState& robot_state) const noexcept {
   return coriolis(robot_state.q, robot_state.dq, robot_state.I_total, robot_state.m_total,
                   robot_state.F_x_Ctotal);
 }
+
+#pragma GCC diagnostic pop
 
 std::array<double, 7> franka::Model::coriolis(
     const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
@@ -178,6 +183,19 @@ std::array<double, 7> franka::Model::coriolis(
     const noexcept {
   std::array<double, 7> output;
   robot_model_->coriolis(q, dq, I_total, m_total, F_x_Ctotal, output);
+
+  return output;
+}
+
+std::array<double, 7> franka::Model::coriolis(
+    const std::array<double, 7>& q,        // NOLINT(readability-identifier-length)
+    const std::array<double, 7>& dq,       // NOLINT(readability-identifier-length)
+    const std::array<double, 9>& I_total,  // NOLINT(readability-identifier-naming)
+    double m_total,
+    const std::array<double, 3>& F_x_Ctotal,  // NOLINT(readability-identifier-naming)
+    const std::array<double, 3>& gravity_earth) const noexcept {
+  std::array<double, 7> output;
+  robot_model_->coriolis(q, dq, I_total, m_total, F_x_Ctotal, gravity_earth, output);
 
   return output;
 }
