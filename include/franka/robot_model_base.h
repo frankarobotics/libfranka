@@ -77,7 +77,7 @@ class RobotModelBase {
                        std::array<double, 7>& g_ne) = 0;
 
   /**
-   * Calculates the 7x7 mass matrix. Unit: \f$[kg \times m^2]\f$.
+   * Calculates the 7x7 inertia matrix. Unit: \f$[kg \times m^2]\f$.
    *
    * @param[in] q Joint position.
    * @param[in] i_total Inertia of the attached total load including end effector, relative to
@@ -86,7 +86,7 @@ class RobotModelBase {
    * Unit: \f$[kg]\f$.
    * @param[in] f_x_ctotal Translation from flange to center of mass of the attached total load.
    * Unit: \f$[m]\f$.
-   * @param[out] m_ne Vectorized 7x7 mass matrix, column-major.
+   * @param[out] m_ne Vectorized 7x7 inertia matrix, column-major.
    */
   virtual void mass(const std::array<double, 7>& q,  // NOLINT(readability-identifier-length)
                     const std::array<double, 9>& i_total,

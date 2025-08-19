@@ -11,6 +11,18 @@
 - Fix: Fixed the elbow limit rating taking the wrong values
 - Breaking: Added the 'async position motion generator' control scheme, which allows for asynchronous position control of the robot
 
+## 0.15.3 - 2025-07-31
+
+* Fix outdated Emika links
+
+## 0.15.2 - 2025-07-24
+
+* Optimize robot model computation
+
+## 0.15.1 - 2025-06-23
+
+* docs starts a new docs build
+
 ## 0.15.0 - 2025-01-16
 
 Requires Franka Research 3 System Version >= 5.7.2
