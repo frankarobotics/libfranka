@@ -16,8 +16,8 @@
 #include <Poco/Net/NetException.h>
 #include <Poco/Net/StreamSocket.h>
 
-#include <netinet/tcp.h>
 #ifdef __APPLE__
+#include <netinet/tcp.h>
   #ifndef TCP_KEEPIDLE
     #define TCP_KEEPIDLE TCP_KEEPALIVE
   #endif
