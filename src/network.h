@@ -16,6 +16,13 @@
 #include <Poco/Net/NetException.h>
 #include <Poco/Net/StreamSocket.h>
 
+#include <netinet/tcp.h>
+#ifdef __APPLE__
+  #ifndef TCP_KEEPIDLE
+    #define TCP_KEEPIDLE TCP_KEEPALIVE
+  #endif
+#endif
+
 #include <franka/exception.h>
 
 #include <research_interface/robot/service_types.h>
