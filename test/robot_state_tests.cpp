@@ -65,6 +65,8 @@ TEST(RobotState, CanBeStreamed) {
   EXPECT_PRED2(stringContains, output, "O_ddP_EE_c");
   EXPECT_PRED2(stringContains, output, "theta");
   EXPECT_PRED2(stringContains, output, "dtheta");
+  EXPECT_PRED2(stringContains, output, "accelerometer_top");
+  EXPECT_PRED2(stringContains, output, "accelerometer_bottom");
   EXPECT_PRED2(stringContains, output, "current_errors");
   EXPECT_PRED2(stringContains, output, "last_motion_errors");
   EXPECT_PRED2(stringContains, output, "control_command_success_rate");

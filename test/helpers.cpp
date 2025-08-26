@@ -190,6 +190,8 @@ void testRobotStatesAreEqual(const franka::RobotState& expected, const franka::R
   EXPECT_EQ(expected.O_ddP_EE_c, actual.O_ddP_EE_c);
   EXPECT_EQ(expected.theta, actual.theta);
   EXPECT_EQ(expected.dtheta, actual.dtheta);
+  EXPECT_EQ(expected.accelerometer_top, actual.accelerometer_top);
+  EXPECT_EQ(expected.accelerometer_bottom, actual.accelerometer_bottom);
   EXPECT_EQ(expected.current_errors, actual.current_errors);
   EXPECT_EQ(expected.last_motion_errors, actual.last_motion_errors);
   EXPECT_EQ(expected.control_command_success_rate, actual.control_command_success_rate);
@@ -279,6 +281,10 @@ void testRobotStatesAreEqual(const research_interface::robot::RobotState& expect
 
 double randomDouble() {
   return 10.0 * static_cast<double>(std::rand()) / RAND_MAX;
+}
+
+double randomFloat() {
+  return 10.0 * static_cast<float>(std::rand()) / RAND_MAX;
 }
 
 bool randomBool() {
@@ -423,6 +429,16 @@ void randomRobotState(franka::RobotState& robot_state) {
   for (double& element : robot_state.dtheta) {
     element = randomDouble();
   }
+  for (auto& acceleration : robot_state.accelerometer_top) {
+    for (float& element : acceleration) {
+      element = randomDouble();
+    }
+  }
+  for (auto& acceleration : robot_state.accelerometer_bottom) {
+    for (float& element : acceleration) {
+      element = randomDouble();
+    }
+  }
   std::array<bool, sizeof(research_interface::robot::RobotState::errors)> errors{};
   for (bool& error : errors) {
     error = randomBool();
@@ -545,6 +561,16 @@ void randomRobotState(research_interface::robot::RobotState& robot_state) {
   }
   for (auto& element : robot_state.dtheta) {
     element = randomDouble();
+  }
+  for (auto& acceleration : robot_state.accelerometer_top) {
+    for (float& element : acceleration) {
+      element = randomFloat();
+    }
+  }
+  for (auto& acceleration : robot_state.accelerometer_bottom) {
+    for (float& element : acceleration) {
+      element = randomFloat();
+    }
   }
   for (bool& error : robot_state.errors) {
     error = randomBool();
@@ -774,6 +800,8 @@ bool operator==(const RobotState& lhs, const RobotState& rhs) {
          lhs.O_dP_EE_d == rhs.O_dP_EE_d && lhs.O_ddP_O == rhs.O_ddP_O &&
          lhs.O_T_EE_c == rhs.O_T_EE_c && lhs.O_dP_EE_c == rhs.O_dP_EE_c &&
          lhs.O_ddP_EE_c == rhs.O_ddP_EE_c && lhs.theta == rhs.theta && lhs.dtheta == rhs.dtheta &&
+         lhs.accelerometer_top == rhs.accelerometer_top &&
+         lhs.accelerometer_bottom == rhs.accelerometer_bottom &&
          lhs.current_errors == rhs.current_errors &&
          lhs.last_motion_errors == rhs.last_motion_errors &&
          lhs.control_command_success_rate == rhs.control_command_success_rate &&

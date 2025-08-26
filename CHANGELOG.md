@@ -10,6 +10,7 @@
 - Bumped: clang version from 6 to 14
 - Fix: Fixed the elbow limit rating taking the wrong values
 - Breaking: Added the 'async position motion generator' control scheme, which allows for asynchronous position control of the robot
+- Feat: expose accelerometer data in robot state
 
 ## 0.15.3 - 2025-07-31
 

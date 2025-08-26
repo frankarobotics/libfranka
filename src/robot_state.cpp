@@ -19,6 +19,23 @@ std::ostream& operator<<(std::ostream& ostream, const std::array<T, N>& array) {
   return ostream;
 }
 
+template <class T, size_t M, size_t N>
+std::ostream& operator<<(std::ostream& ostream, const std::array<std::array<T, M>, N>& array) {
+  ostream << "[";
+  // TODO (wink_ma): check if for loop can be replaced using iterators
+  for (size_t i = 0; i < N; ++i) {
+    if (i > 0) {
+      ostream << ", ";
+    }
+    ostream << "[";
+    std::copy(array[i].cbegin(), array[i].cend() - 1, std::ostream_iterator<T>(ostream, ","));
+    std::copy(array[i].cend() - 1, array[i].cend(), std::ostream_iterator<T>(ostream));
+    ostream << "]";
+  }
+  ostream << "]";
+  return ostream;
+}
+
 }  // anonymous namespace
 
 std::ostream& operator<<(std::ostream& ostream, const RobotMode robot_mode) {
@@ -79,6 +96,8 @@ std::ostream& operator<<(std::ostream& ostream, const franka::RobotState& robot_
           << ", \"O_dP_EE_c\": " << robot_state.O_dP_EE_c
           << ", \"O_ddP_EE_c\": " << robot_state.O_ddP_EE_c << ", \"theta\": " << robot_state.theta
           << ", \"dtheta\": " << robot_state.dtheta
+          << ", \"accelerometer_top\": " << robot_state.accelerometer_top
+          << ", \"accelerometer_bottom\": " << robot_state.accelerometer_bottom
           << ", \"current_errors\": " << robot_state.current_errors
           << ", \"last_motion_errors\": " << robot_state.last_motion_errors
           << ", \"control_command_success_rate\": " << robot_state.control_command_success_rate

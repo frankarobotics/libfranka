@@ -506,6 +506,8 @@ RobotState convertRobotState(const research_interface::robot::RobotState& robot_
   converted.O_ddP_EE_c = robot_state.O_ddP_EE_c;
   converted.theta = robot_state.theta;
   converted.dtheta = robot_state.dtheta;
+  converted.accelerometer_top = robot_state.accelerometer_top;
+  converted.accelerometer_bottom = robot_state.accelerometer_bottom;
   converted.current_errors = robot_state.errors;
   converted.last_motion_errors = robot_state.reflex_reason;
   converted.control_command_success_rate = robot_state.control_command_success_rate;
