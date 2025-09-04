@@ -153,6 +153,9 @@ target_link_libraries(franka PUBLIC
   fmt::fmt
 )
 
+## Compile pylibfranka
+add_subdirectory(pylibfranka)
+
 ## Installation
 include(GNUInstallDirs)
 set(INSTALL_CMAKE_CONFIG_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/Franka)

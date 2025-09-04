@@ -1,0 +1,8 @@
+numpy>=1.19.0
+setuptools>=61.0
+wheel
+pybind11>=2.6.0
+numpy>=1.19.0
+patchelf>=0.10
+auditwheel>=6.0.0
+build>=0.10

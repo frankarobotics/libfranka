@@ -35,8 +35,6 @@
 #include <pybind11/stl.h>
 #include <Eigen/Core>
 
-namespace py = pybind11;
-
 namespace pylibfranka {
 
 class PyRobot {
