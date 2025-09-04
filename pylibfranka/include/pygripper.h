@@ -19,8 +19,6 @@
 #include <memory>
 #include <string>
 
-namespace py = pybind11;
-
 namespace pylibfranka {
 
 class PyGripper {
