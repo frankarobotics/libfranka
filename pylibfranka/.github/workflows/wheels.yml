@@ -1,0 +1,119 @@
+name: Build Wheels
+
+on:
+  push:
+    branches: [ '*' ]
+    tags: [ 'v*' ]  # Trigger on version tags
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  build_and_publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed to create releases
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Get Package Version
+      id: get_package_version
+      run: ./scripts/get_version.sh
+      shell: bash
+
+    - name: Build Docker Image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Dockerfile
+        tags: pylibfranka:latest
+        push: false
+        load: true
+
+    - name: Setup Dependencies
+      uses: addnab/docker-run-action@v3
+      with:
+        image: pylibfranka:latest
+        options: -v ${{ github.workspace }}:/workspace
+        run: |
+          cd /workspace
+          ./scripts/setup_dependencies.sh
+
+    - name: Build Package
+      uses: addnab/docker-run-action@v3
+      with:
+        image: pylibfranka:latest
+        options: -v ${{ github.workspace }}:/workspace
+        run: |
+          cd /workspace
+          ./scripts/build_package.sh
+
+    - name: Repair Wheels with Auditwheel
+      uses: addnab/docker-run-action@v3
+      with:
+        image: pylibfranka:latest
+        options: -v ${{ github.workspace }}:/workspace
+        run: |
+          cd /workspace
+          ./scripts/repair_wheels.sh
+
+    - name: Test Installation
+      uses: addnab/docker-run-action@v3
+      with:
+        image: python:3.10-slim
+        options: -v ${{ github.workspace }}:/workspace
+        run: |
+          cd /workspace
+          /workspace/scripts/test_installation.sh "-manylinux_2_34_x86_64.whl"
+
+    - name: Lint Code
+      uses: addnab/docker-run-action@v3
+      with:
+        image: pylibfranka:latest
+        options: -v ${{ github.workspace }}:/workspace
+        run: |
+          cd /workspace
+          ./scripts/lint_code.sh
+
+    - name: Upload wheels as artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wheels
+        path: ./wheelhouse/*.whl
+
+    - name: Get release info
+      if: startsWith(github.ref, 'refs/tags/')
+      id: get_release_info
+      run: |
+        # Extract tag name from GITHUB_REF (e.g., refs/tags/v1.0.0 -> v1.0.0)
+        TAG=${GITHUB_REF#refs/tags/}
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+        # Extract version without 'v' prefix (e.g., v1.0.0 -> 1.0.0)
+        VERSION=${TAG#v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.get_release_info.outputs.tag }}
+        name: Release ${{ steps.get_release_info.outputs.tag }}
+        draft: false
+        prerelease: false
+        files: ./wheelhouse/*.whl
+        body: |
+          # pylibfranka ${{ steps.get_release_info.outputs.version }}
+          Python bindings for libfranka, providing easy-to-use Python interfaces for controlling Franka robots.
+
+          ## Installation
+          ```bash
+          pip install pylibfranka==${{ steps.get_release_info.outputs.version }}
+          ```
+
+          ## Documentation
+          See the [README](https://github.com/frankaemika/pylibfranka#readme) for more information.
