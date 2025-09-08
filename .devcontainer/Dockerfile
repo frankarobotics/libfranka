@@ -26,30 +26,34 @@ RUN apt-get update \
     && apt-get install -y \
     bash-completion \
     build-essential \
+    cmake \
     clang-6.0 \
     clang-format-6.0 \
     clang-tidy-6.0 \
-    cmake \
+    curl \
     doxygen \
+    dpkg \
+    git \
     graphviz \
     lcov \
     libeigen3-dev \
     libpoco-dev \
-    rename \
-    valgrind \
     lsb-release \
-    dpkg \
-    git \
     libeigen3-dev \
     libpoco-dev \
     libfmt-dev \
-    python3-dev \
-    python3-pip \
     liburdfdom-headers-dev \
     libconsole-bridge-dev \
     libtinyxml2-dev \
     lsb-release \
-    curl \
+    python3-dev \
+    python3-pip \
+    python3-venv \
+    python3-distutils \
+    python3-numpy \
+    pybind11-dev \
+    rename \
+    valgrind \
     wget \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \
@@ -66,11 +70,22 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
 
+# Install Python wheel building tools
+RUN python3 -m pip install --upgrade pip setuptools wheel && \
+    python3 -m pip install \
+    auditwheel \
+    build \
+    cibuildwheel \
+    twine \
+    patchelf \
+    flake8 \
+    pybind11
+
 # Set environment variables
 ENV PATH=/opt/openrobots/bin:$PATH \
     PKG_CONFIG_PATH=/opt/openrobots/lib/pkgconfig:$PKG_CONFIG_PATH \
     LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH \
-    PYTHONPATH=/opt/openrobots/lib/python3.10/site-packages:$PYTHONPATH \
+    PYTHONPATH=~/.local/lib/python3.8/site-packages:/opt/openrobots/lib/python3.8/site-packages:$PYTHONPATH \
     CMAKE_PREFIX_PATH=/opt/openrobots/lib/cmake:$CMAKE_PREFIX_PATH
 
 USER $USERNAME

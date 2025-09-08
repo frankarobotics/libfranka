@@ -26,28 +26,34 @@ RUN apt-get update \
     && apt-get install -y \
     bash-completion \
     build-essential \
+    cmake \
     clang-6.0 \
     clang-format-6.0 \
     clang-tidy-6.0 \
-    cmake \
+    curl \
     doxygen \
+    dpkg \
+    git \
     graphviz \
     lcov \
     libeigen3-dev \
     libpoco-dev \
-    rename \
-    valgrind \
     lsb-release \
-    dpkg \
-    git \
     libeigen3-dev \
     libpoco-dev \
     libfmt-dev \
-    python3-dev \
-    python3-pip \
+    liburdfdom-headers-dev \
+    libconsole-bridge-dev \
     libtinyxml2-dev \
     lsb-release \
-    curl \
+    python3-dev \
+    python3-pip \
+    python3-venv \
+    python3-distutils \
+    python3-numpy \
+    pybind11-dev \
+    rename \
+    valgrind \
     wget \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \
@@ -118,5 +124,15 @@ RUN git clone --recursive --branch v3.11.1 https://github.com/nlohmann/json.git 
     && make install \
     && cd ../.. \
     && rm -rf json
+# Install Python wheel building tools
+RUN python3 -m pip install --upgrade pip setuptools wheel && \
+    python3 -m pip install \
+    auditwheel \
+    build \
+    cibuildwheel \
+    twine \
+    patchelf \
+    flake8 \
+    pybind11
 
 USER $USERNAME

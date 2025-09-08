@@ -24,77 +24,30 @@ Before installing pylibfranka, ensure you have the following prerequisites:
 - Eigen3 development headers
 - Poco development headers
 
+**Disclaimer: If you are using the provided devcontainer, you can skip the prerequisites installation as they are already included in the container.**
+
 ### Installing Prerequisites on Ubuntu/Debian
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y build-essential cmake libeigen3-dev libpoco-dev python3-dev
 ```
-## Installing Pinocchio
 
-```bash
- sudo apt install -qqy lsb-release curl
-```
+#### Installing pylibfranka via PIP
 
-```bash
- sudo mkdir -p /etc/apt/keyrings
- curl http://robotpkg.openrobots.org/packages/debian/robotpkg.asc \
-     | sudo tee /etc/apt/keyrings/robotpkg.asc
-```
-
-```bash
- echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/robotpkg.asc] http://robotpkg.openrobots.org/packages/debian/pub $(lsb_release -cs) robotpkg" \
-     | sudo tee /etc/apt/sources.list.d/robotpkg.list
-```
-```bash
- sudo apt update
- sudo apt install -qqy robotpkg-py3*-pinocchio
-```
-
-### Installation from Source
-
-1. Clone the repository with the `--recursive` flag to also clone the libfranka submodule:
-
-```bash
-git clone --recursive git@github.com:frankaemika/pylibfranka.git
-cd pylibfranka
-```
-
-2. Create and activate a virtual environment (optional but recommended):
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-3. Install the required build dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-4. Install the package in development mode:
+From the root folder, you can install `pylibfranka` (therefore, NOT in the build folder) using pip:
 
 ```bash
 pip install .
 ```
 
-5. Install and set up pre-commit hooks (recommended for development):
+or
 
 ```bash
-pip install pre-commit
-pre-commit install
+pip3 install .
 ```
 
-This will install pre-commit and set up the git hooks to automatically run checks before each commit. The hooks will help maintain code quality by running various checks like code formatting, linting, and other validations.
-
-To manually run the pre-commit checks on all files:
-
-```bash
-pre-commit run --all-files
-```
-
-This will build the C++ extension and install the Python package.
+This will install pylibfranka in your current Python environment.
 
 ## Examples
 
@@ -107,7 +60,8 @@ This example demonstrates how to use an external control loop with pylibfranka t
 To run the example:
 
 ```bash
-python3 examples/joint_position_example.py --ip <robot_ip>
+cd examples
+python3 joint_position_example.py --ip <robot_ip>
 ```
 
 Where `<robot_ip>` is the IP address of your Franka robot. If not specified, it defaults to "localhost".
@@ -125,7 +79,8 @@ This example shows how to read and display the complete state of the robot.
 To run the example:
 
 ```bash
-python3 examples/print_robot_state.py --ip <robot_ip> [--rate <rate>] [--count <count>]
+cd examples
+python3 print_robot_state.py --ip <robot_ip> [--rate <rate>] [--count <count>]
 ```
 
 Where:
@@ -150,7 +105,8 @@ This example demonstrates how to implement a joint impedance controller that ren
 To run the example:
 
 ```bash
-python3 examples/joint_impedance_example.py --ip <robot_ip>
+cd examples
+python3 joint_impedance_example.py --ip <robot_ip>
 ```
 
 Where `--ip` is the robot's IP address (defaults to "localhost").
@@ -174,7 +130,8 @@ This example demonstrates how to control the Franka gripper, including homing, g
 To run the example:
 
 ```bash
-python3 examples/move_gripper.py --robot_ip <robot_ip> [--width <width>] [--homing <0|1>] [--speed <speed>] [--force <force>]
+cd examples
+python3 move_gripper.py --robot_ip <robot_ip> [--width <width>] [--homing <0|1>] [--speed <speed>] [--force <force>]
 ```
 
 Where:
@@ -196,7 +153,3 @@ The gripper example:
 - Attempts to grasp an object with specified parameters
 - Verifies successful grasping
 - Releases the object
-
-## Troubleshooting
-
-More information about troubleshooting you can find in the FCI documentation https://frankaemika.github.io/docs/troubleshooting.html

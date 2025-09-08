@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.16.0 - 2025-09-15
+
+- Feat: Added pylibfranka - a python binding for libfranka
+
 ## 0.15.3 - 2025-07-31
 
 * Fix outdated Emika links
