@@ -61,7 +61,8 @@ pipeline {
                   dir("build-debug.${env.DISTRO}") {
                     sh '''
                       cmake -DCMAKE_BUILD_TYPE=Debug -DSTRICT=ON -DBUILD_COVERAGE=OFF \
-                            -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
+                            -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
+                            -DGENERATE_PYLIBFRANKA=ON ..
                       make -j$(nproc)
                     '''
                   }
@@ -72,7 +73,8 @@ pipeline {
                   dir("build-release.${env.DISTRO}") {
                     sh '''
                       cmake -DCMAKE_BUILD_TYPE=Release -DSTRICT=ON -DBUILD_COVERAGE=OFF \
-                            -DBUILD_DOCUMENTATION=ON -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
+                            -DBUILD_DOCUMENTATION=ON -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
+                            -DGENERATE_PYLIBFRANKA=ON ..
                       make -j$(nproc)
                     '''
                   }
@@ -159,7 +161,7 @@ pipeline {
                      echo 0 | sudo tee /proc/sys/kernel/randomize_va_space || echo "Could not disable ASLR"
                      echo "[Debug Tests] ASLR status: $(cat /proc/sys/kernel/randomize_va_space)"
                    '''
-                   
+
                    dir("build-debug.${env.DISTRO}") {
                      sh '''
                        echo "[Debug Tests] Running tests..."
@@ -173,7 +175,7 @@ pipeline {
                        ctest -V
                      '''
                    }
-                   
+
                    sh '''
                      # Re-enable ASLR for security
                      echo "[Debug Tests] Re-enabling ASLR..."

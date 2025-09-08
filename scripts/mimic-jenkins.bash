@@ -8,7 +8,7 @@ trap 'echo "Error: Script failed at line $LINENO" >&2; exit 1' ERR
 # It's done in a script so that you don't have to do this manually.
 
 # IMPORTANT !
-# In this script STRICT is set to OFF (-werror is not on), 
+# In this script STRICT is set to OFF (-werror is not on),
 # so that the build does not fail on warnings.
 # The real Jenkins Job has STRICT=ON and will fail on warnings
 
@@ -23,7 +23,7 @@ TASKS=$(( $(nproc) > 1 ? $(nproc) - 1 : 1 ))
 echo "Using $TASKS build tasks"
 
 echo 'Build debug'
-mkdir build-debug && pushd build-debug 
+mkdir build-debug && pushd build-debug
 cmake -DCMAKE_BUILD_TYPE=Debug -DSTRICT=OFF -DBUILD_COVERAGE=OFF \
       -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
 make -j${TASKS}

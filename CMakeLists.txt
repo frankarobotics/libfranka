@@ -11,6 +11,7 @@ project(libfranka
 
 option(BUILD_DOCUMENTATION "Build documentation" OFF)
 option(SKIP_CXX_BUILD "Skips the c++ build" OFF)
+option(GENERATE_PYLIBFRANKA "Generate the python bindings for libfranka" OFF)
 if(BUILD_DOCUMENTATION)
   add_subdirectory(doc)
 
@@ -151,7 +152,9 @@ target_link_libraries(franka PUBLIC
 )
 
 ## Compile pylibfranka
-add_subdirectory(pylibfranka)
+if (GENERATE_PYLIBFRANKA)
+  add_subdirectory(pylibfranka)
+endif()
 
 ## Installation
 include(GNUInstallDirs)

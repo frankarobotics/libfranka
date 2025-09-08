@@ -14,7 +14,7 @@ FILES_WITH_ISSUES=()
 for file in $FILES; do
   # Run clang-format and check if replacements are needed
   OUTPUT=$($CLANG_FORMAT -output-replacements-xml "$file")
-  
+
   # If there are replacements, add the file to the issues array
   if [[ $OUTPUT == *"<replacement "* ]]; then
     FILES_WITH_ISSUES+=("$file")

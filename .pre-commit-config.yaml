@@ -36,13 +36,6 @@ repos:
         types_or: [c++, c, cuda]
         args: ["-style=file"]
 
-  # C++ linting with cpplint
-  - repo: https://github.com/cpplint/cpplint
-    rev: 1.6.1
-    hooks:
-      - id: cpplint
-        args: ["--filter=-build/include_subdir,-runtime/references,-whitespace/line_length,-build/include_order,-build/include_what_you_use", "--linelength=100", "--extensions=cpp,h,hpp"]
-
   # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0

@@ -121,6 +121,29 @@ To run a sample program, navigate to the build folder and execute the following 
 ./examples/communication_test <robot-ip>
 ```
 
+### 5. Pylibfranka
+
+Pylibfranka is a Python binding for libfranka, allowing you to control Franka robots using Python. It is included in the libfranka repository and can be built alongside libfranka. For more details, see `pylibfranka` and its [README](pylibfranka/README.md).
+
+### 6. Development Information
+
+If you actively contribute to this repository, you should install and set up pre-commit hooks:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+This will install pre-commit and set up the git hooks to automatically run checks before each commit. The hooks will help maintain code quality by running various checks like code formatting, linting, and other validations.
+
+To manually run the pre-commit checks on all files:
+
+```bash
+pre-commit run --all-files
+```
+
+This will build the C++ extension and install the Python package.
+
 ## License
 
 `libfranka` is licensed under the [Apache 2.0 license][apache-2.0].
