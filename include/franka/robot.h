@@ -465,6 +465,22 @@ class Robot {
   auto getRobotModel() -> std::string;
 
   /**
+   * Computes upper limits for joint velocities based on current joint positions.
+   *
+   * @param[in] q Joint positions.
+   * @return Upper limits for joint velocities.
+   */
+  auto getUpperJointVelocityLimits(const std::array<double, 7>& q) -> std::array<double, 7>;
+
+  /**
+   * Computes lower limits for joint velocities based on current joint positions.
+   *
+   * @param[in] q Joint positions.
+   * @return Lower limits for joint velocities.
+   */
+  auto getLowerJointVelocityLimits(const std::array<double, 7>& q) -> std::array<double, 7>;
+
+  /**
    * Changes the collision behavior.
    *
    * Set separate torque and force boundaries for acceleration/deceleration and constant velocity

@@ -36,6 +36,14 @@ class MockRobotControl : public franka::RobotControl {
               (override));
   MOCK_METHOD(void, cancelMotion, (uint32_t), (override));
   MOCK_METHOD(void, throwOnMotionError, (const franka::RobotState&, uint32_t), (override));
+  MOCK_METHOD((std::array<double, 7>),
+              getUpperJointVelocityLimits,
+              ((const std::array<double, 7>&)),
+              (const, override));
+  MOCK_METHOD((std::array<double, 7>),
+              getLowerJointVelocityLimits,
+              ((const std::array<double, 7>&)),
+              (const, override));
 
   franka::RealtimeConfig realtimeConfig() const noexcept override {
     return franka::RealtimeConfig::kIgnore;

@@ -7,10 +7,12 @@
 #include <franka/active_motion_generator.h>
 #include <franka/exception.h>
 #include <franka/robot.h>
+#include <franka/rate_limiting.h>
 #include "examples_common.h"
 /**
  * @example generate_joint_position_motion_external_control_loop.cpp
- * An example showing how to generate a joint position motion with an external control loop..
+ * An example showing how to generate a joint position motion with an external control loop
+ * using rate limiter parameters parsed from URDF to compute safe joint velocity limits.
  *
  * @warning Before executing this example, make sure there is enough space in front of the robot.
  */
@@ -23,7 +25,7 @@ int main(int argc, char** argv) {
   }
 
   try {
-    franka::Robot robot(argv[1]);
+    franka::Robot robot(argv[1], franka::RealtimeConfig::kIgnore);
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
@@ -46,7 +48,7 @@ int main(int argc, char** argv) {
 
     std::array<double, 7> initial_position{{0, 0, 0, 0, 0, 0, 0}};
     double time = 0.0;
-    auto control_callback = [&initial_position, &time](
+    auto control_callback = [&initial_position, &time, &robot](
                                 const franka::RobotState& robot_state,
                                 franka::Duration period) -> franka::JointPositions {
       time += period.toSec();
@@ -57,16 +59,30 @@ int main(int argc, char** argv) {
 
       double delta_angle = M_PI / 8.0 * (1 - std::cos(M_PI / 2.5 * time));
 
-      franka::JointPositions output = {{initial_position[0], initial_position[1],
-                                        initial_position[2], initial_position[3] + delta_angle,
-                                        initial_position[4] + delta_angle, initial_position[5],
-                                        initial_position[6] + delta_angle}};
+      // Compute desired joint positions
+      std::array<double, 7> commanded_positions = {
+          {initial_position[0], initial_position[1], initial_position[2],
+           initial_position[3] + delta_angle, initial_position[4] + delta_angle,
+           initial_position[5], initial_position[6] + delta_angle}};
+
+      // Compute velocity limits based on current joint position using rate limiter parameters
+      auto upper_velocity_limits = robot.getUpperJointVelocityLimits(robot_state.q);
+      auto lower_velocity_limits = robot.getLowerJointVelocityLimits(robot_state.q);
+
+      // Apply rate limiting directly to positions - this handles velocity/acceleration/jerk
+      // limiting internally
+      auto rate_limited_positions_array = franka::limitRate(
+          upper_velocity_limits, lower_velocity_limits, franka::kMaxJointAcceleration,
+          franka::kMaxJointJerk, commanded_positions, robot_state.q_d, robot_state.dq_d,
+          robot_state.ddq_d);
+
+      franka::JointPositions rate_limited_positions(rate_limited_positions_array);
 
       if (time >= 5.0) {
         std::cout << std::endl << "Finished motion, shutting down example" << std::endl;
-        return franka::MotionFinished(output);
+        return franka::MotionFinished(rate_limited_positions);
       }
-      return output;
+      return rate_limited_positions;
     };
 
     bool motion_finished = false;

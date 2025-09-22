@@ -53,9 +53,10 @@
     <parent link="fp3_link0"/>
     <child link="fp3_link1"/>
     <axis xyz="0 0 1"/>
-    <limit effort="87.0" lower="-2.7437" upper="2.7437" velocity="2.62"/>
+    <limit effort="87.0" lower="-2.750100" upper="2.75010" velocity="2.62"/>
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-2.7437" soft_upper_limit="2.7437"/>
     <dynamics D="1" K="7000" damping="0.003" friction="0.0" mu_coulomb="0" mu_viscous="16"/>
+    <position_based_velocity_limits deceleration_limit="6.0" velocity_offset="0.30"/>
   </joint>
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="fp3_link2">
@@ -80,9 +81,10 @@
     <parent link="fp3_link1"/>
     <child link="fp3_link2"/>
     <axis xyz="0 0 1"/>
-    <limit effort="87.0" lower="-1.7837" upper="1.7837" velocity="2.62"/>
+    <limit effort="87.0" lower="-1.791800" upper="1.79180" velocity="2.62"/>
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-1.7837" soft_upper_limit="1.7837"/>
     <dynamics D="1" K="7000" damping="0.003" friction="0.0" mu_coulomb="0" mu_viscous="16"/>
+    <position_based_velocity_limits deceleration_limit="2.585" velocity_offset="0.20"/>
   </joint>
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="fp3_link3">
@@ -107,9 +109,10 @@
     <parent link="fp3_link2"/>
     <child link="fp3_link3"/>
     <axis xyz="0 0 1"/>
-    <limit effort="87.0" lower="-2.9007" upper="2.9007" velocity="2.62"/>
+    <limit effort="87.0" lower="-2.906500" upper="2.90650" velocity="2.62"/>
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-2.9007" soft_upper_limit="2.9007"/>
     <dynamics D="1" K="7000" damping="0.003" friction="0.0" mu_coulomb="0" mu_viscous="16"/>
+    <position_based_velocity_limits deceleration_limit="3.50" velocity_offset="0.20"/>
   </joint>
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="fp3_link4">
@@ -134,9 +137,10 @@
     <parent link="fp3_link3"/>
     <child link="fp3_link4"/>
     <axis xyz="0 0 1"/>
-    <limit effort="87.0" lower="-3.0421" upper="-0.1518" velocity="2.62"/>
+    <limit effort="87.0" lower="-3.048100" upper="-0.1458" velocity="2.62"/>
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-3.0421" soft_upper_limit="-0.1518"/>
     <dynamics D="1" K="7000" damping="0.003" friction="0.0" mu_coulomb="0" mu_viscous="16"/>
+    <position_based_velocity_limits deceleration_limit="4.00" velocity_offset="0.30"/>
   </joint>
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="fp3_link5">
@@ -161,9 +165,10 @@
     <parent link="fp3_link4"/>
     <child link="fp3_link5"/>
     <axis xyz="0 0 1"/>
-    <limit effort="12.0" lower="-2.8065" upper="2.8065" velocity="5.26"/>
+    <limit effort="12.0" lower="-2.810100" upper="2.81010" velocity="5.26"/>
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-2.8065" soft_upper_limit="2.8065"/>
     <dynamics D="1" K="7000" damping="0.003" friction="0.0" mu_coulomb="0" mu_viscous="16"/>
+    <position_based_velocity_limits deceleration_limit="17.0" velocity_offset="0.35"/>
   </joint>
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="fp3_link6">
@@ -188,9 +193,10 @@
     <parent link="fp3_link5"/>
     <child link="fp3_link6"/>
     <axis xyz="0 0 1"/>
-    <limit effort="12.0" lower="0.5445" upper="4.5169" velocity="4.18"/>
+    <limit effort="12.0" lower="0.54092" upper="4.52050" velocity="4.18"/>
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="0.5445" soft_upper_limit="4.5169"/>
     <dynamics D="1" K="7000" damping="0.003" friction="0.0" mu_coulomb="0" mu_viscous="16"/>
+    <position_based_velocity_limits deceleration_limit="5.5" velocity_offset="0.35"/>
   </joint>
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="fp3_link7">
@@ -215,9 +221,10 @@
     <parent link="fp3_link6"/>
     <child link="fp3_link7"/>
     <axis xyz="0 0 1"/>
-    <limit effort="12.0" lower="-3.0159" upper="3.0159" velocity="5.26"/>
+    <limit effort="12.0" lower="-3.019600" upper="3.01960" velocity="5.26"/>
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-3.0159" soft_upper_limit="3.0159"/>
     <dynamics D="1" K="7000" damping="0.003" friction="0.0" mu_coulomb="0" mu_viscous="16"/>
+    <position_based_velocity_limits deceleration_limit="17.0" velocity_offset="0.35"/>
   </joint>
   <link name="fp3_link8"/>
   <joint name="fp3_joint8" type="fixed">

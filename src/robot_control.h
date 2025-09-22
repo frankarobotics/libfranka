@@ -82,6 +82,24 @@ class RobotControl {
    * @return RealtimeConfig The realtime configuration.
    */
   virtual RealtimeConfig realtimeConfig() const noexcept = 0;
+
+  /**
+   * Computes the upper joint velocity limits based on current joint positions.
+   *
+   * @param q Current joint positions.
+   * @return std::array<double, 7> Upper joint velocity limits.
+   */
+  virtual auto getUpperJointVelocityLimits(const std::array<double, 7>& q) const
+      -> std::array<double, 7> = 0;
+
+  /**
+   * Computes the lower joint velocity limits based on current joint positions.
+   *
+   * @param q Current joint positions.
+   * @return std::array<double, 7> Lower joint velocity limits.
+   */
+  virtual auto getLowerJointVelocityLimits(const std::array<double, 7>& q) const
+      -> std::array<double, 7> = 0;
 };
 
 }  // namespace franka

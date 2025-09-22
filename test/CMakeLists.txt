@@ -19,6 +19,7 @@ set(TEST_DEPENDENCIES
   franka
   libfranka-common
   pinocchio::pinocchio
+  TinyXML2::TinyXML2
 )
 set(TEST_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 
@@ -47,9 +48,9 @@ add_executable(run_all_tests
   robot_tests.cpp
   vacuum_gripper_tests.cpp
   vacuum_gripper_command_tests.cpp
-
   logging/logging_tests.cpp
   logging/robot_state_logger_tests.cpp
+  joint_velocity_limits_tests.cpp
 )
 
 set(TEST_COMPILE_DEFINITIONS FRANKA_TEST_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}")

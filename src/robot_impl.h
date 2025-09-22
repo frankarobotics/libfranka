@@ -6,6 +6,7 @@
 #include <sstream>
 #include <type_traits>
 
+#include <franka/joint_velocity_limits.h>
 #include <franka/model.h>
 #include <franka/robot.h>
 #include <franka/robot_model_base.h>
@@ -40,6 +41,11 @@ class Robot::Impl : public RobotControl {
 
   // Inherited via RobotControl
   auto realtimeConfig() const noexcept -> RealtimeConfig override;
+
+  auto getUpperJointVelocityLimits(const std::array<double, 7>& q) const
+      -> std::array<double, 7> override;
+  auto getLowerJointVelocityLimits(const std::array<double, 7>& q) const
+      -> std::array<double, 7> override;
   auto startMotion(research_interface::robot::Move::ControllerMode controller_mode,
                    research_interface::robot::Move::MotionGeneratorMode motion_generator_mode,
                    const research_interface::robot::Move::Deviation& maximum_path_deviation,
@@ -238,6 +244,7 @@ class Robot::Impl : public RobotControl {
   template <typename MotionGeneratorType>
   void writeOnce(const MotionGeneratorType& motion_generator_input, const Torques& control_input);
 
+ protected:
   std::string commandNotPossibleMsg() const {
     std::stringstream stringstream;
     stringstream << " command rejected: command not possible in the current mode ("
@@ -323,6 +330,7 @@ class Robot::Impl : public RobotControl {
       research_interface::robot::ControllerMode::kOther;
   research_interface::robot::ControllerMode current_move_controller_mode_;
   uint64_t message_id_;
+  JointVelocityLimitsConfig joint_velocity_limits_config_;
 };
 
 template <>

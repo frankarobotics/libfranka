@@ -207,8 +207,8 @@ void ControlLoop<JointPositions>::convertMotion(
   }
   if (limit_rate_) {
     command.q_c =
-        limitRate(computeUpperLimitsJointVelocity(robot_state.q_d),
-                  computeLowerLimitsJointVelocity(robot_state.q_d), kMaxJointAcceleration,
+        limitRate(robot_.getUpperJointVelocityLimits(robot_state.q_d),
+                  robot_.getLowerJointVelocityLimits(robot_state.q_d), kMaxJointAcceleration,
                   kMaxJointJerk, command.q_c, robot_state.q_d, robot_state.dq_d, robot_state.ddq_d);
   }
   checkFinite(command.q_c);
@@ -228,8 +228,8 @@ void ControlLoop<JointVelocities>::convertMotion(
   }
   if (limit_rate_) {
     command.dq_c =
-        limitRate(computeUpperLimitsJointVelocity(robot_state.q_d),
-                  computeLowerLimitsJointVelocity(robot_state.q_d), kMaxJointAcceleration,
+        limitRate(robot_.getUpperJointVelocityLimits(robot_state.q_d),
+                  robot_.getLowerJointVelocityLimits(robot_state.q_d), kMaxJointAcceleration,
                   kMaxJointJerk, command.dq_c, robot_state.dq_d, robot_state.ddq_d);
   }
   checkFinite(command.dq_c);

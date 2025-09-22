@@ -40,7 +40,6 @@ class RobotImplMock : public Robot::Impl {
   MOCK_METHOD2(writeOnce, void(const CartesianPose& motion_input, const Torques& control_input));
   MOCK_METHOD2(writeOnce,
                void(const CartesianVelocities& motion_input, const Torques& control_input));
-
   MOCK_METHOD0(readOnce, RobotState());
   MOCK_METHOD2(throwOnMotionError, void(const RobotState& robot_state, uint32_t motion_id));
 };
