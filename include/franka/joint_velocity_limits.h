@@ -4,6 +4,7 @@
 
 #include <tinyxml2.h>
 #include <array>
+#include <bitset>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -135,12 +136,22 @@ inline void JointVelocityLimitsConfig::parseFromURDF(const std::string& urdf_str
   auto* robot = doc.FirstChildElement(kRobotElementName);
   if (!robot) {
     throw std::runtime_error(
-        "Failed to parse URDF no <robot> element exists for joint velocity limits");
+        "Failed to parse URDF: no <robot> element exists for joint velocity limits");
   }
 
-  auto parseDouble = [](const tinyxml2::XMLElement* elem, const char* attr) -> double {
-    const char* value = elem ? elem->Attribute(attr) : nullptr;
-    return value ? std::stod(value) : 0.0;
+  std::bitset<7> found_joints;
+  
+  auto parseRequiredDouble = [](const tinyxml2::XMLElement* elem, const char* attr, 
+                               const std::string& joint_name, const std::string& element_name) -> double {
+    if (!elem) {
+      throw std::runtime_error("Missing <" + element_name + "> element for joint: " + joint_name);
+    }
+    const char* value = elem->Attribute(attr);
+    if (!value) {
+      throw std::runtime_error("Missing '" + std::string(attr) + "' attribute in <" + 
+                               element_name + "> for joint: " + joint_name);
+    }
+    return std::stod(value);
   };
 
   for (auto* joint = robot->FirstChildElement(kJointElementName); joint;
@@ -153,32 +164,49 @@ inline void JointVelocityLimitsConfig::parseFromURDF(const std::string& urdf_str
     if (idx == -1)
       continue;
 
+    std::string joint_name_str(name);
+
     auto* position_based_limits = joint->FirstChildElement(kPositionBasedVelocityLimitsElementName);
-    if (!position_based_limits)
-      continue;
+    if (!position_based_limits) {
+      throw std::runtime_error("Missing <" + std::string(kPositionBasedVelocityLimitsElementName) + 
+                               "> element for joint: " + joint_name_str);
+    }
 
-    // Parse standard limit element (velocity, upper, lower)
     auto* limit = joint->FirstChildElement(kLimitElementName);
+    if (!limit) {
+      throw std::runtime_error("Missing <" + std::string(kLimitElementName) + 
+                               "> element for joint: " + joint_name_str);
+    }
 
-    // Populate joint configuration using structured binding for clarity
+    found_joints[idx] = true;
+
     joint_params_[idx] = {
-        parseDouble(limit, kVelocityAttributeName),                           // max_base_velocity
-        parseDouble(position_based_limits, kVelocityOffsetAttributeName),     // velocity_offset
-        parseDouble(position_based_limits, kDecelerationLimitAttributeName),  // deceleration_limit
-        parseDouble(limit, kUpperAttributeName),  // upper_joint_position_limit
-        parseDouble(limit, kLowerAttributeName)   // lower_joint_position_limit
+        parseRequiredDouble(limit, kVelocityAttributeName, joint_name_str, kLimitElementName),
+        parseRequiredDouble(position_based_limits, kVelocityOffsetAttributeName, 
+                           joint_name_str, kPositionBasedVelocityLimitsElementName),
+        parseRequiredDouble(position_based_limits, kDecelerationLimitAttributeName, 
+                           joint_name_str, kPositionBasedVelocityLimitsElementName),
+        parseRequiredDouble(limit, kUpperAttributeName, joint_name_str, kLimitElementName),
+        parseRequiredDouble(limit, kLowerAttributeName, joint_name_str, kLimitElementName)
     };
+  }
+
+  if (!found_joints.all()) {
+    std::string missing_joints = "Missing required joints: ";
+    for (int i = 0; i < 7; ++i) {
+      if (!found_joints[i]) {
+        missing_joints += "joint" + std::to_string(i + 1) + " ";
+      }
+    }
+    throw std::runtime_error(missing_joints);
   }
 }
 
-// Implementation of getJointIndex method
 inline int JointVelocityLimitsConfig::getJointIndex(const std::string& joint_name) {
-  // Use a static unordered_map for efficient O(1) lookup
   static const std::unordered_map<std::string, int> joint_name_to_index = {
       {kJoint1Name, 0}, {kJoint2Name, 1}, {kJoint3Name, 2}, {kJoint4Name, 3},
       {kJoint5Name, 4}, {kJoint6Name, 5}, {kJoint7Name, 6}};
 
-  // First try exact match for efficiency
   auto exact_match = joint_name_to_index.find(joint_name);
   if (exact_match != joint_name_to_index.end()) {
     return exact_match->second;

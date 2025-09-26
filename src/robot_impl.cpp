@@ -6,6 +6,7 @@
 
 #include "franka/control_tools.h"
 #include "franka/logging/logger.hpp"
+#include "franka/rate_limiting.h"
 #include "load_calculations.h"
 
 namespace franka {

@@ -43,8 +43,9 @@ TEST(JointVelocityLimits, ParseConfigFromFR3URDF) {
   EXPECT_NEAR(config[6].lower_joint_position_limit, -3.0196, tolerance);
 }
 
-TEST(JointVelocityLimits, ParseConfigFromURDFNewFormat) {
-  const std::string new_format_urdf = R"(
+TEST(JointVelocityLimits, ParseConfigFromURDFNewFormatIncomplete) {
+  // This test now checks that incomplete joint definitions throw exceptions
+  const std::string incomplete_urdf = R"(
     <?xml version="1.0" ?>
     <robot name="test_robot">
       <joint name="fr3v2_joint1" type="revolute">
@@ -55,44 +56,26 @@ TEST(JointVelocityLimits, ParseConfigFromURDFNewFormat) {
         <limit effort="87.0" lower="-1.8360900166666667" upper="1.8360900166666667" velocity="2.62"/>
         <position_based_velocity_limits velocity_offset="0.2499685851463105" deceleration_limit="2.585"/>
       </joint>
-      <joint name="fr3v2_joint3" type="revolute">
-        <limit effort="87.0" lower="-2.9007400166666666" upper="2.9007400166666666" velocity="2.62"/>
-        <!-- No position_based_velocity_limits -->
-      </joint>
-      <joint name="other_joint" type="revolute">
-        <limit effort="12.0" lower="-3.05083335" upper="3.05083335" velocity="5.26"/>
-        <position_based_velocity_limits velocity_offset="0.4591952376425851" deceleration_limit="17.0"/>
+      <!-- Missing joints 3-7 -->
+    </robot>
+  )";
+
+  EXPECT_THROW(JointVelocityLimitsConfig config(incomplete_urdf), std::runtime_error);
+}
+
+TEST(JointVelocityLimits, ParseConfigFromURDFMissingTags) {
+  // Test missing position_based_velocity_limits element
+  const std::string missing_tags_urdf = R"(
+    <?xml version="1.0" ?>
+    <robot name="test_robot">
+      <joint name="fr3v2_joint1" type="revolute">
+        <limit effort="87.0" lower="-2.9" upper="2.9" velocity="2.62"/>
+        <!-- Missing position_based_velocity_limits -->
       </joint>
     </robot>
   )";
 
-  JointVelocityLimitsConfig config(new_format_urdf);
-
-  EXPECT_DOUBLE_EQ(config[0].max_base_velocity, 2.62);
-  EXPECT_DOUBLE_EQ(config[0].velocity_offset, 0.6520000381679385);
-  EXPECT_DOUBLE_EQ(config[0].deceleration_limit, 6.0);
-  EXPECT_DOUBLE_EQ(config[0].upper_joint_position_limit, 2.9007400166666666);
-  EXPECT_DOUBLE_EQ(config[0].lower_joint_position_limit, -2.9007400166666666);
-
-  EXPECT_DOUBLE_EQ(config[1].max_base_velocity, 2.62);
-  EXPECT_DOUBLE_EQ(config[1].velocity_offset, 0.2499685851463105);
-  EXPECT_DOUBLE_EQ(config[1].deceleration_limit, 2.585);
-  EXPECT_DOUBLE_EQ(config[1].upper_joint_position_limit, 1.8360900166666667);
-  EXPECT_DOUBLE_EQ(config[1].lower_joint_position_limit, -1.8360900166666667);
-
-  EXPECT_DOUBLE_EQ(config[2].max_base_velocity, 0.0);
-  EXPECT_DOUBLE_EQ(config[2].velocity_offset, 0.0);
-  EXPECT_DOUBLE_EQ(config[2].deceleration_limit, 0.0);
-  EXPECT_DOUBLE_EQ(config[2].upper_joint_position_limit, 0.0);
-  EXPECT_DOUBLE_EQ(config[2].lower_joint_position_limit, 0.0);
-
-  for (int i = 3; i < 7; ++i) {
-    EXPECT_DOUBLE_EQ(config[i].max_base_velocity, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].velocity_offset, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].deceleration_limit, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].upper_joint_position_limit, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].lower_joint_position_limit, 0.0);
-  }
+  EXPECT_THROW(JointVelocityLimitsConfig config(missing_tags_urdf), std::runtime_error);
 }
 
 TEST(JointVelocityLimits, ParseConfigFromURDFMalformedXML) {
@@ -127,16 +110,8 @@ TEST(JointVelocityLimits, ParseConfigFromURDFMinimalValidXML) {
     </robot>
   )";
 
-  JointVelocityLimitsConfig config(minimal_urdf);
-
-  // All parameters should be default (zero) values
-  for (int i = 0; i < 7; ++i) {
-    EXPECT_DOUBLE_EQ(config[i].max_base_velocity, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].velocity_offset, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].deceleration_limit, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].upper_joint_position_limit, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].lower_joint_position_limit, 0.0);
-  }
+  // Should throw exception because no joints are present
+  EXPECT_THROW(JointVelocityLimitsConfig config(minimal_urdf), std::runtime_error);
 }
 
 TEST(JointVelocityLimits, DefaultConstructor) {
@@ -152,53 +127,79 @@ TEST(JointVelocityLimits, DefaultConstructor) {
   }
 }
 
-TEST(JointVelocityLimits, ParseFromURDFMethod) {
-  const std::string test_urdf = R"(
+TEST(JointVelocityLimits, ParseFromURDFMethodIncomplete) {
+  const std::string incomplete_urdf = R"(
     <?xml version="1.0" ?>
     <robot name="test_robot">
       <joint name="fr3v2_joint1" type="revolute">
         <limit effort="87.0" lower="-2.5" upper="2.5" velocity="3.0"/>
         <position_based_velocity_limits velocity_offset="0.5" deceleration_limit="8.0"/>
       </joint>
+      <!-- Missing joints 2-7 -->
     </robot>
   )";
 
-  JointVelocityLimitsConfig config(test_urdf);
-  config.parseFromURDF(test_urdf);
-
-  // Joint1 should have parameters set
-  EXPECT_DOUBLE_EQ(config[0].max_base_velocity, 3.0);
-  EXPECT_DOUBLE_EQ(config[0].velocity_offset, 0.5);
-  EXPECT_DOUBLE_EQ(config[0].deceleration_limit, 8.0);
-  EXPECT_DOUBLE_EQ(config[0].upper_joint_position_limit, 2.5);
-  EXPECT_DOUBLE_EQ(config[0].lower_joint_position_limit, -2.5);
-
-  // Other joints should have default values
-  for (int i = 1; i < 7; ++i) {
-    EXPECT_DOUBLE_EQ(config[i].max_base_velocity, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].velocity_offset, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].deceleration_limit, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].upper_joint_position_limit, 0.0);
-    EXPECT_DOUBLE_EQ(config[i].lower_joint_position_limit, 0.0);
-  }
+  // Should throw exception because only 1 joint is present, need all 7
+  EXPECT_THROW(JointVelocityLimitsConfig config(incomplete_urdf), std::runtime_error);
 }
 
-TEST(JointVelocityLimits, GetJointParamsMethod) {
-  const std::string test_urdf = R"(
+TEST(JointVelocityLimits, GetJointParamsMethodIncomplete) {
+  const std::string incomplete_urdf = R"(
     <?xml version="1.0" ?>
     <robot name="test_robot">
       <joint name="fr3v2_joint1" type="revolute">
         <limit effort="87.0" lower="-1.5" upper="1.5" velocity="2.5"/>
         <position_based_velocity_limits velocity_offset="0.3" deceleration_limit="5.0"/>
       </joint>
+      <!-- Missing joints 2-7 -->
     </robot>
   )";
 
-  JointVelocityLimitsConfig config(test_urdf);
+  // Should throw exception because only 1 joint is present, need all 7
+  EXPECT_THROW(JointVelocityLimitsConfig config(incomplete_urdf), std::runtime_error);
+}
 
-  const auto& all_params = config.getJointParams();
+TEST(JointVelocityLimits, ParseConfigFromURDFCompleteValidFormat) {
+  // Test with all 7 joints properly defined
+  const std::string complete_urdf = R"(
+    <?xml version="1.0" ?>
+    <robot name="test_robot">
+      <joint name="joint1" type="revolute">
+        <limit effort="87.0" lower="-2.9" upper="2.9" velocity="2.62"/>
+        <position_based_velocity_limits velocity_offset="0.30" deceleration_limit="6.0"/>
+      </joint>
+      <joint name="joint2" type="revolute">
+        <limit effort="87.0" lower="-1.8" upper="1.8" velocity="2.62"/>
+        <position_based_velocity_limits velocity_offset="0.20" deceleration_limit="2.585"/>
+      </joint>
+      <joint name="joint3" type="revolute">
+        <limit effort="87.0" lower="-2.9" upper="2.9" velocity="2.62"/>
+        <position_based_velocity_limits velocity_offset="0.25" deceleration_limit="5.0"/>
+      </joint>
+      <joint name="joint4" type="revolute">
+        <limit effort="87.0" lower="-3.1" upper="0.1" velocity="2.62"/>
+        <position_based_velocity_limits velocity_offset="0.15" deceleration_limit="4.0"/>
+      </joint>
+      <joint name="joint5" type="revolute">
+        <limit effort="12.0" lower="-2.8" upper="2.8" velocity="5.26"/>
+        <position_based_velocity_limits velocity_offset="0.35" deceleration_limit="17.0"/>
+      </joint>
+      <joint name="joint6" type="revolute">
+        <limit effort="12.0" lower="-3.8" upper="0.8" velocity="5.26"/>
+        <position_based_velocity_limits velocity_offset="0.25" deceleration_limit="12.0"/>
+      </joint>
+      <joint name="joint7" type="revolute">
+        <limit effort="12.0" lower="-3.0" upper="3.0" velocity="5.26"/>
+        <position_based_velocity_limits velocity_offset="0.35" deceleration_limit="17.0"/>
+      </joint>
+    </robot>
+  )";
+
+  // Should succeed with all 7 joints
+  JointVelocityLimitsConfig config(complete_urdf);
 
   // Test that getJointParams returns the same data as operator[]
+  const auto& all_params = config.getJointParams();
   for (int i = 0; i < 7; ++i) {
     EXPECT_DOUBLE_EQ(all_params[i].max_base_velocity, config[i].max_base_velocity);
     EXPECT_DOUBLE_EQ(all_params[i].velocity_offset, config[i].velocity_offset);
@@ -209,12 +210,29 @@ TEST(JointVelocityLimits, GetJointParamsMethod) {
                      config[i].lower_joint_position_limit);
   }
 
-  // Verify joint1 has the expected values
-  EXPECT_DOUBLE_EQ(all_params[0].max_base_velocity, 2.5);
-  EXPECT_DOUBLE_EQ(all_params[0].velocity_offset, 0.3);
-  EXPECT_DOUBLE_EQ(all_params[0].deceleration_limit, 5.0);
-  EXPECT_DOUBLE_EQ(all_params[0].upper_joint_position_limit, 1.5);
-  EXPECT_DOUBLE_EQ(all_params[0].lower_joint_position_limit, -1.5);
+  // Verify some specific joint values
+  EXPECT_DOUBLE_EQ(config[0].max_base_velocity, 2.62);
+  EXPECT_DOUBLE_EQ(config[0].velocity_offset, 0.30);
+  EXPECT_DOUBLE_EQ(config[0].deceleration_limit, 6.0);
+  EXPECT_DOUBLE_EQ(config[6].max_base_velocity, 5.26);
+  EXPECT_DOUBLE_EQ(config[6].velocity_offset, 0.35);
+  EXPECT_DOUBLE_EQ(config[6].deceleration_limit, 17.0);
+}
+
+TEST(JointVelocityLimits, ParseConfigFromURDFMissingAttributes) {
+  // Test missing required attributes
+  const std::string missing_attr_urdf = R"(
+    <?xml version="1.0" ?>
+    <robot name="test_robot">
+      <joint name="joint1" type="revolute">
+        <limit effort="87.0" lower="-2.9" upper="2.9"/>
+        <!-- Missing velocity attribute -->
+        <position_based_velocity_limits velocity_offset="0.30" deceleration_limit="6.0"/>
+      </joint>
+    </robot>
+  )";
+
+  EXPECT_THROW(JointVelocityLimitsConfig config(missing_attr_urdf), std::runtime_error);
 }
 
 TEST(JointVelocityLimits, PositionBasedJointVelocityLimitConstantsConstructors) {
