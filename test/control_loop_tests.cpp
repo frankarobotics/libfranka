@@ -198,7 +198,7 @@ JointPositions ControlLoops<JointPositionMotion<false, false>>::createInvalidMot
 
 template <>
 auto ControlLoops<JointPositionMotion<true, true>>::getField(const JointPositions& values) {
-  return Field(&research_interface::robot::MotionGeneratorCommand::q_c, Lt(values.q));
+  return Field(&research_interface::robot::MotionGeneratorCommand::q_c, Eq(values.q));
 }
 
 template <>
@@ -208,7 +208,7 @@ auto ControlLoops<JointPositionMotion<false, true>>::getField(const JointPositio
 
 template <>
 auto ControlLoops<JointPositionMotion<true, false>>::getField(const JointPositions& values) {
-  return Field(&research_interface::robot::MotionGeneratorCommand::q_c, Lt(values.q));
+  return Field(&research_interface::robot::MotionGeneratorCommand::q_c, Eq(values.q));
 }
 
 template <>

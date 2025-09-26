@@ -264,7 +264,7 @@ void ControlLoop<CartesianPose>::convertMotion(
     command.O_T_EE_c = limitRate(
         kMaxTranslationalVelocity, kMaxTranslationalAcceleration, kMaxTranslationalJerk,
         kMaxRotationalVelocity, kMaxRotationalAcceleration, kMaxRotationalJerk, command.O_T_EE_c,
-        robot_state.O_T_EE_c, robot_state.O_dP_EE_c, robot_state.O_ddP_EE_c);
+        previous_cartesian_pose, robot_state.O_dP_EE_c, robot_state.O_ddP_EE_c);
   }
   checkMatrix(command.O_T_EE_c);
 
@@ -277,7 +277,7 @@ void ControlLoop<CartesianPose>::convertMotion(
     }
     if (limit_rate_) {
       command.elbow_c[0] = limitRate(kMaxElbowVelocity, kMinElbowVelocity, kMaxElbowAcceleration,
-                                     kMaxElbowJerk, command.elbow_c[0], robot_state.elbow_c[0],
+                                     kMaxElbowJerk, command.elbow_c[0], previous_elbow_pose[0],
                                      robot_state.delbow_c[0], robot_state.ddelbow_c[0]);
     }
     checkElbow(command.elbow_c);
