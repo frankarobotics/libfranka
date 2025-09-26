@@ -18,6 +18,7 @@ namespace franka {
  */
 class RobotControl {
  public:
+  static constexpr size_t kNumJoints = 7;
   virtual ~RobotControl() = default;
 
   /**
@@ -86,20 +87,20 @@ class RobotControl {
   /**
    * Computes the upper joint velocity limits based on current joint positions.
    *
-   * @param q Current joint positions.
-   * @return std::array<double, 7> Upper joint velocity limits.
+   * @param joint_positions Current joint positions.
+   * @return std::array<double, kNumJoints> Upper joint velocity limits.
    */
-  virtual auto getUpperJointVelocityLimits(const std::array<double, 7>& q) const
-      -> std::array<double, 7> = 0;
+  virtual auto getUpperJointVelocityLimits(const std::array<double, kNumJoints>& joint_positions)
+      const -> std::array<double, kNumJoints> = 0;
 
   /**
    * Computes the lower joint velocity limits based on current joint positions.
    *
-   * @param q Current joint positions.
-   * @return std::array<double, 7> Lower joint velocity limits.
+   * @param joint_positions Current joint positions.
+   * @return std::array<double, kNumJoints> Lower joint velocity limits.
    */
-  virtual auto getLowerJointVelocityLimits(const std::array<double, 7>& q) const
-      -> std::array<double, 7> = 0;
+  virtual auto getLowerJointVelocityLimits(const std::array<double, kNumJoints>& joint_positions)
+      const -> std::array<double, kNumJoints> = 0;
 };
 
 }  // namespace franka

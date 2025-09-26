@@ -60,6 +60,9 @@ struct PositionBasedJointVelocityLimitConstants {
  */
 class JointVelocityLimitsConfig {
  public:
+  // Robot configuration constants
+  static constexpr int kNumJoints = 7;
+
   JointVelocityLimitsConfig() = default;
 
   /**
@@ -87,7 +90,7 @@ class JointVelocityLimitsConfig {
    * Get all joint parameters
    * @return Array of joint velocity limit parameters for all joints
    */
-  const std::array<PositionBasedJointVelocityLimitConstants, 7>& getJointParams() const {
+  const std::array<PositionBasedJointVelocityLimitConstants, kNumJoints>& getJointParams() const {
     return joint_params_;
   }
 
@@ -121,7 +124,7 @@ class JointVelocityLimitsConfig {
    */
   static int getJointIndex(const std::string& joint_name);
 
-  std::array<PositionBasedJointVelocityLimitConstants, 7> joint_params_;
+  std::array<PositionBasedJointVelocityLimitConstants, kNumJoints> joint_params_;
 };
 
 inline void JointVelocityLimitsConfig::parseFromURDF(const std::string& urdf_string) {
@@ -134,66 +137,68 @@ inline void JointVelocityLimitsConfig::parseFromURDF(const std::string& urdf_str
   }
 
   auto* robot = doc.FirstChildElement(kRobotElementName);
-  if (!robot) {
+  if (robot == nullptr) {
     throw std::runtime_error(
         "Failed to parse URDF: no <robot> element exists for joint velocity limits");
   }
 
-  std::bitset<7> found_joints;
-  
-  auto parseRequiredDouble = [](const tinyxml2::XMLElement* elem, const char* attr, 
-                               const std::string& joint_name, const std::string& element_name) -> double {
-    if (!elem) {
+  std::bitset<kNumJoints> found_joints;
+
+  auto parse_required_double = [](const tinyxml2::XMLElement* elem, const char* attr,
+                                  const std::string& joint_name,
+                                  const std::string& element_name) -> double {
+    if (elem == nullptr) {
       throw std::runtime_error("Missing <" + element_name + "> element for joint: " + joint_name);
     }
     const char* value = elem->Attribute(attr);
-    if (!value) {
-      throw std::runtime_error("Missing '" + std::string(attr) + "' attribute in <" + 
-                               element_name + "> for joint: " + joint_name);
+    if (value == nullptr) {
+      throw std::runtime_error("Missing '" + std::string(attr) + "' attribute in <" + element_name +
+                               "> for joint: " + joint_name);
     }
     return std::stod(value);
   };
 
-  for (auto* joint = robot->FirstChildElement(kJointElementName); joint;
+  for (auto* joint = robot->FirstChildElement(kJointElementName); joint != nullptr;
        joint = joint->NextSiblingElement(kJointElementName)) {
     const char* name = joint->Attribute(kNameAttributeName);
-    if (!name)
+    if (name == nullptr) {
       continue;
+    }
 
     int idx = getJointIndex(name);
-    if (idx == -1)
+    if (idx == -1) {
       continue;
+    }
 
     std::string joint_name_str(name);
 
     auto* position_based_limits = joint->FirstChildElement(kPositionBasedVelocityLimitsElementName);
-    if (!position_based_limits) {
-      throw std::runtime_error("Missing <" + std::string(kPositionBasedVelocityLimitsElementName) + 
+    if (position_based_limits == nullptr) {
+      throw std::runtime_error("Missing <" + std::string(kPositionBasedVelocityLimitsElementName) +
                                "> element for joint: " + joint_name_str);
     }
 
     auto* limit = joint->FirstChildElement(kLimitElementName);
-    if (!limit) {
-      throw std::runtime_error("Missing <" + std::string(kLimitElementName) + 
+    if (limit == nullptr) {
+      throw std::runtime_error("Missing <" + std::string(kLimitElementName) +
                                "> element for joint: " + joint_name_str);
     }
 
     found_joints[idx] = true;
 
     joint_params_[idx] = {
-        parseRequiredDouble(limit, kVelocityAttributeName, joint_name_str, kLimitElementName),
-        parseRequiredDouble(position_based_limits, kVelocityOffsetAttributeName, 
-                           joint_name_str, kPositionBasedVelocityLimitsElementName),
-        parseRequiredDouble(position_based_limits, kDecelerationLimitAttributeName, 
-                           joint_name_str, kPositionBasedVelocityLimitsElementName),
-        parseRequiredDouble(limit, kUpperAttributeName, joint_name_str, kLimitElementName),
-        parseRequiredDouble(limit, kLowerAttributeName, joint_name_str, kLimitElementName)
-    };
+        parse_required_double(limit, kVelocityAttributeName, joint_name_str, kLimitElementName),
+        parse_required_double(position_based_limits, kVelocityOffsetAttributeName, joint_name_str,
+                              kPositionBasedVelocityLimitsElementName),
+        parse_required_double(position_based_limits, kDecelerationLimitAttributeName,
+                              joint_name_str, kPositionBasedVelocityLimitsElementName),
+        parse_required_double(limit, kUpperAttributeName, joint_name_str, kLimitElementName),
+        parse_required_double(limit, kLowerAttributeName, joint_name_str, kLimitElementName)};
   }
 
   if (!found_joints.all()) {
     std::string missing_joints = "Missing required joints: ";
-    for (int i = 0; i < 7; ++i) {
+    for (int i = 0; i < kNumJoints; ++i) {
       if (!found_joints[i]) {
         missing_joints += "joint" + std::to_string(i + 1) + " ";
       }

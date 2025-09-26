@@ -206,10 +206,10 @@ void ControlLoop<JointPositions>::convertMotion(
     }
   }
   if (limit_rate_) {
-    command.q_c =
-        limitRate(robot_.getUpperJointVelocityLimits(robot_state.q_d),
-                  robot_.getLowerJointVelocityLimits(robot_state.q_d), kMaxJointAcceleration,
-                  kMaxJointJerk, command.q_c, robot_state.q_d, robot_state.dq_d, robot_state.ddq_d);
+    command.q_c = limitRate(robot_.getUpperJointVelocityLimits(previous_joint_position),
+                            robot_.getLowerJointVelocityLimits(previous_joint_position),
+                            kMaxJointAcceleration, kMaxJointJerk, command.q_c,
+                            previous_joint_position, robot_state.dq_d, robot_state.ddq_d);
   }
   checkFinite(command.q_c);
 }
