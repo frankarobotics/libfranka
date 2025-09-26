@@ -11,7 +11,7 @@
 - Fix: Fixed the elbow limit rating taking the wrong values
 - Breaking: Added the 'async position motion generator' control scheme, which allows for asynchronous position control of the robot
 - Feat: expose accelerometer data in robot state
-- Feat: Parse URDF to get the rate limiter parameters specific to the robot.
+- Feat: Parse joint position–based velocity limits from URDF to compute upper and lower velocity bounds
 
 ## 0.16.0 - 2025-09-15
 
