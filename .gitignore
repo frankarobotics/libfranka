@@ -20,3 +20,4 @@ __pycache__/
 *.whl
 .mypy_cache/
 version_info.properties
+pylibfranka/docs/_build/

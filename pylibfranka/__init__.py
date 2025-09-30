@@ -1,14 +1,31 @@
+"""Python bindings for Franka Robotics control library.
+
+pylibfranka provides high-level Python access to Franka Robotics robots,
+enabling real-time control with torque, position, and velocity commands.
+
+"""
+
 __version__ = "0.1.0"
 
 from ._pylibfranka import (
     ActiveControlBase,
+    CartesianPose,
+    CartesianVelocities,
+    CommandException,
+    ControlException,
     ControllerMode,
+    Duration,
     Errors,
+    FrankaException,
     Gripper,
     GripperState,
+    InvalidOperationException,
     JointPositions,
     JointVelocities,
+    Model,
+    NetworkException,
     RealtimeConfig,
+    RealtimeException,
     Robot,
     RobotMode,
     RobotState,
@@ -17,15 +34,25 @@ from ._pylibfranka import (
 
 __all__ = [
     "ActiveControlBase",
+    "CartesianPose",
+    "CartesianVelocities",
+    "CommandException",
+    "ControlException",
     "ControllerMode",
+    "Duration",
     "Errors",
+    "FrankaException",
+    "Gripper",
+    "GripperState",
+    "InvalidOperationException",
     "JointPositions",
     "JointVelocities",
+    "Model",
+    "NetworkException",
+    "RealtimeConfig",
+    "RealtimeException",
     "Robot",
     "RobotMode",
     "RobotState",
     "Torques",
-    "Gripper",
-    "GripperState",
-    "RealtimeConfig",
 ]

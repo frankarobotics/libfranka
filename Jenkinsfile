@@ -155,33 +155,33 @@ pipeline {
             steps {
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
                                 timeout(time: 300, unit: 'SECONDS') {
-                   sh '''
-                     # ASLR Fix: Disable ASLR temporarily for ASan compatibility
-                     echo "[Debug Tests] Disabling ASLR for ASan compatibility..."
-                     echo 0 | sudo tee /proc/sys/kernel/randomize_va_space || echo "Could not disable ASLR"
-                     echo "[Debug Tests] ASLR status: $(cat /proc/sys/kernel/randomize_va_space)"
-                   '''
+                  sh '''
+                    # ASLR Fix: Disable ASLR temporarily for ASan compatibility
+                    echo "[Debug Tests] Disabling ASLR for ASan compatibility..."
+                    echo 0 | sudo tee /proc/sys/kernel/randomize_va_space || echo "Could not disable ASLR"
+                    echo "[Debug Tests] ASLR status: $(cat /proc/sys/kernel/randomize_va_space)"
+                  '''
 
-                   dir("build-debug.${env.DISTRO}") {
-                     sh '''
-                       echo "[Debug Tests] Running tests..."
-                       ctest -V
-                     '''
-                   }
+                  dir("build-debug.${env.DISTRO}") {
+                    sh '''
+                      echo "[Debug Tests] Running tests..."
+                      ctest -V
+                    '''
+                  }
 
-                   dir("build-release.${env.DISTRO}") {
-                     sh '''
-                       echo "[Release Tests] Running tests..."
-                       ctest -V
-                     '''
-                   }
+                  dir("build-release.${env.DISTRO}") {
+                    sh '''
+                      echo "[Release Tests] Running tests..."
+                      ctest -V
+                    '''
+                  }
 
-                   sh '''
-                     # Re-enable ASLR for security
-                     echo "[Debug Tests] Re-enabling ASLR..."
-                     echo 2 | sudo tee /proc/sys/kernel/randomize_va_space || echo "Could not re-enable ASLR"
-                     echo "[Debug Tests] ASLR restored to: $(cat /proc/sys/kernel/randomize_va_space)"
-                   '''
+                  sh '''
+                    # Re-enable ASLR for security
+                    echo "[Debug Tests] Re-enabling ASLR..."
+                    echo 2 | sudo tee /proc/sys/kernel/randomize_va_space || echo "Could not re-enable ASLR"
+                    echo "[Debug Tests] ASLR restored to: $(cat /proc/sys/kernel/randomize_va_space)"
+                  '''
                 }
               }
             }
@@ -219,6 +219,42 @@ pipeline {
                               reportDir: 'doc/html',
                               reportFiles: 'index.html',
                               reportName: "API Documentation (${env.DISTRO})"])
+                }
+              }
+              
+              // Build and publish pylibfranka documentation
+              catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
+                sh '''
+                  # Install pylibfranka from root (builds against libfranka in build-release.focal)
+                  export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
+                  pip3 install . --user
+                '''
+                
+                dir('pylibfranka/docs') {
+                  sh '''
+                    # Add sphinx to PATH
+                    export PATH="$HOME/.local/bin:$PATH"
+                    
+                    # Install Sphinx and dependencies
+                    pip3 install -r requirements.txt --user
+                    
+                    # Set locale
+                    export LC_ALL=C.UTF-8
+                    export LANG=C.UTF-8
+                    
+                    # Add libfranka to library path
+                    export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
+                    
+                    # Build the documentation
+                    make html
+                  '''
+                  
+                  publishHTML([allowMissing: false,
+                              alwaysLinkToLastBuild: false,
+                              keepAll: true,
+                              reportDir: '_build/html',
+                              reportFiles: 'index.html',
+                              reportName: "pylibfranka Documentation (${env.DISTRO})"])
                 }
               }
             }
