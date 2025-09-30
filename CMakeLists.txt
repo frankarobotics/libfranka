@@ -93,6 +93,7 @@ add_library(franka SHARED
   src/exception.cpp
   src/gripper.cpp
   src/gripper_state.cpp
+  src/joint_velocity_limits.cpp
   src/load_calculations.cpp
   src/lowpass_filter.cpp
   src/model.cpp

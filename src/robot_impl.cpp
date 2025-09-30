@@ -230,34 +230,12 @@ RealtimeConfig Robot::Impl::realtimeConfig() const noexcept {
 
 std::array<double, RobotControl::kNumJoints> Robot::Impl::getUpperJointVelocityLimits(
     const std::array<double, RobotControl::kNumJoints>& joint_positions) const {
-  std::array<double, RobotControl::kNumJoints> result;
-  for (size_t i = 0; i < RobotControl::kNumJoints; ++i) {
-    const auto& params = joint_velocity_limits_config_[i];
-    result[i] =
-        std::min(params.max_base_velocity,
-                 std::max(0.0, -params.velocity_offset +
-                                   std::sqrt(std::max(0.0, 2.0 * params.deceleration_limit *
-                                                               (params.upper_joint_position_limit -
-                                                                joint_positions[i]))))) -
-        kJointVelocityLimitsTolerance[i];
-  }
-  return result;
+  return joint_velocity_limits_config_.getUpperJointVelocityLimits(joint_positions);
 }
 
 std::array<double, RobotControl::kNumJoints> Robot::Impl::getLowerJointVelocityLimits(
     const std::array<double, RobotControl::kNumJoints>& joint_positions) const {
-  std::array<double, RobotControl::kNumJoints> result;
-  for (size_t i = 0; i < RobotControl::kNumJoints; ++i) {
-    const auto& params = joint_velocity_limits_config_[i];
-    result[i] =
-        std::max(-params.max_base_velocity,
-                 std::min(0.0, params.velocity_offset -
-                                   std::sqrt(std::max(0.0, 2.0 * params.deceleration_limit *
-                                                               (-params.lower_joint_position_limit +
-                                                                joint_positions[i]))))) +
-        kJointVelocityLimitsTolerance[i];
-  }
-  return result;
+  return joint_velocity_limits_config_.getLowerJointVelocityLimits(joint_positions);
 }
 
 uint32_t Robot::Impl::startMotion(

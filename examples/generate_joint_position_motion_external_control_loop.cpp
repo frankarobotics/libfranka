@@ -57,26 +57,26 @@ int main(int argc, char** argv) {
         initial_position = robot_state.q;
       }
 
-      // Get previous joint position for rate limiter (first iteration uses current, others use
+      // Get reference joint position for rate limiter (first iteration uses current, others use
       // desired)
-      std::array<double, 7> previous_joint_position =
+      std::array<double, 7> reference_joint_position =
           (time == 0.0) ? robot_state.q : robot_state.q_d;
 
       double delta_angle = M_PI / 8.0 * (1 - std::cos(M_PI / 2.5 * time));
 
-      std::array<double, 7> commanded_positions = {
+      std::array<double, 7> target_positions = {
           {initial_position[0], initial_position[1], initial_position[2],
            initial_position[3] + delta_angle, initial_position[4] + delta_angle,
            initial_position[5], initial_position[6] + delta_angle}};
 
       // Compute velocity limits based on current joint position using rate limiter parameters
-      auto upper_velocity_limits = robot.getUpperJointVelocityLimits(previous_joint_position);
-      auto lower_velocity_limits = robot.getLowerJointVelocityLimits(previous_joint_position);
+      auto upper_velocity_limits = robot.getUpperJointVelocityLimits(reference_joint_position);
+      auto lower_velocity_limits = robot.getLowerJointVelocityLimits(reference_joint_position);
 
-      auto rate_limited_positions_array = franka::limitRate(
-          upper_velocity_limits, lower_velocity_limits, franka::kMaxJointAcceleration,
-          franka::kMaxJointJerk, commanded_positions, previous_joint_position, robot_state.dq_d,
-          robot_state.ddq_d);
+      auto rate_limited_positions_array =
+          franka::limitRate(upper_velocity_limits, lower_velocity_limits,
+                            franka::kMaxJointAcceleration, franka::kMaxJointJerk, target_positions,
+                            reference_joint_position, robot_state.dq_d, robot_state.ddq_d);
 
       franka::JointPositions rate_limited_positions(rate_limited_positions_array);
 

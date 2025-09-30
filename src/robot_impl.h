@@ -246,7 +246,6 @@ class Robot::Impl : public RobotControl {
   template <typename MotionGeneratorType>
   void writeOnce(const MotionGeneratorType& motion_generator_input, const Torques& control_input);
 
- protected:
   std::string commandNotPossibleMsg() const {
     std::stringstream stringstream;
     stringstream << " command rejected: command not possible in the current mode ("

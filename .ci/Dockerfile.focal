@@ -76,15 +76,6 @@ RUN git clone --recursive --branch boost-1.77.0 https://github.com/boostorg/boos
     && cd ../.. \
     && rm -rf boost
 
-RUN git clone --branch 10.0.0 https://github.com/leethomason/tinyxml2.git \
-    && cd tinyxml2 \
-    && mkdir build && cd build \
-    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_POSITION_INDEPENDENT_CODE=ON  \
-    && make \
-    && make install \
-    && cd ../.. \
-    && rm -rf tinyxml2
-
 RUN git clone --branch 1.0.2 https://github.com/ros/console_bridge.git \
     && cd console_bridge \
     && mkdir build && cd build \

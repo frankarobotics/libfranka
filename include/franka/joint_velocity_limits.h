@@ -2,12 +2,8 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #pragma once
 
-#include <tinyxml2.h>
 #include <array>
-#include <bitset>
-#include <stdexcept>
 #include <string>
-#include <unordered_map>
 
 /**
  * @file joint_velocity_limits.h
@@ -21,42 +17,43 @@ namespace franka {
  * These parameters define velocity limits that depend on the current joint position.
  */
 struct PositionBasedJointVelocityLimitConstants {
-  double max_base_velocity;           // Maximum base velocity for the joint
-  double velocity_offset;             // Velocity offset parameter from URDF
-  double deceleration_limit;          // Deceleration limit parameter from URDF
-  double upper_joint_position_limit;  // Reference position for upper limit calculation
-  double lower_joint_position_limit;  // Reference position for lower limit calculation
+  double max_velocity;
+  double velocity_offset;
+  double deceleration_limit;
+  double upper_position_limit;
+  double lower_position_limit;
 
   PositionBasedJointVelocityLimitConstants()
-      : max_base_velocity(0),
+      : max_velocity(0),
         velocity_offset(0),
         deceleration_limit(0),
-        upper_joint_position_limit(0),
-        lower_joint_position_limit(0) {}
+        upper_position_limit(0),
+        lower_position_limit(0) {}
 
   /**
    * Constructor with specified parameters
-   * @param max_vel Maximum base velocity
+   * @param max_velocity Maximum velocity
    * @param velocity_offset Velocity offset parameter
    * @param deceleration_limit Deceleration limit parameter
-   * @param upper_joint_position_limit Upper reference position
-   * @param lower_joint_position_limit Lower reference position
+   * @param upper_position_limit Upper position limit
+   * @param lower_position_limit Lower position limit
    */
-  PositionBasedJointVelocityLimitConstants(double max_vel,
+  PositionBasedJointVelocityLimitConstants(double max_velocity,
                                            double velocity_offset,
                                            double deceleration_limit,
-                                           double upper_joint_position_limit,
-                                           double lower_joint_position_limit)
-      : max_base_velocity(max_vel),
+                                           double upper_position_limit,
+                                           double lower_position_limit)
+      : max_velocity(max_velocity),
         velocity_offset(velocity_offset),
         deceleration_limit(deceleration_limit),
-        upper_joint_position_limit(upper_joint_position_limit),
-        lower_joint_position_limit(lower_joint_position_limit) {}
+        upper_position_limit(upper_position_limit),
+        lower_position_limit(lower_position_limit) {}
 };
 
 /**
  * Configuration class that holds position-based joint velocity limit parameters for all 7 joints.
- * This class handles parsing URDF data and storing the resulting joint configurations.
+ * This class handles parsing URDF data, storing joint configurations, and computing velocity
+ * limits.
  */
 class JointVelocityLimitsConfig {
  public:
@@ -70,12 +67,6 @@ class JointVelocityLimitsConfig {
    * @param urdf_string The URDF string to parse for joint velocity limit parameters
    */
   explicit JointVelocityLimitsConfig(const std::string& urdf_string) { parseFromURDF(urdf_string); }
-
-  /**
-   * Parse joint velocity limit parameters from URDF string
-   * @param urdf_string The URDF string to parse
-   */
-  void parseFromURDF(const std::string& urdf_string);
 
   /**
    * Get joint parameters for a specific joint
@@ -93,6 +84,22 @@ class JointVelocityLimitsConfig {
   const std::array<PositionBasedJointVelocityLimitConstants, kNumJoints>& getJointParams() const {
     return joint_params_;
   }
+
+  /**
+   * Compute upper joint velocity limits based on current joint positions
+   * @param joint_positions Current joint positions
+   * @return Array of upper velocity limits for each joint
+   */
+  std::array<double, kNumJoints> getUpperJointVelocityLimits(
+      const std::array<double, kNumJoints>& joint_positions) const;
+
+  /**
+   * Compute lower joint velocity limits based on current joint positions
+   * @param joint_positions Current joint positions
+   * @return Array of lower velocity limits for each joint
+   */
+  std::array<double, kNumJoints> getLowerJointVelocityLimits(
+      const std::array<double, kNumJoints>& joint_positions) const;
 
  private:
   // XML element and attribute name constants
@@ -118,6 +125,12 @@ class JointVelocityLimitsConfig {
   static constexpr const char* kJoint7Name = "joint7";
 
   /**
+   * Parse joint velocity limit parameters from URDF string
+   * @param urdf_string The URDF string to parse
+   */
+  void parseFromURDF(const std::string& urdf_string);
+
+  /**
    * Get joint index from joint name using efficient lookup
    * @param joint_name The name of the joint to find index for
    * @return Joint index (0-6) or -1 if not found
@@ -126,104 +139,5 @@ class JointVelocityLimitsConfig {
 
   std::array<PositionBasedJointVelocityLimitConstants, kNumJoints> joint_params_;
 };
-
-inline void JointVelocityLimitsConfig::parseFromURDF(const std::string& urdf_string) {
-  // Reset to defaults
-  joint_params_ = {};
-
-  tinyxml2::XMLDocument doc;
-  if (doc.Parse(urdf_string.c_str()) != tinyxml2::XML_SUCCESS) {
-    throw std::runtime_error("Failed to parse URDF for joint velocity limits");
-  }
-
-  auto* robot = doc.FirstChildElement(kRobotElementName);
-  if (robot == nullptr) {
-    throw std::runtime_error(
-        "Failed to parse URDF: no <robot> element exists for joint velocity limits");
-  }
-
-  std::bitset<kNumJoints> found_joints;
-
-  auto parse_required_double = [](const tinyxml2::XMLElement* elem, const char* attr,
-                                  const std::string& joint_name,
-                                  const std::string& element_name) -> double {
-    if (elem == nullptr) {
-      throw std::runtime_error("Missing <" + element_name + "> element for joint: " + joint_name);
-    }
-    const char* value = elem->Attribute(attr);
-    if (value == nullptr) {
-      throw std::runtime_error("Missing '" + std::string(attr) + "' attribute in <" + element_name +
-                               "> for joint: " + joint_name);
-    }
-    return std::stod(value);
-  };
-
-  for (auto* joint = robot->FirstChildElement(kJointElementName); joint != nullptr;
-       joint = joint->NextSiblingElement(kJointElementName)) {
-    const char* name = joint->Attribute(kNameAttributeName);
-    if (name == nullptr) {
-      continue;
-    }
-
-    int idx = getJointIndex(name);
-    if (idx == -1) {
-      continue;
-    }
-
-    std::string joint_name_str(name);
-
-    auto* position_based_limits = joint->FirstChildElement(kPositionBasedVelocityLimitsElementName);
-    if (position_based_limits == nullptr) {
-      throw std::runtime_error("Missing <" + std::string(kPositionBasedVelocityLimitsElementName) +
-                               "> element for joint: " + joint_name_str);
-    }
-
-    auto* limit = joint->FirstChildElement(kLimitElementName);
-    if (limit == nullptr) {
-      throw std::runtime_error("Missing <" + std::string(kLimitElementName) +
-                               "> element for joint: " + joint_name_str);
-    }
-
-    found_joints[idx] = true;
-
-    joint_params_[idx] = {
-        parse_required_double(limit, kVelocityAttributeName, joint_name_str, kLimitElementName),
-        parse_required_double(position_based_limits, kVelocityOffsetAttributeName, joint_name_str,
-                              kPositionBasedVelocityLimitsElementName),
-        parse_required_double(position_based_limits, kDecelerationLimitAttributeName,
-                              joint_name_str, kPositionBasedVelocityLimitsElementName),
-        parse_required_double(limit, kUpperAttributeName, joint_name_str, kLimitElementName),
-        parse_required_double(limit, kLowerAttributeName, joint_name_str, kLimitElementName)};
-  }
-
-  if (!found_joints.all()) {
-    std::string missing_joints = "Missing required joints: ";
-    for (int i = 0; i < kNumJoints; ++i) {
-      if (!found_joints[i]) {
-        missing_joints += "joint" + std::to_string(i + 1) + " ";
-      }
-    }
-    throw std::runtime_error(missing_joints);
-  }
-}
-
-inline int JointVelocityLimitsConfig::getJointIndex(const std::string& joint_name) {
-  static const std::unordered_map<std::string, int> joint_name_to_index = {
-      {kJoint1Name, 0}, {kJoint2Name, 1}, {kJoint3Name, 2}, {kJoint4Name, 3},
-      {kJoint5Name, 4}, {kJoint6Name, 5}, {kJoint7Name, 6}};
-
-  auto exact_match = joint_name_to_index.find(joint_name);
-  if (exact_match != joint_name_to_index.end()) {
-    return exact_match->second;
-  }
-
-  for (const auto& [joint_pattern, index] : joint_name_to_index) {
-    if (joint_name.find(joint_pattern) != std::string::npos) {
-      return index;
-    }
-  }
-
-  return -1;
-}
 
 }  // namespace franka
