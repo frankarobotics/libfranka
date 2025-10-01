@@ -12,6 +12,7 @@
 #include <franka/control_types.h>
 #include <franka/exception.h>
 #include <franka/lowpass_filter.h>
+#include <franka/rate_limiting.h>
 #include <franka/robot.h>
 #include <research_interface/robot/service_types.h>
 #include <robot_impl.h>
@@ -462,6 +463,70 @@ TEST(RobotConnectionTests, ThrowsOnIncompatibleLibraryVersion) {
 
   EXPECT_THROW(Robot robot("127.0.0.1", franka::RealtimeConfig::kIgnore),
                IncompatibleVersionException);
+}
+
+TEST_F(RobotTests, JointVelocityLimitsMatchRateLimitingFunctions) {
+  std::vector<std::array<double, 7>> test_positions = {
+      {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},   {{1.0, 0.5, -0.5, -1.5, 1.2, 2.0, -1.0}},
+      {{2.5, 1.5, 2.5, -0.2, 2.5, 4.0, 2.8}},  {{-2.5, -1.5, -2.5, -2.8, -2.5, 1.0, -2.8}},
+      {{1.5, -0.8, 1.2, -2.0, 0.5, 3.5, 1.5}},
+  };
+
+  const double tolerance = 1e-8;
+
+  for (const auto& joint_positions : test_positions) {
+    auto robot_upper_limits = default_robot.getUpperJointVelocityLimits(joint_positions);
+    auto rate_limiting_upper_limits = computeUpperLimitsJointVelocity(joint_positions);
+
+    for (size_t i = 0; i < 7; ++i) {
+      EXPECT_NEAR(robot_upper_limits[i], rate_limiting_upper_limits[i], tolerance)
+          << "Upper velocity limit mismatch for joint " << i << " at position "
+          << joint_positions[i];
+    }
+
+    auto robot_lower_limits = default_robot.getLowerJointVelocityLimits(joint_positions);
+    auto rate_limiting_lower_limits = computeLowerLimitsJointVelocity(joint_positions);
+    for (size_t i = 0; i < 7; ++i) {
+      EXPECT_NEAR(robot_lower_limits[i], rate_limiting_lower_limits[i], tolerance)
+          << "Lower velocity limit mismatch for joint " << i << " at position "
+          << joint_positions[i];
+    }
+  }
+}
+
+TEST_F(RobotTests, JointVelocityLimitsConsistency) {
+  std::array<double, 7> joint_positions{{0.5, -0.3, 1.2, -1.8, 0.8, 2.5, -0.5}};
+
+  auto upper_limits = default_robot.getUpperJointVelocityLimits(joint_positions);
+  auto lower_limits = default_robot.getLowerJointVelocityLimits(joint_positions);
+
+  for (size_t i = 0; i < 7; ++i) {
+    EXPECT_GE(upper_limits[i], lower_limits[i])
+        << "Upper limit should be >= lower limit for joint " << i;
+  }
+}
+
+TEST_F(RobotTests, JointVelocityLimitsAtExtremePositions) {
+  std::vector<std::array<double, 7>> extreme_positions = {
+      {{2.743, 1.783, 2.900, -0.152, 2.806, 4.516, 3.015}},
+      {{-2.743, -1.783, -2.900, -3.041, -2.806, 0.545, -3.015}},
+  };
+
+  const double tolerance = 1e-8;
+
+  for (const auto& joint_positions : extreme_positions) {
+    EXPECT_NO_THROW({
+      auto robot_upper_limits = default_robot.getUpperJointVelocityLimits(joint_positions);
+      auto robot_lower_limits = default_robot.getLowerJointVelocityLimits(joint_positions);
+      auto rate_limiting_upper_limits = computeUpperLimitsJointVelocity(joint_positions);
+      auto rate_limiting_lower_limits = computeLowerLimitsJointVelocity(joint_positions);
+
+      for (size_t i = 0; i < 7; ++i) {
+        EXPECT_NEAR(robot_upper_limits[i], rate_limiting_upper_limits[i], tolerance);
+        EXPECT_NEAR(robot_lower_limits[i], rate_limiting_lower_limits[i], tolerance);
+      }
+    });
+  }
 }
 
 TEST(RobotMultipleControlTests, CanStartOnlyOneControl) {

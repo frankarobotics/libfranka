@@ -34,6 +34,15 @@ using std::placeholders::_2;
 constexpr bool kUseNoAsyncMotionGenerator = false;
 const std::optional<std::vector<double>> kNoMaximumVelocities = std::nullopt;
 
+// Helper function to setup rate limiter mock expectations
+void setupJointVelocityLimitsMock(MockRobotControl& robot) {
+  EXPECT_CALL(robot, getUpperJointVelocityLimits(testing::_))
+      .WillRepeatedly(testing::Return(std::array<double, 7>{2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0}));
+  EXPECT_CALL(robot, getLowerJointVelocityLimits(testing::_))
+      .WillRepeatedly(
+          testing::Return(std::array<double, 7>{-2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0}));
+}
+
 class MockControlCallback {
  public:
   MOCK_METHOD2(invoke, Torques(const RobotState&, Duration));
@@ -189,7 +198,7 @@ JointPositions ControlLoops<JointPositionMotion<false, false>>::createInvalidMot
 
 template <>
 auto ControlLoops<JointPositionMotion<true, true>>::getField(const JointPositions& values) {
-  return Field(&research_interface::robot::MotionGeneratorCommand::q_c, Lt(values.q));
+  return Field(&research_interface::robot::MotionGeneratorCommand::q_c, Eq(values.q));
 }
 
 template <>
@@ -199,7 +208,7 @@ auto ControlLoops<JointPositionMotion<false, true>>::getField(const JointPositio
 
 template <>
 auto ControlLoops<JointPositionMotion<true, false>>::getField(const JointPositions& values) {
-  return Field(&research_interface::robot::MotionGeneratorCommand::q_c, Lt(values.q));
+  return Field(&research_interface::robot::MotionGeneratorCommand::q_c, Eq(values.q));
 }
 
 template <>
@@ -745,6 +754,7 @@ TYPED_TEST_CASE(ControlLoops, MotionTypes);
 
 TYPED_TEST(ControlLoops, CanNotConstructWithoutMotionCallback) {
   StrictMock<MockRobotControl> robot;
+  setupJointVelocityLimitsMock(robot);
 
   EXPECT_THROW(typename TestFixture::Loop loop(
                    robot,
@@ -764,6 +774,7 @@ TYPED_TEST(ControlLoops, CanNotConstructWithoutMotionCallback) {
 
 TYPED_TEST(ControlLoops, CanNotConstructWithoutControlCallback) {
   StrictMock<MockRobotControl> robot;
+  setupJointVelocityLimitsMock(robot);
 
   EXPECT_THROW(
       typename TestFixture::Loop loop(robot, typename TestFixture::ControlCallback(),
@@ -821,6 +832,7 @@ TYPED_TEST(ControlLoops, CanConstructWithControlCallback) {
 
 TYPED_TEST(ControlLoops, SpinOnceWithMotionCallbackAndControllerMode) {
   StrictMock<MockRobotControl> robot;
+  setupJointVelocityLimitsMock(robot);
   EXPECT_CALL(
       robot, startMotion(Move::ControllerMode::kJointImpedance, this->kMotionGeneratorMode,
                          TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
@@ -847,6 +859,7 @@ TYPED_TEST(ControlLoops, SpinOnceWithMotionCallbackAndControllerMode) {
 
 TYPED_TEST(ControlLoops, SpinOnceWithMotionAndControllerCallback) {
   StrictMock<MockRobotControl> robot;
+  setupJointVelocityLimitsMock(robot);
   EXPECT_CALL(
       robot, startMotion(Move::ControllerMode::kExternalController, this->kMotionGeneratorMode,
                          TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
@@ -902,6 +915,7 @@ TYPED_TEST(ControlLoops, SpinOnceWithInvalidMotionAndControllerCallback) {
                                           std::numeric_limits<double>::infinity()};
   for (size_t i = 0; i < invalid_values.size(); i++) {
     StrictMock<MockRobotControl> robot;
+    setupJointVelocityLimitsMock(robot);
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
                                    this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
                                    TestFixture::Loop::kDefaultDeviation, kUseNoAsyncMotionGenerator,
@@ -1259,6 +1273,7 @@ TYPED_TEST_CASE(ControlLoopWithTransformationMatrix, CartesianPoseMotionTypes);
 
 TYPED_TEST(ControlLoopWithTransformationMatrix, SpinOnceWithInvalidTransformationMatrix) {
   StrictMock<MockRobotControl> robot;
+  setupJointVelocityLimitsMock(robot);
   EXPECT_CALL(
       robot, startMotion(Move::ControllerMode::kExternalController, this->kMotionGeneratorMode,
                          TestFixture::Loop::kDefaultDeviation, TestFixture::Loop::kDefaultDeviation,
@@ -1303,6 +1318,7 @@ TYPED_TEST(ControlLoopWithElbow, SpinOnceWithInvalidElbowCallback) {
                                           std::numeric_limits<double>::infinity()};
   for (size_t i = 0; i < invalid_values.size(); i++) {
     StrictMock<MockRobotControl> robot;
+    setupJointVelocityLimitsMock(robot);
     EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
                                    this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
                                    TestFixture::Loop::kDefaultDeviation, kUseNoAsyncMotionGenerator,

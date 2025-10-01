@@ -6,6 +6,7 @@
 
 #include "franka/control_tools.h"
 #include "franka/logging/logger.hpp"
+#include "franka/rate_limiting.h"
 #include "load_calculations.h"
 
 namespace franka {
@@ -67,6 +68,10 @@ Robot::Impl::Impl(std::unique_ptr<Network> network, size_t log_size, RealtimeCon
   connect<research_interface::robot::Connect, research_interface::robot::kVersion>(*network_,
                                                                                    &ri_version_);
   updateState(network_->udpBlockingReceive<research_interface::robot::RobotState>());
+
+  auto get_robot_model =
+      this->executeCommand<research_interface::robot::GetRobotModel, GetRobotModelResult>();
+  joint_velocity_limits_config_ = JointVelocityLimitsConfig(get_robot_model.robot_model_urdf);
 }
 
 RobotState Robot::Impl::updateMotion(
@@ -221,6 +226,16 @@ bool Robot::Impl::controllerRunning() const noexcept {
 
 RealtimeConfig Robot::Impl::realtimeConfig() const noexcept {
   return realtime_config_;
+}
+
+std::array<double, RobotControl::kNumJoints> Robot::Impl::getUpperJointVelocityLimits(
+    const std::array<double, RobotControl::kNumJoints>& joint_positions) const {
+  return joint_velocity_limits_config_.getUpperJointVelocityLimits(joint_positions);
+}
+
+std::array<double, RobotControl::kNumJoints> Robot::Impl::getLowerJointVelocityLimits(
+    const std::array<double, RobotControl::kNumJoints>& joint_positions) const {
+  return joint_velocity_limits_config_.getLowerJointVelocityLimits(joint_positions);
 }
 
 uint32_t Robot::Impl::startMotion(

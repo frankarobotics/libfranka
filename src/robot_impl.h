@@ -6,6 +6,7 @@
 #include <sstream>
 #include <type_traits>
 
+#include <franka/joint_velocity_limits.h>
 #include <franka/model.h>
 #include <franka/robot.h>
 #include <franka/robot_model_base.h>
@@ -40,6 +41,13 @@ class Robot::Impl : public RobotControl {
 
   // Inherited via RobotControl
   auto realtimeConfig() const noexcept -> RealtimeConfig override;
+
+  auto getUpperJointVelocityLimits(
+      const std::array<double, RobotControl::kNumJoints>& joint_positions) const
+      -> std::array<double, RobotControl::kNumJoints> override;
+  auto getLowerJointVelocityLimits(
+      const std::array<double, RobotControl::kNumJoints>& joint_positions) const
+      -> std::array<double, RobotControl::kNumJoints> override;
   auto startMotion(research_interface::robot::Move::ControllerMode controller_mode,
                    research_interface::robot::Move::MotionGeneratorMode motion_generator_mode,
                    const research_interface::robot::Move::Deviation& maximum_path_deviation,
@@ -308,21 +316,27 @@ class Robot::Impl : public RobotControl {
   research_interface::robot::RobotState receiveRobotState();
   void updateState(const research_interface::robot::RobotState& robot_state);
 
-  std::unique_ptr<Network> network_;
+  std::unique_ptr<Network> network_;  // NOLINT(readability-identifier-naming)
 
-  RobotStateLogger logger_;
+  RobotStateLogger logger_;  // NOLINT(readability-identifier-naming)
 
   const RealtimeConfig realtime_config_;  // NOLINT(readability-identifier-naming)
-  uint16_t ri_version_;
+  uint16_t ri_version_;                   // NOLINT(readability-identifier-naming)
 
-  research_interface::robot::RobotMode robot_mode_ = research_interface::robot::RobotMode::kOther;
-  research_interface::robot::MotionGeneratorMode motion_generator_mode_;
-  research_interface::robot::MotionGeneratorMode current_move_motion_generator_mode_ =
+  research_interface::robot::RobotMode robot_mode_ =  // NOLINT(readability-identifier-naming)
+      research_interface::robot::RobotMode::kOther;
+  research_interface::robot::MotionGeneratorMode
+      motion_generator_mode_;  // NOLINT(readability-identifier-naming)
+  research_interface::robot::MotionGeneratorMode
+      current_move_motion_generator_mode_ =  // NOLINT(readability-identifier-naming)
       research_interface::robot::MotionGeneratorMode::kIdle;
-  research_interface::robot::ControllerMode controller_mode_ =
+  research_interface::robot::ControllerMode
+      controller_mode_ =  // NOLINT(readability-identifier-naming)
       research_interface::robot::ControllerMode::kOther;
-  research_interface::robot::ControllerMode current_move_controller_mode_;
-  uint64_t message_id_;
+  research_interface::robot::ControllerMode
+      current_move_controller_mode_;                        // NOLINT(readability-identifier-naming)
+  uint64_t message_id_;                                     // NOLINT(readability-identifier-naming)
+  JointVelocityLimitsConfig joint_velocity_limits_config_;  // NOLINT(readability-identifier-naming)
 };
 
 template <>

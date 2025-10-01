@@ -18,6 +18,7 @@ namespace franka {
  */
 class RobotControl {
  public:
+  static constexpr size_t kNumJoints = 7;
   virtual ~RobotControl() = default;
 
   /**
@@ -82,6 +83,24 @@ class RobotControl {
    * @return RealtimeConfig The realtime configuration.
    */
   virtual RealtimeConfig realtimeConfig() const noexcept = 0;
+
+  /**
+   * Computes the upper joint velocity limits based on current joint positions.
+   *
+   * @param joint_positions Current joint positions.
+   * @return std::array<double, kNumJoints> Upper joint velocity limits.
+   */
+  virtual auto getUpperJointVelocityLimits(const std::array<double, kNumJoints>& joint_positions)
+      const -> std::array<double, kNumJoints> = 0;
+
+  /**
+   * Computes the lower joint velocity limits based on current joint positions.
+   *
+   * @param joint_positions Current joint positions.
+   * @return std::array<double, kNumJoints> Lower joint velocity limits.
+   */
+  virtual auto getLowerJointVelocityLimits(const std::array<double, kNumJoints>& joint_positions)
+      const -> std::array<double, kNumJoints> = 0;
 };
 
 }  // namespace franka

@@ -194,6 +194,16 @@ auto Robot::getRobotModel() -> std::string {
   return get_robot_model.robot_model_urdf;
 }
 
+auto Robot::getUpperJointVelocityLimits(const std::array<double, kNumJoints>& joint_positions)
+    -> std::array<double, kNumJoints> {
+  return impl_->getUpperJointVelocityLimits(joint_positions);
+}
+
+auto Robot::getLowerJointVelocityLimits(const std::array<double, kNumJoints>& joint_positions)
+    -> std::array<double, kNumJoints> {
+  return impl_->getLowerJointVelocityLimits(joint_positions);
+}
+
 void Robot::setCollisionBehavior(const std::array<double, 7>& lower_torque_thresholds_acceleration,
                                  const std::array<double, 7>& upper_torque_thresholds_acceleration,
                                  const std::array<double, 7>& lower_torque_thresholds_nominal,

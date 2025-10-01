@@ -2,12 +2,26 @@
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include "mock_server.h"
 
+#include <fstream>
 #include <sstream>
 
 #include <Poco/Net/DatagramSocket.h>
 #include <Poco/Net/ServerSocket.h>
 #include <Poco/Net/StreamSocket.h>
 #include <gtest/gtest.h>
+#include "test_utils.h"
+
+namespace {
+// Helper function to get test URDF content
+std::string getTestUrdfContent() {
+  static std::string cached_urdf;
+  if (cached_urdf.empty()) {
+    std::string urdf_path = franka_test_utils::getUrdfPath(__FILE__);
+    cached_urdf = franka_test_utils::readFileToString(urdf_path);
+  }
+  return cached_urdf;
+}
+}  // namespace
 
 template <typename C>
 MockServer<C>::MockServer(ConnectCallbackT on_connect, uint32_t sequence_number)
@@ -17,6 +31,11 @@ MockServer<C>::MockServer(ConnectCallbackT on_connect, uint32_t sequence_number)
       initialized_{false},
       sequence_number_{sequence_number},
       on_connect_{on_connect} {
+  initializeServer();
+}
+
+template <typename C>
+void MockServer<C>::initializeServer() {
   std::unique_lock<std::mutex> lock(command_mutex_);
   server_thread_ = std::thread(&MockServer<C>::serverThread, this);
 
@@ -184,6 +203,35 @@ void MockServer<RobotTypes>::sendInitialState(Socket& udp_socket) {
 }
 
 template <typename C>
+void MockServer<C>::addDefaultRobotModelHandler() {}
+
+template <>
+void MockServer<RobotTypes>::addDefaultRobotModelHandler() {
+  // Only add GetRobotModel handler if connection is expected to succeed
+  // (i.e., no custom connect callback, or callback returns success)
+  bool should_add_robot_model_handler = true;
+  if (on_connect_) {
+    // Test the callback with a dummy request to see if it returns success
+    RobotTypes::Connect::Request dummy_request(0);  // dummy UDP port
+    auto response = on_connect_(dummy_request);
+    should_add_robot_model_handler = (response.status == RobotTypes::Connect::Status::kSuccess);
+  }
+
+  if (should_add_robot_model_handler) {
+    std::lock_guard<std::mutex> lock(command_mutex_);
+    // Automatically queue a GetRobotModel handler to return test URDF
+    // This will be consumed only if a GetRobotModel request is actually received
+    commands_.emplace_back("waitForCommand<GetRobotModel>", [this](Socket& tcp_socket, Socket&) {
+      handleCommand<research_interface::robot::GetRobotModel>(
+          tcp_socket, [](const research_interface::robot::GetRobotModel::Request& /*request*/) {
+            return research_interface::robot::GetRobotModel::Response(
+                research_interface::robot::GetRobotModel::Status::kSuccess, getTestUrdfContent());
+          });
+    });
+  }
+}
+
+template <typename C>
 MockServer<C>& MockServer<C>::doForever(std::function<bool()> callback) {
   std::lock_guard<std::mutex> _(command_mutex_);
   return doForever(callback, commands_.end());
@@ -216,6 +264,18 @@ MockServer<C>& MockServer<C>::doForever(std::function<bool()> callback,
   };
   commands_.emplace(it, "doForever", callback_wrapper);
   return *this;
+}
+
+template <>
+MockServer<RobotTypes>::MockServer(ConnectCallbackT on_connect, uint32_t sequence_number)
+    : block_{false},
+      shutdown_{false},
+      continue_{false},
+      initialized_{false},
+      sequence_number_{sequence_number},
+      on_connect_{on_connect} {
+  addDefaultRobotModelHandler();
+  initializeServer();
 }
 
 template class MockServer<RobotTypes>;

@@ -51,6 +51,7 @@ set(THIRDPARTY_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty" CACHE PATH
 find_package(Poco REQUIRED COMPONENTS Net Foundation)
 find_package(Eigen3 REQUIRED)
 find_package(pinocchio REQUIRED)
+find_package(TinyXML2 REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -92,6 +93,7 @@ add_library(franka SHARED
   src/exception.cpp
   src/gripper.cpp
   src/gripper_state.cpp
+  src/joint_velocity_limits.cpp
   src/load_calculations.cpp
   src/lowpass_filter.cpp
   src/model.cpp
@@ -144,6 +146,7 @@ target_link_libraries(franka PRIVATE
   Eigen3::Eigen3
   Threads::Threads
   pinocchio::pinocchio
+  TinyXML2::TinyXML2
 )
 
 target_link_libraries(franka PUBLIC

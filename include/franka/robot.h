@@ -68,6 +68,11 @@ class ActiveControlBase;
 class Robot {
  public:
   /**
+   * Number of joints of the robot.
+   */
+  static constexpr size_t kNumJoints = 7;
+
+  /**
    * Version of the robot server.
    */
   using ServerVersion = uint16_t;
@@ -463,6 +468,24 @@ class Robot {
    * @return std::string Provides the URDF model of the attached robot arm as json string
    */
   auto getRobotModel() -> std::string;
+
+  /**
+   * Computes upper limits for joint velocities based on current joint positions.
+   *
+   * @param[in] joint_positions Joint positions.
+   * @return Upper limits for joint velocities.
+   */
+  auto getUpperJointVelocityLimits(const std::array<double, kNumJoints>& joint_positions)
+      -> std::array<double, kNumJoints>;
+
+  /**
+   * Computes lower limits for joint velocities based on current joint positions.
+   *
+   * @param[in] joint_positions Joint positions.
+   * @return Lower limits for joint velocities.
+   */
+  auto getLowerJointVelocityLimits(const std::array<double, kNumJoints>& joint_positions)
+      -> std::array<double, kNumJoints>;
 
   /**
    * Changes the collision behavior.
