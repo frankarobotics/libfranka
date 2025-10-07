@@ -33,9 +33,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/frankaemika/pylibfranka"
-Repository = "https://github.com/frankaemika/pylibfranka"
-Issues = "https://github.com/frankaemika/pylibfranka/issues"
+Homepage = "https://github.com/frankarobotics/libfranka"
+Repository = "https://github.com/frankarobotics/libfranka"
+Issues = "https://github.com/frankarobotics/libfranka/issues"
 
 [project.optional-dependencies]
 dev = [
