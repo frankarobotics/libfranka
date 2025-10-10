@@ -1,18 +1,33 @@
 # CHANGELOG
 
-## Pending Release
+All notable changes to libfranka and pylibfranka will be documented in this file.
 
-- Updated libfranka-common (aka: common-libfranka) - with float based RobotState struct
-- Updated pinocchio to version 3.4.0
-- Feat: use pinocchio to compute forward kinematics
-- Feat: use pinocchio to compute jacobians
-- Chore: remove dynamic library loading from model constructor
-- Bumped: clang version from 6 to 14
-- Fix: Fixed the elbow limit rating taking the wrong values
-- Breaking: Added the 'async position motion generator' control scheme, which allows for asynchronous position control of the robot
-- Feat: expose accelerometer data in robot state
-- Feat: Parse joint position–based velocity limits from URDF to compute upper and lower velocity bounds
-- Docs: move the docs under libfranka repo
+## [Unreleased]
+
+### libfranka - C++
+#### Added
+- Async position motion generator control scheme for asynchronous position control of the robot (**BREAKING CHANGE**)
+- Forward kinematics computation using Pinocchio library
+- Jacobian computation using Pinocchio library
+- Accelerometer data exposed in robot state
+- Joint position-based velocity limits parsed from URDF to compute upper and lower velocity bounds
+- Documentation under libfranka repository
+
+#### Changed
+- Updated libfranka-common (common-libfranka) to use float-based RobotState struct
+- Upgraded Pinocchio dependency to version 3.4.0
+- Upgraded minimum Clang version from 6 to 14
+- Removed dynamic library loading from Model constructor
+
+#### Fixed
+- Corrected elbow limit rating which was using incorrect values
+
+### pylibfranka - Python
+*
+
+## 0.16.1 - 2025-10-10
+
+* Fix: fix cmake and package versioning
 
 ## 0.16.0 - 2025-09-15
 
