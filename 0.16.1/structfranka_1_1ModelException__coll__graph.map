@@ -1,0 +1,7 @@
+<map id="franka::ModelException" name="franka::ModelException">
+<area shape="rect" id="Node000001" title="ModelException is thrown if an error occurs when loading the model library." alt="" coords="5,152,180,177"/>
+<area shape="rect" id="Node000002" href="$structfranka_1_1Exception.html" title="Base class for all exceptions used by libfranka." alt="" coords="25,79,160,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,118,95,152,90,152,90,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="23,5,162,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="95,44,95,79,90,79,90,44"/>
+</map>

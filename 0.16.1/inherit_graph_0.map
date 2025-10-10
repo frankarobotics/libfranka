@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classfranka_1_1ActiveControlBase.html" title="Allows the user to read the state of a Robot and to send new control commands after starting a contro..." alt="" coords="5,42,196,67"/>
+<area shape="rect" id="Node000001" href="$classfranka_1_1ActiveControl.html" title="Documented in ActiveControlBase." alt="" coords="244,42,403,67"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="210,52,244,52,244,57,210,57"/>
+<area shape="rect" id="Node000002" href="$classfranka_1_1ActiveMotionGenerator.html" title="Allows the user to read the state of a Robot and to send new motion generator commands after starting..." alt="" coords="451,5,673,45"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="416,41,450,36,451,42,417,46"/>
+<area shape="rect" id="Node000003" href="$classfranka_1_1ActiveTorqueControl.html" title="Allows the user to read the state of a Robot and to send new torque control commands after starting a..." alt="" coords="461,70,663,95"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="417,63,461,68,460,73,417,68"/>
+</map>
