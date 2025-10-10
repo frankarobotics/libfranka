@@ -1,8 +1,11 @@
 # CHANGELOG
+## 0.16.1 - 2025-10-10
+
+* fix: fix cmake and package versioning
 
 ## 0.16.0 - 2025-09-15
 
-- Feat: Added pylibfranka - a python binding for libfranka
+* Feat: Added pylibfranka - a python binding for libfranka
 
 ## 0.15.3 - 2025-07-31
 
