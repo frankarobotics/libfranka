@@ -2,7 +2,7 @@
 
 All notable changes to libfranka and pylibfranka will be documented in this file.
 
-## [Unreleased]
+## [0.18.0] - Unreleased
 Requires Franka Research 3 System Version >= 5.9.0
 
 ### libfranka - C++
