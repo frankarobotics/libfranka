@@ -5,7 +5,7 @@ enabling real-time control with torque, position, and velocity commands.
 
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from ._pylibfranka import (
     ActiveControlBase,

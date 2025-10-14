@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(franka_python_bindings VERSION 0.1.0)
+project(franka_python_bindings VERSION ${libfranka_VERSION})
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)

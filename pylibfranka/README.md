@@ -122,6 +122,15 @@ The joint impedance example:
 - Includes position holding with dwell time between movements
 - Compensates for Coriolis effects
 
+### And more control examples
+
+There are more control examples to discover. All of them can be executed in a similar way:
+
+```bash
+cd examples
+python3 other_example.py --ip <robot_ip>
+```
+
 ### Gripper Control Example
 
 This example demonstrates how to control the Franka gripper, including homing, grasping, and reading gripper state.

@@ -8,7 +8,7 @@ import time
 
 import numpy as np
 
-from pylibfranka import ControllerMode, CartesianPose, Robot
+from pylibfranka import CartesianPose, ControllerMode, RealtimeConfig, Robot
 
 
 def main():
@@ -18,7 +18,7 @@ def main():
     args = parser.parse_args()
 
     # Connect to robot
-    robot = Robot(args.ip)
+    robot = Robot(args.ip, RealtimeConfig.kIgnore)
 
     try:
         # Set collision behavior
@@ -60,7 +60,6 @@ def main():
 
             # Update time
             time_elapsed += duration.to_sec()
-
 
             # Update joint positions
             new_cartesian_pose = initial_cartesian_pose.copy()
