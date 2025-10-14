@@ -10,6 +10,7 @@ This document provides comprehensive instructions for installing and using pylib
   - [Joint Position Example](#joint-position-example)
   - [Print Robot State Example](#print-robot-state-example)
   - [Joint Impedance Control Example](#joint-impedance-control-example)
+  - [And more control examples](#and-more-control-examples)
   - [Gripper Control Example](#gripper-control-example)
 - [Troubleshooting](#troubleshooting)
 
@@ -121,6 +122,15 @@ The joint impedance example:
   - Return to home position
 - Includes position holding with dwell time between movements
 - Compensates for Coriolis effects
+
+### And more control examples
+
+All control examples can be executed the way you already saw it:
+
+```bash
+cd examples
+python3 other_example.py --ip <robot_ip>
+```
 
 ### Gripper Control Example
 

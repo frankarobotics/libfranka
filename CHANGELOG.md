@@ -1,4 +1,9 @@
 # CHANGELOG
+
+## 0.17.0 - 2025-10-14
+
+* Feat: Added CartesianPose control to pylibfranka
+
 ## 0.16.1 - 2025-10-10
 
 * fix: fix cmake and package versioning
