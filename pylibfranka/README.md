@@ -6,7 +6,6 @@ This document provides comprehensive instructions for installing and using pylib
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
   - [Installation from Source](#installation-from-source)
-  - [Installation from Artifactory](#installation-from-artifactory)
 - [Examples](#examples)
   - [Joint Position Example](#joint-position-example)
   - [Print Robot State Example](#print-robot-state-example)

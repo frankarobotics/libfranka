@@ -16,6 +16,26 @@
 
 namespace py = pybind11;
 
+namespace {
+
+/**
+ * Convert franka::ControllerMode to research_interface::robot::Move::ControllerMode
+ * @param mode franka::ControllerMode the mode to convert
+ * @return research_interface::robot::Move::ControllerMode
+ */
+auto convertControllerMode(franka::ControllerMode mode)
+    -> research_interface::robot::Move::ControllerMode {
+  switch (mode) {
+    case franka::ControllerMode::kJointImpedance:
+      return research_interface::robot::Move::ControllerMode::kJointImpedance;
+    case franka::ControllerMode::kCartesianImpedance:
+      return research_interface::robot::Move::ControllerMode::kCartesianImpedance;
+    default:
+      throw std::invalid_argument("Invalid franka::ControllerMode");
+  }
+}
+}  // namespace
+
 namespace pylibfranka {
 
 PyGripper::PyGripper(const std::string& franka_address)
@@ -51,30 +71,23 @@ franka::Gripper::ServerVersion PyGripper::serverVersion() {
 PyRobot::PyRobot(const std::string& franka_address, franka::RealtimeConfig realtime_config)
     : robot_(std::make_unique<franka::Robot>(franka_address, realtime_config)) {}
 
-std::unique_ptr<franka::ActiveControlBase> PyRobot::startTorqueControl() {
+auto PyRobot::startTorqueControl() -> std::unique_ptr<franka::ActiveControlBase> {
   return robot_->startTorqueControl();
 }
 
-std::unique_ptr<franka::ActiveControlBase> PyRobot::startJointPositionControl(
-    const franka::ControllerMode& control_type) {
-  research_interface::robot::Move::ControllerMode mode;
-  if (control_type == franka::ControllerMode::kJointImpedance) {
-    mode = research_interface::robot::Move::ControllerMode::kJointImpedance;
-  } else {
-    mode = research_interface::robot::Move::ControllerMode::kCartesianImpedance;
-  }
-  return robot_->startJointPositionControl(mode);
+auto PyRobot::startJointPositionControl(franka::ControllerMode controller_mode)
+    -> std::unique_ptr<franka::ActiveControlBase> {
+  return robot_->startJointPositionControl(convertControllerMode(controller_mode));
 }
 
-std::unique_ptr<franka::ActiveControlBase> PyRobot::startJointVelocityControl(
-    const franka::ControllerMode& control_type) {
-  research_interface::robot::Move::ControllerMode mode;
-  if (control_type == franka::ControllerMode::kJointImpedance) {
-    mode = research_interface::robot::Move::ControllerMode::kJointImpedance;
-  } else {
-    mode = research_interface::robot::Move::ControllerMode::kCartesianImpedance;
-  }
-  return robot_->startJointVelocityControl(mode);
+auto PyRobot::startJointVelocityControl(franka::ControllerMode controller_mode)
+    -> std::unique_ptr<franka::ActiveControlBase> {
+  return robot_->startJointVelocityControl(convertControllerMode(controller_mode));
+}
+
+auto PyRobot::startCartesianPoseControl(franka::ControllerMode controller_mode)
+    -> std::unique_ptr<franka::ActiveControlBase> {
+  return robot_->startCartesianPoseControl(convertControllerMode(controller_mode));
 }
 
 void PyRobot::setCollisionBehavior(const std::array<double, 7>& lower_torque_thresholds,
@@ -430,6 +443,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
       .def("start_torque_control", &PyRobot::startTorqueControl)
       .def("start_joint_position_control", &PyRobot::startJointPositionControl)
       .def("start_joint_velocity_control", &PyRobot::startJointVelocityControl)
+      .def("start_cartesian_pose_control", &PyRobot::startCartesianPoseControl)
       .def("set_collision_behavior", &PyRobot::setCollisionBehavior)
       .def("set_joint_impedance", &PyRobot::setJointImpedance)
       .def("set_cartesian_impedance", &PyRobot::setCartesianImpedance)

@@ -2,6 +2,7 @@ __version__ = "0.1.0"
 
 from ._pylibfranka import (
     ActiveControlBase,
+    CartesianPose,
     ControllerMode,
     Errors,
     Gripper,
@@ -18,6 +19,7 @@ from ._pylibfranka import (
 __all__ = [
     "ActiveControlBase",
     "ControllerMode",
+    "CartesianPose",
     "Errors",
     "JointPositions",
     "JointVelocities",
