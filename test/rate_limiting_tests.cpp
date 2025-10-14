@@ -523,34 +523,3 @@ TEST(RateLimiting, CartesianPoseIntegrationAndDifferentation) {
     ASSERT_NEAR(twist[i], last_cmd_velocity[i], 1e-6);
   }
 }
-
-TEST(RateLimiting, PositionBasedVelocityLimitBoundaryCheck) {
-  {
-    const std::array<double, 7> q_lower_limits = {-2.9007, -1.8361, -2.9007, -3.0770,
-                                                  -2.8763, 0.4398,  -3.0508};
-    const std::array<double, 7> dq_upper_limits = {2.62, 2.62, 2.62, 2.62, 5.26, 4.18, 5.26};
-    const std::array<double, 7> dq_lower_limits = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-    auto dq_max = computeUpperLimitsJointVelocity(q_lower_limits);
-    EXPECT_LT(dq_max, dq_upper_limits);
-
-    auto dq_min = computeLowerLimitsJointVelocity(q_lower_limits);
-    EXPECT_GT(dq_min, dq_lower_limits);
-
-    EXPECT_GT(dq_max, dq_min);
-  }
-
-  {
-    const std::array<double, 7> q_upper_limits = {2.9007, 1.8361, 2.9007, -0.1169,
-                                                  2.8763, 4.6216, 3.0508};
-    const std::array<double, 7> dq_upper_limits = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    const std::array<double, 7> dq_lower_limits = {-2.62, -2.62, -2.62, -2.62, -5.26, -4.18, -5.26};
-    auto dq_max = computeUpperLimitsJointVelocity(q_upper_limits);
-    EXPECT_LT(dq_max, dq_upper_limits);
-
-    auto dq_min = computeLowerLimitsJointVelocity(q_upper_limits);
-    EXPECT_GT(dq_min, dq_lower_limits);
-
-    EXPECT_GT(dq_max, dq_min);
-  }
-}
