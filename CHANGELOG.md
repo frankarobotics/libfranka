@@ -25,6 +25,7 @@ Requires Franka Research 3 System Version >= 5.9.0
 
 #### Deprecated
 - Marked `franka::computeUpperLimitsJointVelocity(const std::array<double, 7UL> &q)` and `franka::computeLowerLimitsJointVelocity(const std::array<double, 7UL> &q)`as deprecated. It will be removed in future versions. Use `Robot::getUpperJointVelocityLimits(const std::array<double, 7UL> &joint_positions)` and `Robot::getLowerJointVelocityLimits(const std::array<double, 7UL> &joint_positions)` instead.
+- With system image >= 5.9.0, the joint position limits of the system with libfranka are increased to match the datasheet. The methods `franka::computeUpperLimitsJointVelocity(const std::array<double, 7UL> &q)` and `franka::computeLowerLimitsJointVelocity(const std::array<double, 7UL> &q)` now impose stricter constraints compared to the new parametrized limits.
 
 ### pylibfranka - Python
 *

@@ -12,7 +12,6 @@
 #include <franka/control_types.h>
 #include <franka/exception.h>
 #include <franka/lowpass_filter.h>
-#include <franka/rate_limiting.h>
 #include <franka/robot.h>
 #include <research_interface/robot/service_types.h>
 #include <robot_impl.h>
@@ -476,10 +475,8 @@ TEST_F(RobotTests, JointVelocityLimitsMatchRateLimitingFunctions) {
 
   for (const auto& joint_positions : test_positions) {
     auto robot_upper_limits = default_robot.getUpperJointVelocityLimits(joint_positions);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    auto rate_limiting_upper_limits = computeUpperLimitsJointVelocity(joint_positions);
-#pragma GCC diagnostic pop
+    auto rate_limiting_upper_limits = referenceUpperLimitsJointVelocityCalculation(joint_positions);
+
     for (size_t i = 0; i < 7; ++i) {
       EXPECT_NEAR(robot_upper_limits[i], rate_limiting_upper_limits[i], tolerance)
           << "Upper velocity limit mismatch for joint " << i << " at position "
@@ -487,10 +484,8 @@ TEST_F(RobotTests, JointVelocityLimitsMatchRateLimitingFunctions) {
     }
 
     auto robot_lower_limits = default_robot.getLowerJointVelocityLimits(joint_positions);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    auto rate_limiting_lower_limits = computeLowerLimitsJointVelocity(joint_positions);
-#pragma GCC diagnostic pop
+    auto rate_limiting_lower_limits = referenceLowerLimitsJointVelocityCalculation(joint_positions);
+
     for (size_t i = 0; i < 7; ++i) {
       EXPECT_NEAR(robot_lower_limits[i], rate_limiting_lower_limits[i], tolerance)
           << "Lower velocity limit mismatch for joint " << i << " at position "
@@ -520,19 +515,18 @@ TEST_F(RobotTests, JointVelocityLimitsAtExtremePositions) {
   const double tolerance = 1e-8;
 
   for (const auto& joint_positions : extreme_positions) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     EXPECT_NO_THROW({
       auto robot_upper_limits = default_robot.getUpperJointVelocityLimits(joint_positions);
       auto robot_lower_limits = default_robot.getLowerJointVelocityLimits(joint_positions);
-      auto rate_limiting_upper_limits = computeUpperLimitsJointVelocity(joint_positions);
-      auto rate_limiting_lower_limits = computeLowerLimitsJointVelocity(joint_positions);
+      auto rate_limiting_upper_limits =
+          referenceUpperLimitsJointVelocityCalculation(joint_positions);
+      auto rate_limiting_lower_limits =
+          referenceLowerLimitsJointVelocityCalculation(joint_positions);
       for (size_t i = 0; i < 7; ++i) {
         EXPECT_NEAR(robot_upper_limits[i], rate_limiting_upper_limits[i], tolerance);
         EXPECT_NEAR(robot_lower_limits[i], rate_limiting_lower_limits[i], tolerance);
       }
     });
-#pragma GCC diagnostic pop
   }
 }
 
