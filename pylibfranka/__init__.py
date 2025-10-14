@@ -39,6 +39,7 @@ __all__ = [
     "CommandException",
     "ControlException",
     "ControllerMode",
+    "CartesianPose",
     "Duration",
     "Errors",
     "FrankaException",

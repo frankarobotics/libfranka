@@ -7,8 +7,7 @@
  *
  * This header file provides C++ classes that wrap the Franka Robotics Robot Control Library
  * for use in Python through pybind11. It offers:
- *
- * 1. PyRobot: A wrapper for the Franka robot control functionality, providing:
+ * PyRobot: A wrapper for the Franka robot control functionality, providing:
  *    - Active control methods (torque, joint position, joint velocity control)
  *    - Configuration methods (collision behavior, impedance settings, etc.)
  *    - State reading and control methods
@@ -44,11 +43,31 @@ class PyRobot {
   ~PyRobot() = default;
 
   // Active control methods
-  std::unique_ptr<franka::ActiveControlBase> startTorqueControl();
-  std::unique_ptr<franka::ActiveControlBase> startJointPositionControl(
-      const franka::ControllerMode&);
-  std::unique_ptr<franka::ActiveControlBase> startJointVelocityControl(
-      const franka::ControllerMode&);
+  /**
+   * Starts torque control mode.
+   */
+  auto startTorqueControl() -> std::unique_ptr<franka::ActiveControlBase>;
+
+  /**
+   * Starts the joint position control mode.
+   * @param control_type The type of controller to use (JointImpedance or CartesianImpedance).
+   */
+  auto startJointPositionControl(franka::ControllerMode controller_mode)
+      -> std::unique_ptr<franka::ActiveControlBase>;
+
+  /**
+   * Starts the joint velocity control mode.
+   * @param control_type The type of controller to use (JointImpedance or CartesianImpedance).
+   */
+  auto startJointVelocityControl(franka::ControllerMode controller_mode)
+      -> std::unique_ptr<franka::ActiveControlBase>;
+
+  /**
+   * Starts the Cartesian pose control mode.
+   * @param control_type The type of controller to use (JointImpedance or CartesianImpedance).
+   */
+  auto startCartesianPoseControl(franka::ControllerMode controller_mode)
+      -> std::unique_ptr<franka::ActiveControlBase>;
 
   // Configuration methods
   void setCollisionBehavior(const std::array<double, 7>& lower_torque_thresholds,
