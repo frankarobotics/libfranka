@@ -12,7 +12,7 @@ pipeline {
   }
   options {
     parallelsAlwaysFailFast()
-    timeout(time: 1, unit: 'HOURS')
+    timeout(time: 90, unit: 'MINUTES')
   }
   environment {
     VERSION = feDetermineVersionFromGit()
@@ -194,11 +194,30 @@ pipeline {
               }
             }
           }
+
+          // Trigger the docs upstream to verify that the docu is building correctly
+          stage('Trigger Docs Upstream') {
+            steps {
+              script {
+                try {
+                  build job: "FCI/fci_docs/master"
+                } catch (Exception e) {
+                  echo "Upstream docs build job failed: ${e.message}"
+                  currentBuild.result = 'FAILURE'
+                  error("Failing the build because the upstream docs build failed.")
+                }
+              }
+            }
+          }
+
+
           stage('Check Github Sync') {
             steps {
               sh '.ci/checkgithistory.sh https://github.com/frankarobotics/libfranka.git develop'
             }
           }
+
+          // Everything is finished and ready for being published
           stage('Publish') {
             steps {
               dir("build-release.${env.DISTRO}") {
@@ -221,7 +240,7 @@ pipeline {
                               reportName: "API Documentation (${env.DISTRO})"])
                 }
               }
-              
+
               // Build and publish pylibfranka documentation
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
                 sh '''
@@ -229,26 +248,26 @@ pipeline {
                   export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
                   pip3 install . --user
                 '''
-                
+
                 dir('pylibfranka/docs') {
                   sh '''
                     # Add sphinx to PATH
                     export PATH="$HOME/.local/bin:$PATH"
-                    
+
                     # Install Sphinx and dependencies
                     pip3 install -r requirements.txt --user
-                    
+
                     # Set locale
                     export LC_ALL=C.UTF-8
                     export LANG=C.UTF-8
-                    
+
                     # Add libfranka to library path
                     export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
-                    
+
                     # Build the documentation
                     make html
                   '''
-                  
+
                   publishHTML([allowMissing: false,
                               alwaysLinkToLastBuild: false,
                               keepAll: true,
