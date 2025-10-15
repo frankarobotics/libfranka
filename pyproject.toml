@@ -13,7 +13,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pylibfranka"
-version = "0.1.0"
+version = "0.2.0"
 description = "Python bindings for libfranka with automatic dependency bundling"
 authors = [{name = "Franka Robotics GmbH", email = "info@franka.de"}]
 license = {text = "Apache-2.0"}

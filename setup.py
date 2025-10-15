@@ -54,7 +54,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="pylibfranka",
-    version="0.1.0",
+    version="0.2.0",
     packages=["pylibfranka"],
     python_requires=">=3.8",
     install_requires=["numpy>=1.19.0"],

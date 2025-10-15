@@ -16,6 +16,26 @@
 
 namespace py = pybind11;
 
+namespace {
+
+/**
+ * Convert franka::ControllerMode to research_interface::robot::Move::ControllerMode
+ * @param mode franka::ControllerMode the mode to convert
+ * @return research_interface::robot::Move::ControllerMode
+ */
+auto convertControllerMode(franka::ControllerMode mode)
+    -> research_interface::robot::Move::ControllerMode {
+  switch (mode) {
+    case franka::ControllerMode::kJointImpedance:
+      return research_interface::robot::Move::ControllerMode::kJointImpedance;
+    case franka::ControllerMode::kCartesianImpedance:
+      return research_interface::robot::Move::ControllerMode::kCartesianImpedance;
+    default:
+      throw std::invalid_argument("Invalid franka::ControllerMode");
+  }
+}
+}  // namespace
+
 namespace pylibfranka {
 
 PyGripper::PyGripper(const std::string& franka_address)
@@ -51,30 +71,23 @@ franka::Gripper::ServerVersion PyGripper::serverVersion() {
 PyRobot::PyRobot(const std::string& franka_address, franka::RealtimeConfig realtime_config)
     : robot_(std::make_unique<franka::Robot>(franka_address, realtime_config)) {}
 
-std::unique_ptr<franka::ActiveControlBase> PyRobot::startTorqueControl() {
+auto PyRobot::startTorqueControl() -> std::unique_ptr<franka::ActiveControlBase> {
   return robot_->startTorqueControl();
 }
 
-std::unique_ptr<franka::ActiveControlBase> PyRobot::startJointPositionControl(
-    const franka::ControllerMode& control_type) {
-  research_interface::robot::Move::ControllerMode mode;
-  if (control_type == franka::ControllerMode::kJointImpedance) {
-    mode = research_interface::robot::Move::ControllerMode::kJointImpedance;
-  } else {
-    mode = research_interface::robot::Move::ControllerMode::kCartesianImpedance;
-  }
-  return robot_->startJointPositionControl(mode);
+auto PyRobot::startJointPositionControl(franka::ControllerMode controller_mode)
+    -> std::unique_ptr<franka::ActiveControlBase> {
+  return robot_->startJointPositionControl(convertControllerMode(controller_mode));
 }
 
-std::unique_ptr<franka::ActiveControlBase> PyRobot::startJointVelocityControl(
-    const franka::ControllerMode& control_type) {
-  research_interface::robot::Move::ControllerMode mode;
-  if (control_type == franka::ControllerMode::kJointImpedance) {
-    mode = research_interface::robot::Move::ControllerMode::kJointImpedance;
-  } else {
-    mode = research_interface::robot::Move::ControllerMode::kCartesianImpedance;
-  }
-  return robot_->startJointVelocityControl(mode);
+auto PyRobot::startJointVelocityControl(franka::ControllerMode controller_mode)
+    -> std::unique_ptr<franka::ActiveControlBase> {
+  return robot_->startJointVelocityControl(convertControllerMode(controller_mode));
+}
+
+auto PyRobot::startCartesianPoseControl(franka::ControllerMode controller_mode)
+    -> std::unique_ptr<franka::ActiveControlBase> {
+  return robot_->startCartesianPoseControl(convertControllerMode(controller_mode));
 }
 
 void PyRobot::setCollisionBehavior(const std::array<double, 7>& lower_torque_thresholds,
@@ -143,7 +156,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def("to_sec", &franka::Duration::toSec, R"pbdoc(
         Convert duration to seconds.
-        
+
         @return Duration in seconds as float
     )pbdoc");
 
@@ -183,12 +196,12 @@ PYBIND11_MODULE(_pylibfranka, m) {
       .def(py::init<>())
       .def("__bool__", &franka::Errors::operator bool, R"pbdoc(
         Check if any error is present.
-        
+
         @return True if any error flag is set
     )pbdoc")
       .def("__str__", &franka::Errors::operator std::string, R"pbdoc(
         Get string representation of active errors.
-        
+
         @return Comma-separated list of active error names
     )pbdoc")
       .def_property_readonly(
@@ -339,7 +352,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
   // Bind franka::RobotState
   py::class_<franka::RobotState>(m, "RobotState", R"pbdoc(
         Current state of the Franka robot.
-        
+
         Contains all robot state information including joint positions, velocities,
         torques, Cartesian poses, and error states. All arrays are NumPy arrays.
     )pbdoc")
@@ -403,7 +416,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
           },
           R"pbdoc(
         Compute Coriolis force vector.
-        
+
         @param robot_state Current robot state
         @return Coriolis force vector [Nm] as numpy array (7,)
     )pbdoc")
@@ -414,7 +427,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
           },
           R"pbdoc(
         Compute gravity force vector.
-        
+
         @param robot_state Current robot state
         @return Gravity force vector [Nm] as numpy array (7,)
     )pbdoc")
@@ -425,7 +438,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
           },
           R"pbdoc(
         Compute mass matrix.
-        
+
         @param robot_state Current robot state
         @return Mass matrix [kg*m²] as numpy array (7, 7)
     )pbdoc")
@@ -436,7 +449,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
           },
           R"pbdoc(
         Compute zero Jacobian for end effector frame.
-        
+
         @param robot_state Current robot state
         @return Jacobian matrix as numpy array (6, 7)
     )pbdoc")
@@ -448,7 +461,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
           },
           R"pbdoc(
         Compute zero Jacobian for specified frame.
-        
+
         @param frame Frame to compute Jacobian for
         @param robot_state Current robot state
         @return Jacobian matrix as numpy array (6, 7)
@@ -466,35 +479,35 @@ PYBIND11_MODULE(_pylibfranka, m) {
           },
           R"pbdoc(
         Read robot state once.
-        
+
         @return Tuple of (RobotState, Duration) containing the robot state and time since last read operation
     )pbdoc")
       .def("writeOnce",
            py::overload_cast<const franka::Torques&>(&franka::ActiveControlBase::writeOnce),
            R"pbdoc(
         Write torque command.
-        
+
         @param command Torque command
     )pbdoc")
       .def("writeOnce",
            py::overload_cast<const franka::JointPositions&>(&franka::ActiveControlBase::writeOnce),
            R"pbdoc(
         Write joint position command.
-        
+
         @param command Joint position command
     )pbdoc")
       .def("writeOnce",
            py::overload_cast<const franka::JointVelocities&>(&franka::ActiveControlBase::writeOnce),
            R"pbdoc(
         Write joint velocity command.
-        
+
         @param command Joint velocity command
     )pbdoc")
       .def("writeOnce",
            py::overload_cast<const franka::CartesianPose&>(&franka::ActiveControlBase::writeOnce),
            R"pbdoc(
         Write Cartesian pose command.
-        
+
         @param command Cartesian pose command
     )pbdoc")
       .def("writeOnce",
@@ -502,7 +515,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
                &franka::ActiveControlBase::writeOnce),
            R"pbdoc(
         Write Cartesian velocity command.
-        
+
         @param command Cartesian velocity command
     )pbdoc");
 
@@ -512,7 +525,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def(py::init<const std::array<double, 7>&>(), R"pbdoc(
         Create torque command.
-        
+
         @param tau_J Joint torques [Nm] (7,)
     )pbdoc")
       .def_readwrite("tau_J", &franka::Torques::tau_J, "Joint torques [Nm] (7,)")
@@ -524,7 +537,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def(py::init<const std::array<double, 7>&>(), R"pbdoc(
         Create joint position command.
-        
+
         @param q Joint positions [rad] (7,)
     )pbdoc")
       .def_readwrite("q", &franka::JointPositions::q, "Joint positions [rad] (7,)")
@@ -536,7 +549,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def(py::init<const std::array<double, 7>&>(), R"pbdoc(
         Create joint velocity command.
-        
+
         @param dq Joint velocities [rad/s] (7,)
     )pbdoc")
       .def_readwrite("dq", &franka::JointVelocities::dq, "Joint velocities [rad/s] (7,)")
@@ -548,7 +561,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def(py::init<const std::array<double, 16>&>(), R"pbdoc(
         Create Cartesian pose command.
-        
+
         @param O_T_EE Homogeneous transformation matrix (16,) in column-major order
     )pbdoc")
       .def_readwrite("O_T_EE", &franka::CartesianPose::O_T_EE,
@@ -561,7 +574,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def(py::init<const std::array<double, 6>&>(), R"pbdoc(
         Create Cartesian velocity command.
-        
+
         @param O_dP_EE End effector twist [vx, vy, vz, wx, wy, wz] in [m/s, rad/s] (6,)
     )pbdoc")
       .def_readwrite("O_dP_EE", &franka::CartesianVelocities::O_dP_EE,
@@ -571,37 +584,43 @@ PYBIND11_MODULE(_pylibfranka, m) {
   // Bind PyRobot
   py::class_<PyRobot>(m, "Robot", R"pbdoc(
         Main interface for controlling a Franka robot.
-        
+
         Provides real-time control capabilities including torque, position,
         and velocity control modes.
     )pbdoc")
       .def(py::init<const std::string&, franka::RealtimeConfig>(), py::arg("robot_ip_address"),
            py::arg("realtime_config") = franka::RealtimeConfig::kEnforce, R"pbdoc(
         Connect to a Franka robot.
-        
+
         @param robot_ip_address IP address or hostname of the robot
         @param realtime_config Real-time scheduling requirements (default: kEnforce)
     )pbdoc")
       .def("start_torque_control", &PyRobot::startTorqueControl, R"pbdoc(
         Start torque control mode.
-        
+
         @return ActiveControlBase interface for sending torque commands
     )pbdoc")
       .def("start_joint_position_control", &PyRobot::startJointPositionControl, R"pbdoc(
         Start joint position control mode.
-        
+
         @param control_type Controller mode (JointImpedance or CartesianImpedance)
         @return ActiveControlBase interface for sending position commands
     )pbdoc")
       .def("start_joint_velocity_control", &PyRobot::startJointVelocityControl, R"pbdoc(
         Start joint velocity control mode.
-        
+
         @param control_type Controller mode (JointImpedance or CartesianImpedance)
         @return ActiveControlBase interface for sending velocity commands
     )pbdoc")
+      .def("start_cartesian_pose_control", &PyRobot::startCartesianPoseControl, R"pbdoc(
+        Start Cartesian pose control mode.
+
+        @param control_type Controller mode (JointImpedance or CartesianImpedance)
+        @return ActiveControlBase interface for sending Cartesian pose commands
+    )pbdoc")
       .def("set_collision_behavior", &PyRobot::setCollisionBehavior, R"pbdoc(
         Configure collision detection thresholds.
-        
+
         @param lower_torque_thresholds Lower torque thresholds [Nm] (7,)
         @param upper_torque_thresholds Upper torque thresholds [Nm] (7,)
         @param lower_force_thresholds Lower Cartesian force thresholds [N, Nm] (6,)
@@ -609,27 +628,27 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def("set_joint_impedance", &PyRobot::setJointImpedance, R"pbdoc(
         Set joint impedance for internal controller.
-        
+
         @param K_theta Joint stiffness values [Nm/rad] (7,)
     )pbdoc")
       .def("set_cartesian_impedance", &PyRobot::setCartesianImpedance, R"pbdoc(
         Set Cartesian impedance for internal controller.
-        
+
         @param K_x Cartesian stiffness values [N/m, Nm/rad] (6,)
     )pbdoc")
       .def("set_K", &PyRobot::setK, R"pbdoc(
         Set stiffness frame K in end effector frame.
-        
+
         @param EE_T_K Homogeneous transformation matrix (16,) in column-major order
     )pbdoc")
       .def("set_EE", &PyRobot::setEE, R"pbdoc(
         Set end effector frame relative to nominal end effector frame.
-        
+
         @param NE_T_EE Homogeneous transformation matrix (16,) in column-major order
     )pbdoc")
       .def("set_load", &PyRobot::setLoad, R"pbdoc(
         Set external load parameters.
-        
+
         @param load_mass Mass of the external load [kg]
         @param F_x_Cload Center of mass of load in flange frame [m] (3,)
         @param load_inertia Inertia tensor of load [kg*m²] (9,) in column-major order
@@ -639,12 +658,12 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def("read_once", &PyRobot::readOnce, R"pbdoc(
         Read current robot state once.
-        
+
         @return Current robot state
     )pbdoc")
       .def("load_model", &PyRobot::loadModel, R"pbdoc(
         Load robot dynamics model.
-        
+
         @return Model object for computing dynamics quantities
     )pbdoc")
       .def("stop", &PyRobot::stop, R"pbdoc(
@@ -667,18 +686,18 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def(py::init<const std::string&>(), R"pbdoc(
         Connect to gripper.
-        
+
         Establishes connection to the Franka Hand gripper at the specified address.
-        
+
         @param franka_address IP address or hostname of the robot
         :raises NetworkException: if the connection cannot be established
     )pbdoc")
       .def("homing", &PyGripper::homing, R"pbdoc(
         Perform homing to find maximum width.
-        
+
         Homing moves the gripper fingers to the maximum width to calibrate the position.
         This should be performed after powering on the gripper or when the gripper state is uncertain.
-        
+
         @return True if successful
         :raises CommandException: if the command fails
         :raises NetworkException: if the connection is lost
@@ -686,11 +705,11 @@ PYBIND11_MODULE(_pylibfranka, m) {
       .def("grasp", &PyGripper::grasp, py::arg("width"), py::arg("speed"), py::arg("force"),
            py::arg("epsilon_inner") = 0.005, py::arg("epsilon_outer") = 0.005, R"pbdoc(
         Grasp an object.
-        
+
         The gripper closes at the specified speed and force until an object is detected
         or the target width is reached. The grasp is considered successful if the final
         width is within the specified tolerances.
-        
+
         @param width Target grasp width [m]
         @param speed Closing speed [m/s]
         @param force Grasping force [N]
@@ -702,28 +721,28 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def("read_once", &PyGripper::readOnce, R"pbdoc(
         Read current gripper state once.
-        
+
         Queries the gripper for its current state including width, temperature,
         and grasp status.
-        
+
         @return Current gripper state
         :raises NetworkException: if the connection is lost
     )pbdoc")
       .def("stop", &PyGripper::stop, R"pbdoc(
         Stop current gripper motion.
-        
+
         Stops any ongoing gripper movement immediately.
-        
+
         @return True if successful
         :raises CommandException: if the command fails
         :raises NetworkException: if the connection is lost
     )pbdoc")
       .def("move", &PyGripper::move, R"pbdoc(
         Move gripper fingers to a specific width.
-        
+
         Moves the gripper to the specified width at the given speed. Use this for
         opening and closing the gripper without force control.
-        
+
         @param width Target width [m]
         @param speed Movement speed [m/s]
         @return True if successful
@@ -732,7 +751,7 @@ PYBIND11_MODULE(_pylibfranka, m) {
     )pbdoc")
       .def("server_version", &PyGripper::serverVersion, R"pbdoc(
         Get gripper server version.
-        
+
         @return Server version information
     )pbdoc");
 }

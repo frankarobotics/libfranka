@@ -6,7 +6,6 @@ This document provides comprehensive instructions for installing and using pylib
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
   - [Installation from Source](#installation-from-source)
-  - [Installation from Artifactory](#installation-from-artifactory)
 - [Examples](#examples)
   - [Joint Position Example](#joint-position-example)
   - [Print Robot State Example](#print-robot-state-example)
@@ -122,6 +121,15 @@ The joint impedance example:
   - Return to home position
 - Includes position holding with dwell time between movements
 - Compensates for Coriolis effects
+
+### And more control examples
+
+There are more control examples to discover. All of them can be executed in a similar way:
+
+```bash
+cd examples
+python3 other_example.py --ip <robot_ip>
+```
 
 ### Gripper Control Example
 
