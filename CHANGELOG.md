@@ -2,11 +2,12 @@
 
 All notable changes to libfranka and pylibfranka will be documented in this file.
 
-## [Unreleased]
+## [0.18.0] - Unreleased
+Requires Franka Research 3 System Version >= 5.9.0
 
 ### libfranka - C++
 #### Added
-- Async position motion generator control scheme for asynchronous position control of the robot (**BREAKING CHANGE**)
+- Asynchronous position motion generator control scheme for non-blocking position control of the robot (**Experimental and subject to change**)
 - Forward kinematics computation using Pinocchio library
 - Jacobian computation using Pinocchio library
 - Accelerometer data exposed in robot state
@@ -21,6 +22,10 @@ All notable changes to libfranka and pylibfranka will be documented in this file
 
 #### Fixed
 - Corrected elbow limit rating which was using incorrect values
+
+#### Deprecated
+- Marked `franka::computeUpperLimitsJointVelocity(const std::array<double, 7UL> &q)` and `franka::computeLowerLimitsJointVelocity(const std::array<double, 7UL> &q)`as deprecated. It will be removed in future versions. Use `Robot::getUpperJointVelocityLimits(const std::array<double, 7UL> &joint_positions)` and `Robot::getLowerJointVelocityLimits(const std::array<double, 7UL> &joint_positions)` instead.
+- With system image >= 5.9.0, the joint position limits of the system with libfranka are increased to match the datasheet. The methods `franka::computeUpperLimitsJointVelocity(const std::array<double, 7UL> &q)` and `franka::computeLowerLimitsJointVelocity(const std::array<double, 7UL> &q)` now impose stricter constraints compared to the new parametrized limits.
 
 ### pylibfranka - Python
 *

@@ -122,8 +122,15 @@ constexpr double kMinElbowVelocity = -kMaxElbowVelocity;
  * @param[in] q joint position.
  *
  * @return Upper limits of joint velocity at the given joint position.
+ *
+ * @deprecated This function is deprecated and will be removed in future versions.
+ * Use `Robot::getUpperJointVelocityLimits(const std::array<double, 7UL> &joint_positions)` instead
+ * (if applicable).
  */
-inline std::array<double, 7> computeUpperLimitsJointVelocity(
+[[deprecated(
+    "Use Robot::getUpperJointVelocityLimits(const std::array<double, 7UL> &joint_positions) "
+    "instead with system images >= 5.9.0.")]] inline std::array<double, 7>
+computeUpperLimitsJointVelocity(
     const std::array<double, 7>& q) {  // NOLINT(readability-identifier-length)
   return std::array<double, 7>{
       std::min(2.62, std::max(0.0, -0.30 + std::sqrt(std::max(0.0, 12.0 * (2.75010 - q[0]))))) -
@@ -152,8 +159,15 @@ inline std::array<double, 7> computeUpperLimitsJointVelocity(
  * @param[in] q joint position.
  *
  * @return Lower limits of joint velocity at the given joint position.
+ *
+ * @deprecated This function is deprecated and will be removed in future versions.
+ * Use `Robot::getlowerJointVelocityLimits(const std::array<double, 7UL> &joint_positions)` instead
+ * (if applicable).
  */
-inline std::array<double, 7> computeLowerLimitsJointVelocity(
+[[deprecated(
+    "Use Robot::getlowerJointVelocityLimits(const std::array<double, 7UL> &joint_positions) "
+    "instead with system images >= 5.9.0.")]] inline std::array<double, 7>
+computeLowerLimitsJointVelocity(
     const std::array<double, 7>& q) {  // NOLINT(readability-identifier-length)
   return std::array<double, 7>{
       std::max(-2.62, std::min(0.0, 0.30 - std::sqrt(std::max(0.0, 12.0 * (2.750100 + q[0]))))) +
