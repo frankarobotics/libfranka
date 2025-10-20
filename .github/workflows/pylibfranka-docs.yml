@@ -1,0 +1,79 @@
+name: Generate Sphinx Documentation for pylibfranka
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  sphinx-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0  # Fetch all history including tags for version detection
+
+    - name: Build Docker Image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./.devcontainer/Dockerfile
+        tags: pylibfranka:latest
+        push: false
+        load: true
+
+    - name: Setup Dependencies
+      uses: addnab/docker-run-action@v3
+      with:
+        image: pylibfranka:latest
+        options: -v ${{ github.workspace }}:/workspace
+        run: |
+          cd /workspace/pylibfranka
+          ./scripts/setup_dependencies.sh
+
+    - name: Build and Install pylibfranka and Generate Docs
+      uses: addnab/docker-run-action@v3
+      with:
+        image: pylibfranka:latest
+        options: -v ${{ github.workspace }}:/workspace
+        run: |
+          cd /workspace
+          export PATH="$HOME/.local/bin:$PATH"
+          export LC_ALL=C.UTF-8
+          export LANG=C.UTF-8
+          
+          # Install pylibfranka
+          pip3 install .
+          
+          # Move to docs directory
+          cd pylibfranka/docs
+          
+          # Install Sphinx requirements
+          pip3 install -r requirements.txt --user
+          
+          # Get version from pylibfranka
+          VERSION=$(python3 -c "import pylibfranka; print(pylibfranka.__version__)")
+          echo "Building documentation for version: $VERSION"
+          
+          # Build documentation
+          make clean
+          make html
+          
+          # Prepare output directory with pylibfranka subfolder
+          mkdir -p /workspace/docs_output/pylibfranka/${VERSION}
+          cp -r _build/html/* /workspace/docs_output/pylibfranka/${VERSION}/
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: docs_output
+        keep_files: true
