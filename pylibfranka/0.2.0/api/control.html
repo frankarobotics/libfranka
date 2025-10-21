@@ -1,0 +1,1088 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Control Interface &#8212; pylibfranka 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/control';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dynamics Model" href="model.html" />
+    <link rel="prev" title="Robot" href="robot.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">pylibfranka</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api_overview.html">
+                        API Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../class_list.html">
+                        Class List
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../class_hierarchy.html">
+                        Class Hierarchy
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../modules.html">
+                        Module Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="robot.html">
+                        Robot
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="#">
+                        Control Interface
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="model.html">
+                        Dynamics Model
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="gripper.html">
+                        Gripper
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="state.html">
+                        Robot State
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="exceptions.html">
+                        Exceptions
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/frankarobotics/libfranka" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api_overview.html">
+                        API Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../class_list.html">
+                        Class List
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../class_hierarchy.html">
+                        Class Hierarchy
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../modules.html">
+                        Module Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="robot.html">
+                        Robot
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="#">
+                        Control Interface
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="model.html">
+                        Dynamics Model
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="gripper.html">
+                        Gripper
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="state.html">
+                        Robot State
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="exceptions.html">
+                        Exceptions
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/frankarobotics/libfranka" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="robot.html">Robot</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Control Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Dynamics Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gripper.html">Gripper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="state.html">Robot State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../modules.html" class="nav-link">Module Reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Control Interface</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="control-interface">
+<h1>Control Interface<a class="headerlink" href="#control-interface" title="Permalink to this heading">#</a></h1>
+<p>The control interface provides real-time command and feedback for robot control.
+It is returned by the <code class="docutils literal notranslate"><span class="pre">start_*</span></code> methods of the <a class="reference internal" href="robot.html#pylibfranka.Robot" title="pylibfranka.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">Robot</span></code></a> class.</p>
+<section id="activecontrolbase-class">
+<h2>ActiveControlBase Class<a class="headerlink" href="#activecontrolbase-class" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylibfranka.ActiveControlBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylibfranka.</span></span><span class="sig-name descname"><span class="pre">ActiveControlBase</span></span><a class="headerlink" href="#pylibfranka.ActiveControlBase" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Base class for active robot control providing real-time command interface.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylibfranka.ActiveControlBase.readOnce">
+<span class="sig-name descname"><span class="pre">readOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylibfranka.ActiveControlBase" title="pylibfranka._pylibfranka.ActiveControlBase"><span class="pre">pylibfranka._pylibfranka.ActiveControlBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></span><a class="headerlink" href="#pylibfranka.ActiveControlBase.readOnce" title="Permalink to this definition">#</a></dt>
+<dd><p>Read robot state once.</p>
+<p>&#64;return Tuple of (RobotState, Duration) containing the robot state and time since last read operation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylibfranka.ActiveControlBase.writeOnce">
+<span class="sig-name descname"><span class="pre">writeOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylibfranka.ActiveControlBase.writeOnce" title="Permalink to this definition">#</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>writeOnce(self: pylibfranka._pylibfranka.ActiveControlBase, arg0: franka::Torques) -&gt; None</p>
+<blockquote>
+<div><p>Write torque command.</p>
+<p>&#64;param command Torque command</p>
+</div></blockquote>
+</li>
+<li><p>writeOnce(self: pylibfranka._pylibfranka.ActiveControlBase, arg0: franka::JointPositions) -&gt; None</p>
+<blockquote>
+<div><p>Write joint position command.</p>
+<p>&#64;param command Joint position command</p>
+</div></blockquote>
+</li>
+<li><p>writeOnce(self: pylibfranka._pylibfranka.ActiveControlBase, arg0: franka::JointVelocities) -&gt; None</p>
+<blockquote>
+<div><p>Write joint velocity command.</p>
+<p>&#64;param command Joint velocity command</p>
+</div></blockquote>
+</li>
+<li><p>writeOnce(self: pylibfranka._pylibfranka.ActiveControlBase, arg0: franka::CartesianPose) -&gt; None</p>
+<blockquote>
+<div><p>Write Cartesian pose command.</p>
+<p>&#64;param command Cartesian pose command</p>
+</div></blockquote>
+</li>
+<li><p>writeOnce(self: pylibfranka._pylibfranka.ActiveControlBase, arg0: franka::CartesianVelocities) -&gt; None</p>
+<blockquote>
+<div><p>Write Cartesian velocity command.</p>
+<p>&#64;param command Cartesian velocity command</p>
+</div></blockquote>
+</li>
+</ol>
+</dd></dl>
+
+</dd></dl>
+
+<section id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this heading">#</a></h3>
+<section id="readonce">
+<h4>readOnce<a class="headerlink" href="#readonce" title="Permalink to this heading">#</a></h4>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ActiveControlBase.</span></span><span class="sig-name descname"><span class="pre">readOnce</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Read robot state once from the control loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple of (RobotState, Duration) containing the robot state and time since last read operation</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>(<a class="reference internal" href="state.html#pylibfranka.RobotState" title="pylibfranka.RobotState">RobotState</a>, <a class="reference internal" href="state.html#pylibfranka.Duration" title="pylibfranka.Duration">Duration</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="writeonce-torques">
+<h4>writeOnce (Torques)<a class="headerlink" href="#writeonce-torques" title="Permalink to this heading">#</a></h4>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ActiveControlBase.</span></span><span class="sig-name descname"><span class="pre">writeOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylibfranka.Torques" title="pylibfranka.Torques"><span class="pre">Torques</span></a></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Write torque command to the robot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>command</strong> (<a class="reference internal" href="#pylibfranka.Torques" title="pylibfranka.Torques"><em>Torques</em></a>) – Torque command to send</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="writeonce-jointpositions">
+<h4>writeOnce (JointPositions)<a class="headerlink" href="#writeonce-jointpositions" title="Permalink to this heading">#</a></h4>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ActiveControlBase.</span></span><span class="sig-name descname"><span class="pre">writeOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylibfranka.JointPositions" title="pylibfranka.JointPositions"><span class="pre">JointPositions</span></a></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Write joint position command to the robot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>command</strong> (<a class="reference internal" href="#pylibfranka.JointPositions" title="pylibfranka.JointPositions"><em>JointPositions</em></a>) – Joint position command to send</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="writeonce-jointvelocities">
+<h4>writeOnce (JointVelocities)<a class="headerlink" href="#writeonce-jointvelocities" title="Permalink to this heading">#</a></h4>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ActiveControlBase.</span></span><span class="sig-name descname"><span class="pre">writeOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylibfranka.JointVelocities" title="pylibfranka.JointVelocities"><span class="pre">JointVelocities</span></a></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Write joint velocity command to the robot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>command</strong> (<a class="reference internal" href="#pylibfranka.JointVelocities" title="pylibfranka.JointVelocities"><em>JointVelocities</em></a>) – Joint velocity command to send</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="writeonce-cartesianpose">
+<h4>writeOnce (CartesianPose)<a class="headerlink" href="#writeonce-cartesianpose" title="Permalink to this heading">#</a></h4>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ActiveControlBase.</span></span><span class="sig-name descname"><span class="pre">writeOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylibfranka.CartesianPose" title="pylibfranka.CartesianPose"><span class="pre">CartesianPose</span></a></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Write Cartesian pose command to the robot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>command</strong> (<a class="reference internal" href="#pylibfranka.CartesianPose" title="pylibfranka.CartesianPose"><em>CartesianPose</em></a>) – Cartesian pose command to send</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="writeonce-cartesianvelocities">
+<h4>writeOnce (CartesianVelocities)<a class="headerlink" href="#writeonce-cartesianvelocities" title="Permalink to this heading">#</a></h4>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ActiveControlBase.</span></span><span class="sig-name descname"><span class="pre">writeOnce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylibfranka.CartesianVelocities" title="pylibfranka.CartesianVelocities"><span class="pre">CartesianVelocities</span></a></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Write Cartesian velocity command to the robot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>command</strong> (<a class="reference internal" href="#pylibfranka.CartesianVelocities" title="pylibfranka.CartesianVelocities"><em>CartesianVelocities</em></a>) – Cartesian velocity command to send</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+<section id="command-types">
+<h2>Command Types<a class="headerlink" href="#command-types" title="Permalink to this heading">#</a></h2>
+<section id="torques">
+<h3>Torques<a class="headerlink" href="#torques" title="Permalink to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylibfranka.Torques">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylibfranka.</span></span><span class="sig-name descname"><span class="pre">Torques</span></span><a class="headerlink" href="#pylibfranka.Torques" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Torque control command.</p>
+<p>Torque control command for joint-level torque control.</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">tau_J</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array_like</span></em></dt>
+<dd><p>Joint torques [Nm] (7,)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">motion_finished</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em></dt>
+<dd><p>Set to True to finish motion and exit control loop</p>
+</dd></dl>
+
+<p><strong>Constructor:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylibfranka.Torques.Torques">
+<span class="sig-name descname"><span class="pre">Torques</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_J</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylibfranka.Torques.Torques" title="Permalink to this definition">#</a></dt>
+<dd><p>Create torque command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tau_J</strong> (<em>array_like</em>) – Joint torques [Nm] (7,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylibfranka.Torques.motion_finished">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">motion_finished</span></span><a class="headerlink" href="#pylibfranka.Torques.motion_finished" title="Permalink to this definition">#</a></dt>
+<dd><p>Set to True to finish motion</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylibfranka.Torques.tau_J">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_J</span></span><a class="headerlink" href="#pylibfranka.Torques.tau_J" title="Permalink to this definition">#</a></dt>
+<dd><p>Joint torques [Nm] (7,)</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="jointpositions">
+<h3>JointPositions<a class="headerlink" href="#jointpositions" title="Permalink to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylibfranka.JointPositions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylibfranka.</span></span><span class="sig-name descname"><span class="pre">JointPositions</span></span><a class="headerlink" href="#pylibfranka.JointPositions" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Joint position control command.</p>
+<p>Joint position control command.</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">q</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array_like</span></em></dt>
+<dd><p>Joint positions [rad] (7,)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">motion_finished</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em></dt>
+<dd><p>Set to True to finish motion and exit control loop</p>
+</dd></dl>
+
+<p><strong>Constructor:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylibfranka.JointPositions.JointPositions">
+<span class="sig-name descname"><span class="pre">JointPositions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylibfranka.JointPositions.JointPositions" title="Permalink to this definition">#</a></dt>
+<dd><p>Create joint position command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>q</strong> (<em>array_like</em>) – Joint positions [rad] (7,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylibfranka.JointPositions.motion_finished">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">motion_finished</span></span><a class="headerlink" href="#pylibfranka.JointPositions.motion_finished" title="Permalink to this definition">#</a></dt>
+<dd><p>Set to True to finish motion</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylibfranka.JointPositions.q">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">q</span></span><a class="headerlink" href="#pylibfranka.JointPositions.q" title="Permalink to this definition">#</a></dt>
+<dd><p>Joint positions [rad] (7,)</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="jointvelocities">
+<h3>JointVelocities<a class="headerlink" href="#jointvelocities" title="Permalink to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylibfranka.JointVelocities">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylibfranka.</span></span><span class="sig-name descname"><span class="pre">JointVelocities</span></span><a class="headerlink" href="#pylibfranka.JointVelocities" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Joint velocity control command.</p>
+<p>Joint velocity control command.</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">dq</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array_like</span></em></dt>
+<dd><p>Joint velocities [rad/s] (7,)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">motion_finished</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em></dt>
+<dd><p>Set to True to finish motion and exit control loop</p>
+</dd></dl>
+
+<p><strong>Constructor:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylibfranka.JointVelocities.JointVelocities">
+<span class="sig-name descname"><span class="pre">JointVelocities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylibfranka.JointVelocities.JointVelocities" title="Permalink to this definition">#</a></dt>
+<dd><p>Create joint velocity command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dq</strong> (<em>array_like</em>) – Joint velocities [rad/s] (7,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylibfranka.JointVelocities.dq">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dq</span></span><a class="headerlink" href="#pylibfranka.JointVelocities.dq" title="Permalink to this definition">#</a></dt>
+<dd><p>Joint velocities [rad/s] (7,)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylibfranka.JointVelocities.motion_finished">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">motion_finished</span></span><a class="headerlink" href="#pylibfranka.JointVelocities.motion_finished" title="Permalink to this definition">#</a></dt>
+<dd><p>Set to True to finish motion</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="cartesianpose">
+<h3>CartesianPose<a class="headerlink" href="#cartesianpose" title="Permalink to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylibfranka.CartesianPose">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylibfranka.</span></span><span class="sig-name descname"><span class="pre">CartesianPose</span></span><a class="headerlink" href="#pylibfranka.CartesianPose" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Cartesian pose control command.</p>
+<p>Cartesian pose control command.</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">O_T_EE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array_like</span></em></dt>
+<dd><p>End effector pose as homogeneous transformation matrix (16,) in column-major order</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">motion_finished</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em></dt>
+<dd><p>Set to True to finish motion and exit control loop</p>
+</dd></dl>
+
+<p><strong>Constructor:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylibfranka.CartesianPose.CartesianPose">
+<span class="sig-name descname"><span class="pre">CartesianPose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">O_T_EE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylibfranka.CartesianPose.CartesianPose" title="Permalink to this definition">#</a></dt>
+<dd><p>Create Cartesian pose command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>O_T_EE</strong> (<em>array_like</em>) – Homogeneous transformation matrix (16,) in column-major order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylibfranka.CartesianPose.O_T_EE">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">O_T_EE</span></span><a class="headerlink" href="#pylibfranka.CartesianPose.O_T_EE" title="Permalink to this definition">#</a></dt>
+<dd><p>End effector pose (16,) column-major</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylibfranka.CartesianPose.motion_finished">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">motion_finished</span></span><a class="headerlink" href="#pylibfranka.CartesianPose.motion_finished" title="Permalink to this definition">#</a></dt>
+<dd><p>Set to True to finish motion</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="cartesianvelocities">
+<h3>CartesianVelocities<a class="headerlink" href="#cartesianvelocities" title="Permalink to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylibfranka.CartesianVelocities">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylibfranka.</span></span><span class="sig-name descname"><span class="pre">CartesianVelocities</span></span><a class="headerlink" href="#pylibfranka.CartesianVelocities" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Cartesian velocity control command.</p>
+<p>Cartesian velocity control command (twist).</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">O_dP_EE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array_like</span></em></dt>
+<dd><p>End effector twist [vx, vy, vz, wx, wy, wz] in [m/s, rad/s] (6,)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">motion_finished</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em></dt>
+<dd><p>Set to True to finish motion and exit control loop</p>
+</dd></dl>
+
+<p><strong>Constructor:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylibfranka.CartesianVelocities.CartesianVelocities">
+<span class="sig-name descname"><span class="pre">CartesianVelocities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">O_dP_EE</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylibfranka.CartesianVelocities.CartesianVelocities" title="Permalink to this definition">#</a></dt>
+<dd><p>Create Cartesian velocity command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>O_dP_EE</strong> (<em>array_like</em>) – End effector twist [vx, vy, vz, wx, wy, wz] in [m/s, rad/s] (6,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylibfranka.CartesianVelocities.O_dP_EE">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">O_dP_EE</span></span><a class="headerlink" href="#pylibfranka.CartesianVelocities.O_dP_EE" title="Permalink to this definition">#</a></dt>
+<dd><p>End effector twist [m/s, rad/s] (6,)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylibfranka.CartesianVelocities.motion_finished">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">motion_finished</span></span><a class="headerlink" href="#pylibfranka.CartesianVelocities.motion_finished" title="Permalink to this definition">#</a></dt>
+<dd><p>Set to True to finish motion</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="robot.html#pylibfranka.Robot" title="pylibfranka.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">Robot</span></code></a> – Main robot control interface</p></li>
+<li><p><a class="reference internal" href="state.html#pylibfranka.RobotState" title="pylibfranka.RobotState"><code class="xref py py-class docutils literal notranslate"><span class="pre">RobotState</span></code></a> – Robot state information</p></li>
+<li><p><a class="reference internal" href="model.html#pylibfranka.Model" title="pylibfranka.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> – Dynamics model</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="robot.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Robot</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="model.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Dynamics Model</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#activecontrolbase-class">ActiveControlBase Class</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.ActiveControlBase"><code class="docutils literal notranslate"><span class="pre">ActiveControlBase</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.ActiveControlBase.readOnce"><code class="docutils literal notranslate"><span class="pre">ActiveControlBase.readOnce()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.ActiveControlBase.writeOnce"><code class="docutils literal notranslate"><span class="pre">ActiveControlBase.writeOnce()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#readonce">readOnce</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#writeonce-torques">writeOnce (Torques)</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#writeonce-jointpositions">writeOnce (JointPositions)</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#writeonce-jointvelocities">writeOnce (JointVelocities)</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#writeonce-cartesianpose">writeOnce (CartesianPose)</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#writeonce-cartesianvelocities">writeOnce (CartesianVelocities)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#command-types">Command Types</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#torques">Torques</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Torques"><code class="docutils literal notranslate"><span class="pre">Torques</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Torques.Torques"><code class="docutils literal notranslate"><span class="pre">Torques.Torques()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Torques.motion_finished"><code class="docutils literal notranslate"><span class="pre">Torques.motion_finished</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Torques.tau_J"><code class="docutils literal notranslate"><span class="pre">Torques.tau_J</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#jointpositions">JointPositions</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.JointPositions"><code class="docutils literal notranslate"><span class="pre">JointPositions</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.JointPositions.JointPositions"><code class="docutils literal notranslate"><span class="pre">JointPositions.JointPositions()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.JointPositions.motion_finished"><code class="docutils literal notranslate"><span class="pre">JointPositions.motion_finished</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.JointPositions.q"><code class="docutils literal notranslate"><span class="pre">JointPositions.q</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#jointvelocities">JointVelocities</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.JointVelocities"><code class="docutils literal notranslate"><span class="pre">JointVelocities</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.JointVelocities.JointVelocities"><code class="docutils literal notranslate"><span class="pre">JointVelocities.JointVelocities()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.JointVelocities.dq"><code class="docutils literal notranslate"><span class="pre">JointVelocities.dq</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.JointVelocities.motion_finished"><code class="docutils literal notranslate"><span class="pre">JointVelocities.motion_finished</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cartesianpose">CartesianPose</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.CartesianPose"><code class="docutils literal notranslate"><span class="pre">CartesianPose</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.CartesianPose.CartesianPose"><code class="docutils literal notranslate"><span class="pre">CartesianPose.CartesianPose()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.CartesianPose.O_T_EE"><code class="docutils literal notranslate"><span class="pre">CartesianPose.O_T_EE</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.CartesianPose.motion_finished"><code class="docutils literal notranslate"><span class="pre">CartesianPose.motion_finished</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cartesianvelocities">CartesianVelocities</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.CartesianVelocities"><code class="docutils literal notranslate"><span class="pre">CartesianVelocities</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.CartesianVelocities.CartesianVelocities"><code class="docutils literal notranslate"><span class="pre">CartesianVelocities.CartesianVelocities()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.CartesianVelocities.O_dP_EE"><code class="docutils literal notranslate"><span class="pre">CartesianVelocities.O_dP_EE</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.CartesianVelocities.motion_finished"><code class="docutils literal notranslate"><span class="pre">CartesianVelocities.motion_finished</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#see-also">See Also</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Franka Robotics GmbH.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
