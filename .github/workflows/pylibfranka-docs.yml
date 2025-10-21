@@ -58,10 +58,13 @@ jobs:
           # Install Sphinx requirements
           pip3 install -r requirements.txt --user
           
-          # Get version from pylibfranka
-          VERSION=$(python3 -c "import pylibfranka; print(pylibfranka.__version__)")
-          echo "Building documentation for version: $VERSION"
-          
+          # Get version from git tag (e.g., v0.15.0 -> 0.15.0)
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')
+          if [ -z "$VERSION" ]; then
+            # Fallback to pylibfranka version if no tag found
+            VERSION=$(python3 -c "import pylibfranka; print(pylibfranka.__version__)")
+          fi
+
           # Build documentation
           make clean
           make html
