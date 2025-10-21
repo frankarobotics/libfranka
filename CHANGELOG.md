@@ -28,7 +28,8 @@ Requires Franka Research 3 System Version >= 5.9.0
 - With system image >= 5.9.0, the joint position limits of the system with libfranka are increased to match the datasheet. The methods `franka::computeUpperLimitsJointVelocity(const std::array<double, 7UL> &q)` and `franka::computeLowerLimitsJointVelocity(const std::array<double, 7UL> &q)` now impose stricter constraints compared to the new parametrized limits.
 
 ### pylibfranka - Python
--
+- Deployment of the pylibfranka to the github hosted web-page
+
 
 ## [0.17.0] - 2025-10-15
 ### pylibfranka - Python
