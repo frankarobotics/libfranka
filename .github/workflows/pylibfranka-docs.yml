@@ -64,6 +64,7 @@ jobs:
             # Fallback to pylibfranka version if no tag found
             VERSION=$(python3 -c "import pylibfranka; print(pylibfranka.__version__)")
           fi
+          echo "Building documentation for version: $VERSION"
 
           # Build documentation
           make clean
@@ -72,6 +73,10 @@ jobs:
           # Prepare output directory with pylibfranka subfolder
           mkdir -p /workspace/docs_output/pylibfranka/${VERSION}
           cp -r _build/html/* /workspace/docs_output/pylibfranka/${VERSION}/
+          
+          # Also copy to 'latest' directory for easy access
+          mkdir -p /workspace/docs_output/pylibfranka/latest
+          cp -r _build/html/* /workspace/docs_output/pylibfranka/latest/
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
