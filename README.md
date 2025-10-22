@@ -123,7 +123,7 @@ To run a sample program, navigate to the build folder and execute the following 
 
 ### 5. Pylibfranka
 
-Pylibfranka is a Python binding for libfranka, allowing you to control Franka robots using Python. It is included in the libfranka repository and can be built alongside libfranka. For more details, see `pylibfranka` and its [README](pylibfranka/README.md).
+Pylibfranka is a Python binding for libfranka, allowing you to control Franka robots using Python. It is included in the libfranka repository and can be built alongside libfranka. For more details, see `pylibfranka` and its [README](pylibfranka/README.md). The [generated API documentation][pylibfranka-api-docs] offers an overview of its capabilities.
 
 ### 6. Development Information
 
@@ -155,6 +155,7 @@ This will build the C++ extension and install the Python package.
 [compatibility-matrix]: https://frankarobotics.github.io/docs/compatibility.html
 [apache-2.0]: https://www.apache.org/licenses/LICENSE-2.0.html
 [api-docs]: https://frankarobotics.github.io/libfranka/0.15.0
+[pylibfranka-api-docs]: https://frankarobotics.github.io/libfranka/pylibfranka/latest
 [fci-docs]: https://frankarobotics.github.io/docs
 [codecov-status]: https://codecov.io/gh/frankarobotics/libfranka/branch/master/graph/badge.svg
 [codecov]: https://codecov.io/gh/frankarobotics/libfranka
