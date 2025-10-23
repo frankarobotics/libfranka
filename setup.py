@@ -1,10 +1,62 @@
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
+
+
+def get_version():
+    """Extract version from CMakeLists.txt."""
+    cmake_file = Path(__file__).parent / "CMakeLists.txt"
+    if cmake_file.exists():
+        with open(cmake_file, 'r') as f:
+            content = f.read()
+            match = re.search(r'set\(libfranka_VERSION\s+(\d+\.\d+\.\d+)\)', content)
+            if match:
+                return match.group(1)
+    return "0.0.0"
+
+
+def update_version_file():
+    """Update _version.py with current version from CMakeLists.txt."""
+    version = get_version()
+    version_file = Path(__file__).parent / "pylibfranka" / "_version.py"
+    
+    if version_file.exists():
+        # Read current content
+        with open(version_file, 'r') as f:
+            content = f.read()
+        
+        # Update the version line (matches the pattern with AUTO-GENERATED comment)
+        new_content = re.sub(
+            r'__version__ = "[^"]*"  # AUTO-GENERATED',
+            f'__version__ = "{version}"  # AUTO-GENERATED',
+            content
+        )
+        
+        # Write the updated content
+        with open(version_file, 'w') as f:
+            f.write(new_content)
+    else:
+        # Create the file if it doesn't exist
+        with open(version_file, 'w') as f:
+            f.write(f'''"""Version information for pylibfranka."""
+
+__all__ = ['__version__']
+
+
+# Version will be written here by pip install . command
+# or setup.py during build/install
+# DO NOT EDIT THIS LINE - it is automatically replaced
+__version__ = "{version}"  # AUTO-GENERATED
+''')
+
+
+# Update version file immediately when setup.py is loaded
+update_version_file()
 
 
 class CMakeExtension(Extension):
@@ -14,6 +66,13 @@ class CMakeExtension(Extension):
 
 
 class CMakeBuild(build_ext):
+    def run(self):
+        # Ensure version file is updated (redundant but safe)
+        update_version_file()
+        
+        # Call parent run
+        super().run()
+    
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
 
@@ -54,7 +113,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="pylibfranka",
-    version="0.2.0",
+    version=get_version(),
     packages=["pylibfranka"],
     python_requires=">=3.8",
     install_requires=["numpy>=1.19.0"],

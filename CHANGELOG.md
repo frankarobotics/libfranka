@@ -29,6 +29,7 @@ Requires Franka Research 3 System Version >= 5.9.0
 
 ### pylibfranka - Python
 - Deployment of the pylibfranka to the github hosted web-page
+- Pylibfranka and libfranka versions are synchronized
 
 
 ## [0.17.0] - 2025-10-15

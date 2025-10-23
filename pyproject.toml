@@ -13,7 +13,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pylibfranka"
-version = "0.2.0"
+dynamic = ["version"]
 description = "Python bindings for libfranka with automatic dependency bundling"
 authors = [{name = "Franka Robotics GmbH", email = "info@franka.de"}]
 license = {text = "Apache-2.0"}
@@ -51,6 +51,9 @@ dev = [
 [tool.setuptools]
 packages = ["pylibfranka"]
 zip-safe = false
+
+[tool.setuptools.dynamic]
+version = {attr = "pylibfranka._version.__version__"}
 
 [tool.setuptools.package-data]
 pylibfranka = ["*.so", "*.pyd", "_pylibfranka*"]
