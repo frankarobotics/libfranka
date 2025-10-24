@@ -34,8 +34,10 @@ sys.path.insert(0, os.path.abspath('..'))
 project = 'pylibfranka'
 copyright = '2025, Franka Robotics GmbH'
 author = 'Franka Robotics GmbH'
-release = '0.1.0'
-version = '0.1.0'
+
+# Get version from _version.py
+import pylibfranka
+version = pylibfranka.__version__
 
 # -- General configuration ---------------------------------------------------
 extensions = [
@@ -58,7 +60,7 @@ html_static_path = []
 
 html_theme_options = {
     "logo": {
-        "text": "pylibfranka",
+        "text": f"pylibfranka v{version}",
     },
     "github_url": "https://github.com/frankarobotics/libfranka",
     "navbar_end": ["navbar-icon-links", "search-field"],
@@ -69,8 +71,12 @@ html_theme_options = {
 }
 
 html_context = {
-    "default_mode": "light"
+    "default_mode": "dark",
+    "display_version": True,
 }
+
+# Add version to HTML title
+html_title = f"pylibfranka {version} documentation"
 
 # -- Extension configuration -------------------------------------------------
 

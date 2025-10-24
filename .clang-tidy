@@ -23,7 +23,7 @@ Checks: |
   -misc-non-private-member-variables-in-classes,
   -readability-suspicious-call-argument
   -cppcoreguidelines-prefer-member-initializer
-HeaderFilterRegex: '^.*(src|include/franka).*$'
+HeaderFilterRegex: '/(src|include/franka)/'
 CheckOptions:
 # Classes, structs, ...
   - key:    readability-identifier-naming.NamespaceCase
