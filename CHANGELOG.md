@@ -13,6 +13,7 @@ Requires Franka Research 3 System Version >= 5.9.0
 - Accelerometer data exposed in robot state
 - Joint position-based velocity limits parsed from URDF to compute upper and lower velocity bounds
 - Documentation under libfranka repository
+- Feat: Async Position Control Handler added to libfranka to support asynchronous position control
 
 #### Changed
 - Updated libfranka-common (common-libfranka) to use float-based RobotState struct
