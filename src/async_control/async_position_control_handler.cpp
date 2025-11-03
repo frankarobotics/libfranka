@@ -20,11 +20,14 @@ AsyncPositionControlHandler::AsyncPositionControlHandler(
       goal_tolerance_(goal_tolerance.value_or(kDefaultGoalTolerance)) {}
 
 AsyncPositionControlHandler::~AsyncPositionControlHandler() {
-  active_robot_control_.reset();
+  if (active_robot_control_ != nullptr) {
+    active_robot_control_.reset();
+  }
 }
 
 auto AsyncPositionControlHandler::configure(const std::shared_ptr<Robot>& robot,
-                                            Configuration configuration) -> ConfigurationResult {
+                                            const Configuration& configuration)
+    -> ConfigurationResult {
   ConfigurationResult result;
 
   try {
@@ -51,7 +54,7 @@ auto AsyncPositionControlHandler::configure(const std::shared_ptr<Robot>& robot,
 
 auto AsyncPositionControlHandler::setJointPositionTarget(const JointPositionTarget& target)
     -> CommandResult {
-  CommandResult result;
+  CommandResult result{};
 
   if (control_status_ == TargetStatus::kAborted || active_robot_control_ == nullptr) {
     result.error_message = "Control interface is in aborted state.";
@@ -61,13 +64,15 @@ auto AsyncPositionControlHandler::setJointPositionTarget(const JointPositionTarg
   }
 
   try {
-    auto next_joint_position = JointPositions{target.joint_positions};
+    auto next_joint_position = JointPositions(target.joint_positions);
     next_joint_position.motion_finished = false;
     active_robot_control_->writeOnce(next_joint_position);
 
+    result.was_successful = true;
     result.motion_uuid = std::string{"test_uuid"};
   } catch (const std::exception& e) {
     result.error_message = e.what();
+    result.was_successful = false;
     logging::logError("Error while setting next joint positions: {}", result.error_message.value());
 
     control_status_ = TargetStatus::kAborted;
@@ -81,7 +86,7 @@ auto AsyncPositionControlHandler::setJointPositionTarget(const JointPositionTarg
 }
 
 auto AsyncPositionControlHandler::getTargetFeedback() -> TargetFeedback {
-  TargetFeedback feedback;
+  TargetFeedback feedback{};
 
   if (control_status_ == TargetStatus::kAborted || active_robot_control_ == nullptr) {
     feedback.status = TargetStatus::kAborted;

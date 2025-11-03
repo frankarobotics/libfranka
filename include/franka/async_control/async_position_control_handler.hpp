@@ -33,9 +33,9 @@ class AsyncPositionControlHandler {
   // This is the output structure for the initialization.
   // It contains either the handler or an error message.
   struct ConfigurationResult {
-    std::shared_ptr<AsyncPositionControlHandler> handler;
+    std::shared_ptr<AsyncPositionControlHandler> handler{};
 
-    std::optional<std::string> error_message;
+    std::optional<std::string> error_message{};
   };
 
   // This defines the structure to send the next control target to the robot.
@@ -45,17 +45,17 @@ class AsyncPositionControlHandler {
 
   // This structure holds the result after sending the next target.
   struct CommandResult {
-    std::optional<std::string> motion_uuid;
+    std::optional<std::string> motion_uuid{};
 
-    bool was_successful;
-    std::optional<std::string> error_message;
+    bool was_successful{};
+    std::optional<std::string> error_message{};
   };
 
   // This structure holds feedback information about the current target state.
   struct TargetFeedback {
     TargetStatus status{TargetStatus::kIdle};
 
-    std::optional<std::string> error_message;
+    std::optional<std::string> error_message{};
   };
 
   virtual ~AsyncPositionControlHandler();
@@ -64,10 +64,10 @@ class AsyncPositionControlHandler {
    * Constructs the async control handler.
    *
    * @param robot Shared pointer to the robot instance.
-   * @param initialization_input Input parameters for the initialization.
+   * @param configuration Input parameters for the initialization.
    * @return ConfigurationResult containing either the handler or an error message.
    */
-  static auto configure(const std::shared_ptr<Robot>& robot, Configuration initialization_input)
+  static auto configure(const std::shared_ptr<Robot>& robot, const Configuration& configuration)
       -> ConfigurationResult;
 
   /**

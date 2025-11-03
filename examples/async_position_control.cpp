@@ -1,5 +1,6 @@
 // Copyright (c) 2025 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <csignal>
@@ -20,7 +21,8 @@ const std::vector<double> kDefaultMaximumVelocities{0.655, 0.655, 0.655, 0.655,
                                                     1.315, 1.315, 1.315};
 constexpr double kDefaultGoalTolerance = 10.0;
 
-std::atomic<bool> motion_finished = false;
+std::atomic<bool> motion_finished =  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    false;
 
 // Capture SIGINT to stop the example gracefully
 void signalHandler(int signal) {
