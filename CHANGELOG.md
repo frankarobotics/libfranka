@@ -2,18 +2,17 @@
 
 All notable changes to libfranka and pylibfranka will be documented in this file.
 
-## [0.18.0] - Unreleased
+## [0.18.0]
 Requires Franka Research 3 System Version >= 5.9.0
 
 ### libfranka - C++
 #### Added
-- Asynchronous position motion generator control scheme for non-blocking position control of the robot (**Experimental and subject to change**)
 - Forward kinematics computation using Pinocchio library
 - Jacobian computation using Pinocchio library
 - Accelerometer data exposed in robot state
 - Joint position-based velocity limits parsed from URDF to compute upper and lower velocity bounds
 - Documentation under libfranka repository
-- Feat: Async Position Control Handler added to libfranka to support asynchronous position control
+- Feat: Async Position Control Handler added to libfranka to support asynchronous position control (**Experimental and subject to change**)
 
 #### Changed
 - Updated libfranka-common (common-libfranka) to use float-based RobotState struct
