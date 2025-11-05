@@ -281,7 +281,8 @@ std::unique_ptr<ActiveControlBase> Robot::startControl(
 template <typename MotionGeneratorType>
 auto Robot::startAsyncControl(
     const research_interface::robot::Move::ControllerMode& controller_type,
-    const std::vector<double>& maximum_velocities) -> std::unique_ptr<ActiveControlBase> {
+    const std::optional<std::vector<double>>& maximum_velocities)
+    -> std::unique_ptr<ActiveControlBase> {
   std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
   assertOwningLock(control_lock);
 
@@ -317,7 +318,7 @@ std::unique_ptr<ActiveControlBase> Robot::startJointPositionControl(
 
 std::unique_ptr<ActiveControlBase> Robot::startAsyncJointPositionControl(
     const research_interface::robot::Move::ControllerMode& control_type,
-    const std::vector<double>& maximum_velocities) {
+    const std::optional<std::vector<double>>& maximum_velocities) {
   return startAsyncControl<JointPositions>(control_type, maximum_velocities);
 }
 

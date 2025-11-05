@@ -705,7 +705,7 @@ class Robot {
    *
    * @param control_type research_interface::robot::Move::ControllerMode control type for the
    *   operation
-   * @param maximum_velocities Maximum joint velocities for the motion generator
+   * @param maximum_velocities maximum joint velocities for the motion generator
    * @return unique_ptr of ActiveMotionGenerator for the started motion
    *
    * @throw ControlException if an error related to torque control or motion generation
@@ -716,7 +716,7 @@ class Robot {
    */
   virtual std::unique_ptr<ActiveControlBase> startAsyncJointPositionControl(
       const research_interface::robot::Move::ControllerMode& control_type,
-      const std::vector<double>& maximum_velocities);
+      const std::optional<std::vector<double>>& maximum_velocities);
 
   /**
    * Starts a new joint velocity motion generator
@@ -857,7 +857,7 @@ class Robot {
    */
   template <typename MotionGeneratorType>
   auto startAsyncControl(const research_interface::robot::Move::ControllerMode& controller_type,
-                         const std::vector<double>& maximum_velocities)
+                         const std::optional<std::vector<double>>& maximum_velocities)
       -> std::unique_ptr<ActiveControlBase>;
 };
 

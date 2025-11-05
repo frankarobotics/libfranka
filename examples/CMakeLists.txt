@@ -30,6 +30,7 @@ target_include_directories(examples_common PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 set(EXAMPLES
+  async_position_control
   cartesian_impedance_control
   communication_test
   echo_robot_state
