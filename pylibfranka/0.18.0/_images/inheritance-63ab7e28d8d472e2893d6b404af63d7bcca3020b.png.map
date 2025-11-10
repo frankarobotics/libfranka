@@ -1,0 +1,8 @@
+<map id="inheritancea95a000f05" name="inheritancea95a000f05">
+<area shape="rect" id="node1" href="api/exceptions.html#pylibfranka.CommandException" target="_top" title="CommandException" alt="" coords="3,3,122,30"/>
+<area shape="rect" id="node2" href="api/exceptions.html#pylibfranka.ControlException" target="_top" title="ControlException" alt="" coords="136,3,238,30"/>
+<area shape="rect" id="node3" href="api/exceptions.html#pylibfranka.FrankaException" target="_top" title="FrankaException" alt="" coords="252,3,351,30"/>
+<area shape="rect" id="node4" href="api/exceptions.html#pylibfranka.InvalidOperationException" target="_top" title="InvalidOperationException" alt="" coords="366,3,518,30"/>
+<area shape="rect" id="node5" href="api/exceptions.html#pylibfranka.NetworkException" target="_top" title="NetworkException" alt="" coords="532,3,641,30"/>
+<area shape="rect" id="node6" href="api/exceptions.html#pylibfranka.RealtimeException" target="_top" title="RealtimeException" alt="" coords="655,3,765,30"/>
+</map>
