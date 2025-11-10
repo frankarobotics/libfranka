@@ -1,0 +1,5 @@
+<map id="franka::GripperState" name="franka::GripperState">
+<area shape="rect" id="Node000001" title="Describes the gripper state." alt="" coords="5,93,159,119"/>
+<area shape="rect" id="Node000002" href="$classfranka_1_1Duration.html" title="Represents a duration with millisecond resolution." alt="" coords="19,5,145,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,45,85,93,79,93,79,45"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="include/franka/robot_model_base.h" name="include/franka/robot_model_base.h">
+<area shape="rect" id="Node000001" title="Abstract interface class for robot dynamic parameters computed from the URDF model with Pinocchio." alt="" coords="5,5,157,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="53,93,109,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,46,84,79,79,79,79,46"/>
+</map>
