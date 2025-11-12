@@ -17,13 +17,11 @@
   <buildtool_depend>cmake</buildtool_depend>
 
   <build_depend>eigen</build_depend>
-  <build_depend>fmt</build_depend>
-  <build_depend>libpoco-dev</build_depend>
-  <build_depend>pinocchio</build_depend>
 
-  <exec_depend>fmt</exec_depend>
-  <exec_depend>libpoco-dev</exec_depend>
-  <exec_depend>pinocchio</exec_depend>
+  <depend>fmt</depend>
+  <depend>libconsole-bridge-dev</depend>
+  <depend>libpoco-dev</depend>
+  <depend>pinocchio</depend>
 
   <doc_depend>doxygen</doc_depend>
   <doc_depend>graphviz</doc_depend>
