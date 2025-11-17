@@ -618,3 +618,20 @@ Behavioral errors
 
 * If you reach the joint or the Cartesian limits you will get
   a ``joint_velocity_violation`` or a ``cartesian_velocity_violation`` error respectively.
+
+Basic Example
+-------------
+
+For jump starting with libfranka, one needs to setup a `CMakeLists.txt` file and a simple `main.cpp` file.
+
+Here is an example of a `CMakeLists.txt` file:
+
+.. literalinclude:: assets/example_cmake_lists.txt
+  :language: cmake
+
+The `CMakeLists.txt` file specifies the `find_package` command to locate the `libfranka` library and creates the executable target.
+
+A matching `main.cpp` file could look like this:
+
+.. literalinclude:: assets/example_main.cpp
+  :language: cpp
