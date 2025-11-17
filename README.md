@@ -91,7 +91,7 @@ cd build
 Configure the project and build
 
 ```bash
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/opt/openrobots/lib/cmake -DBUILD_TESTS=OFF ..
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF ..
 make
 ```
 

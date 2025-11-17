@@ -48,10 +48,11 @@ set(THIRDPARTY_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty" CACHE PATH
   "Directory for third-party sources")
 
 ## Dependencies
-find_package(Poco REQUIRED COMPONENTS Net Foundation)
+find_package(console_bridge REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(Poco REQUIRED COMPONENTS Net Foundation)
 find_package(pinocchio REQUIRED)
-find_package(TinyXML2 REQUIRED)
+find_package(tinyxml2 REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -143,12 +144,12 @@ target_include_directories(franka PUBLIC
 )
 
 target_link_libraries(franka PRIVATE
+  tinyxml2
   Poco::Foundation
   Poco::Net
   Eigen3::Eigen3
   Threads::Threads
   pinocchio::pinocchio
-  TinyXML2::TinyXML2
 )
 
 target_link_libraries(franka PUBLIC
