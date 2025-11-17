@@ -219,12 +219,12 @@ endif()
 ## Packaging
 include(SetVersionFromGit)
 set_version_from_git(PACKAGE_VERSION PACKAGE_TAG)
-EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE PACKAGE_ARCH)
+execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE PACKAGE_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 set(CPACK_PACKAGE_VENDOR "Franka Robotics GmbH")
 set(CPACK_GENERATOR "DEB;TGZ")
 set(CPACK_PACKAGE_VERSION ${libfranka_VERSION})
-set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PACKAGE_TAG}-${PACKAGE_ARCH})
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}_${PACKAGE_TAG}_${PACKAGE_ARCH})
 set(CPACK_PACKAGE_VERSION ${PACKAGE_TAG})
 set(CPACK_PACKAGE_ARCHITECTURE ${PACKAGE_ARCH})
 set(CPACK_SYSTEM_NAME ${CMAKE_HOST_SYSTEM_PROCESSOR})
@@ -232,7 +232,7 @@ set(CPACK_SYSTEM_NAME ${CMAKE_HOST_SYSTEM_PROCESSOR})
 # Debian versions require a dash
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Franka Robotics GmbH")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libpoco-dev, libfmt-dev, libeigen3-dev")
-set(CPACK_DEBIAN_PACKAGE_CONFLICTS "ros-kinetic-libfranka, ros-melodic-libfranka, ros-noetic-libfranka, ros-foxy-libfranka, ros-humble-libfranka")
+set(CPACK_DEBIAN_PACKAGE_CONFLICTS "ros-kinetic-libfranka, ros-melodic-libfranka, ros-noetic-libfranka, ros-foxy-libfranka, ros-humble-libfranka, ros-jazzy-libfranka")
 include(CPack)
 
 ## Tools
