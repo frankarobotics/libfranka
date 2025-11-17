@@ -2,6 +2,12 @@
 
 All notable changes to libfranka and pylibfranka will be documented in this file.
 
+## [Unreleased]
+
+### libfranka - C++
+#### Changed
+- The libfranka library is built with static links - removing the need for dynamic dependencies at runtime
+
 ## [0.18.0]
 Requires Franka Research 3 System Version >= 5.9.0
 
