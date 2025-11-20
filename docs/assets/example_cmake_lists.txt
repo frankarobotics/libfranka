@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.10)
+project(MyRobotProject)
+
+# Find libfranka
+find_package(Franka REQUIRED)
+
+# Create executable
+add_executable(${PROJECT_NAME} src/main.cpp)
+
+# Link libfranka
+target_link_libraries(${PROJECT_NAME} Franka::Franka)

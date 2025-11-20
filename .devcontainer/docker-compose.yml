@@ -1,8 +1,8 @@
 services:
   libfranka_project:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../.ci/
+      dockerfile: ../.ci/Dockerfile.focal
       args:
         USER_UID: ${USER_UID}
         USER_GID: ${USER_GID}

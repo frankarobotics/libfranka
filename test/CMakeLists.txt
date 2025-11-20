@@ -18,8 +18,6 @@ set(TEST_DEPENDENCIES
   Threads::Threads
   franka
   libfranka-common
-  pinocchio::pinocchio
-  TinyXML2::TinyXML2
 )
 set(TEST_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 

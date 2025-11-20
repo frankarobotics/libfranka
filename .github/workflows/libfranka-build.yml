@@ -1,0 +1,45 @@
+name: Build the libfranka Debian Package
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .ci/
+          file: .ci/Dockerfile.focal
+          tags: libfranka-build:latest
+          push: false
+          load: true
+
+      - name: Build and package in container
+        uses: addnab/docker-run-action@v3
+        with:
+          image: libfranka-build:latest
+          options: -v ${{ github.workspace }}:/workspaces
+          run: |
+            cd /workspaces
+            cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -B build -S .
+            cmake --build build -- -j$(nproc)
+            cd build
+            cpack -G DEB
+
+      - name: Upload Debian package
+        uses: actions/upload-artifact@v4
+        with:
+          name: libfranka-deb
+          path: build/*.deb

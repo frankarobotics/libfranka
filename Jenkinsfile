@@ -23,7 +23,8 @@ pipeline {
       matrix {
         agent {
           dockerfile {
-            filename ".ci/Dockerfile.${env.DISTRO}"
+            dir ".ci"
+            filename "Dockerfile.${env.DISTRO}"
             reuseNode true
             args '--privileged ' +
                  '--cap-add=SYS_PTRACE ' +
@@ -221,7 +222,7 @@ pipeline {
                               reportName: "API Documentation (${env.DISTRO})"])
                 }
               }
-              
+
               // Build and publish pylibfranka documentation
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
                 sh '''
@@ -229,26 +230,26 @@ pipeline {
                   export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
                   pip3 install . --user
                 '''
-                
+
                 dir('pylibfranka/docs') {
                   sh '''
                     # Add sphinx to PATH
                     export PATH="$HOME/.local/bin:$PATH"
-                    
+
                     # Install Sphinx and dependencies
                     pip3 install -r requirements.txt --user
-                    
+
                     # Set locale
                     export LC_ALL=C.UTF-8
                     export LANG=C.UTF-8
-                    
+
                     # Add libfranka to library path
                     export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
-                    
+
                     # Build the documentation
                     make html
                   '''
-                  
+
                   publishHTML([allowMissing: false,
                               alwaysLinkToLastBuild: false,
                               keepAll: true,

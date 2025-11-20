@@ -48,10 +48,11 @@ set(THIRDPARTY_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty" CACHE PATH
   "Directory for third-party sources")
 
 ## Dependencies
-find_package(Poco REQUIRED COMPONENTS Net Foundation)
+find_package(console_bridge REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(Poco REQUIRED COMPONENTS Net Foundation)
 find_package(pinocchio REQUIRED)
-find_package(TinyXML2 REQUIRED)
+find_package(tinyxml2 REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -143,12 +144,12 @@ target_include_directories(franka PUBLIC
 )
 
 target_link_libraries(franka PRIVATE
+  tinyxml2
   Poco::Foundation
   Poco::Net
   Eigen3::Eigen3
   Threads::Threads
   pinocchio::pinocchio
-  TinyXML2::TinyXML2
 )
 
 target_link_libraries(franka PUBLIC
@@ -218,12 +219,12 @@ endif()
 ## Packaging
 include(SetVersionFromGit)
 set_version_from_git(PACKAGE_VERSION PACKAGE_TAG)
-EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE PACKAGE_ARCH)
+execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE PACKAGE_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 set(CPACK_PACKAGE_VENDOR "Franka Robotics GmbH")
 set(CPACK_GENERATOR "DEB;TGZ")
 set(CPACK_PACKAGE_VERSION ${libfranka_VERSION})
-set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PACKAGE_TAG}-${PACKAGE_ARCH})
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}_${PACKAGE_TAG}_${PACKAGE_ARCH})
 set(CPACK_PACKAGE_VERSION ${PACKAGE_TAG})
 set(CPACK_PACKAGE_ARCHITECTURE ${PACKAGE_ARCH})
 set(CPACK_SYSTEM_NAME ${CMAKE_HOST_SYSTEM_PROCESSOR})
@@ -231,7 +232,7 @@ set(CPACK_SYSTEM_NAME ${CMAKE_HOST_SYSTEM_PROCESSOR})
 # Debian versions require a dash
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Franka Robotics GmbH")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libpoco-dev, libfmt-dev, libeigen3-dev")
-set(CPACK_DEBIAN_PACKAGE_CONFLICTS "ros-kinetic-libfranka, ros-melodic-libfranka, ros-noetic-libfranka, ros-foxy-libfranka, ros-humble-libfranka")
+set(CPACK_DEBIAN_PACKAGE_CONFLICTS "ros-kinetic-libfranka, ros-melodic-libfranka, ros-noetic-libfranka, ros-foxy-libfranka, ros-humble-libfranka, ros-jazzy-libfranka")
 include(CPack)
 
 ## Tools

@@ -1,0 +1,28 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index df25fb61..2c777f5c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -58,6 +58,10 @@ else()
+   endif()
+ endif()
+
++FIND_PACKAGE(assimp REQUIRED)
++FIND_PACKAGE(console_bridge REQUIRED)
++FIND_PACKAGE(tinyxml2 REQUIRED)
++
+ set(DOXYGEN_USE_MATHJAX YES)
+
+ # ----------------------------------------------------
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 500d657f..4ed70b82 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -69,7 +69,7 @@ function(PINOCCHIO_TARGET target_name)
+   set(LIB_NAME "${target_name}")
+
+   # Manage different scope type if building an interface or shared library
+-  set(LIBRARY_TYPE SHARED)
++  set(LIBRARY_TYPE STATIC)
+   set(LIBRARY_PUBLIC_SCOPE PUBLIC)
+   if(ARGS_INTERFACE)
+     set(LIBRARY_TYPE INTERFACE)
