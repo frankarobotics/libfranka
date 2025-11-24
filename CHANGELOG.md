@@ -8,6 +8,10 @@ All notable changes to libfranka and pylibfranka will be documented in this file
 #### Changed
 - The libfranka library is built with static links - removing the need for dynamic dependencies at runtime
 
+### pylibfranka - Python
+#### Added
+- Added API documentation section to the official docs: [API References](https://frankarobotics.github.io/docs/api_references.html)
+
 ## [0.18.0]
 Requires Franka Research 3 System Version >= 5.9.0
 
