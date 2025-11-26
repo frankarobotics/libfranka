@@ -19,8 +19,8 @@ jobs:
     - name: Build Docker Image
       uses: docker/build-push-action@v4
       with:
-        context: .
-        file: ./.devcontainer/Dockerfile
+        context: .ci/
+        file: .ci/Dockerfile.focal
         tags: pylibfranka:latest
         push: false
         load: true
@@ -44,16 +44,16 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           export LC_ALL=C.UTF-8
           export LANG=C.UTF-8
-          
+
           # Install pylibfranka
           pip3 install .
-          
+
           # Move to docs directory
           cd pylibfranka/docs
-          
+
           # Install Sphinx requirements
           pip3 install -r requirements.txt --user
-          
+
           # Get version from installed package (synced from CMakeLists.txt)
           VERSION=$(python3 -c "import pylibfranka; print(pylibfranka.__version__)")
           echo "Building documentation for version: $VERSION"
@@ -61,11 +61,11 @@ jobs:
           # Build documentation
           make clean
           make html
-          
+
           # Prepare output directory with pylibfranka subfolder
           mkdir -p /workspace/docs_output/pylibfranka/${VERSION}
           cp -r _build/html/* /workspace/docs_output/pylibfranka/${VERSION}/
-          
+
           # Also copy to 'latest' directory for easy access
           mkdir -p /workspace/docs_output/pylibfranka/latest
           cp -r _build/html/* /workspace/docs_output/pylibfranka/latest/
