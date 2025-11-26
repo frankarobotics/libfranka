@@ -8,9 +8,11 @@ namespace franka {
 RobotModel::RobotModel(const std::string& urdf) {
   pinocchio::urdf::buildModelFromXML(urdf, pinocchio_model_);
 
-  last_joint_index_ =                       // NOLINT(cppcoreguidelines-prefer-member-initializer)
-      pinocchio_model_.joints.back().id();  // NOLINT(cppcoreguidelines-prefer-member-initializer)
-  last_link_frame_index_ = pinocchio_model_.getFrameId(pinocchio_model_.frames.back().name);
+  last_link_frame_index_ = pinocchio_model_.getFrameId(kLastLinkName);
+  last_joint_index_ =  // NOLINT(cppcoreguidelines-prefer-member-initializer)
+      pinocchio_model_.frames[last_link_frame_index_]
+          .parentJoint;  // NOLINT(cppcoreguidelines-prefer-member-initializer)
+
   initial_last_link_inertia_ = pinocchio_model_.inertias[last_joint_index_];
 
   cached_f_x_ctotal_.fill(-1.0);

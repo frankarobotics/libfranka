@@ -228,6 +228,8 @@ class RobotModel : public RobotModelBase {
       const std::array<double, 3>& g_earth,
       std::array<double, 7>& g_ne) const;
 
+  static constexpr const char* kLastLinkName = "link8";
+
   pinocchio::Inertia initial_last_link_inertia_;
   pinocchio::FrameIndex last_link_frame_index_;
   pinocchio::JointIndex last_joint_index_;

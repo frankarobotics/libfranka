@@ -7,6 +7,8 @@ All notable changes to libfranka and pylibfranka will be documented in this file
 ### libfranka - C++
 #### Changed
 - The libfranka library is built with static links - removing the need for dynamic dependencies at runtime
+- Fix the acceleration link addition bug and robot model link parsing [github](https://github.com/frankarobotics/libfranka/issues/213)
+- Update the test urdf with the acceleration links and joint
 
 ### pylibfranka - Python
 #### Added

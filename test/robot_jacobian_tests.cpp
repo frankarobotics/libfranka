@@ -31,6 +31,55 @@ class RobotJacobianTest : public ::testing::Test {
   std::array<double, 16> rotated_stiffness{0,  0, 1, 0.05, 0, 1, 0, 0.15,
                                            -1, 0, 0, 0.25, 0, 0, 0, 1};
 
+  // Expected zero Jacobian for default_joint_configuration {0, 0, 0, -0.75*M_PI, 0, 0.75*M_PI, 0}
+  // This value is the same for Flange, EE (with identity transform), and Stiffness (with identity
+  // transforms) frames, as well as with rotated transforms (the zero Jacobian is expressed in base
+  // frame, so end effector transforms don't affect it)
+  const std::array<double, 42> expected_default_zero_jacobian = {
+      -3.300438565e-16,
+      0.5003653134,
+      0,
+      0,
+      0,
+      1,  // Col 1
+      -0.004192694528,
+      -2.222068367e-16,
+      -0.5003653134,
+      0,
+      1,
+      -4.440892099e-16,  // Col 2
+      -1.897116662e-16,
+      0.5003653134,
+      0,
+      0,
+      0,
+      1,  // Col 3
+      0.3201926945,
+      -1.855694769e-16,
+      0.4178653134,
+      0,
+      -1,
+      -4.440892099e-16,  // Col 4
+      -1.391756684e-17,
+      0.01343502884,
+      4.86479492e-19,
+      0.7071067812,
+      7.581077016e-16,
+      -0.7071067812,  // Col 5
+      0.107,
+      -3.907985047e-17,
+      0.088,
+      0,
+      -1,
+      -4.440892099e-16,  // Col 6
+      0,
+      0,
+      0,
+      0,
+      8.881784197e-16,
+      -1  // Col 7
+  };
+
   void SetUp() override {
     std::string urdf_path = franka_test_utils::getUrdfPath(__FILE__);
     auto urdf_string = franka_test_utils::readFileToString(urdf_path);
@@ -284,4 +333,36 @@ TEST_F(
 
   testZeroJacobianStiffness(default_joint_configuration, rotated_ee, rotated_stiffness,
                             expected_jacobian);
+}
+
+// BUG REPRODUCTION TESTS
+// These tests verify that zeroJacobian functions return correct values for
+// kFlange, kEndEffector, and kStiffness frames
+TEST_F(RobotJacobianTest, ZeroJacobianFlangeReturnsCorrectValues) {
+  std::array<double, 42> jacobian = model->zeroJacobianFlange(default_joint_configuration);
+  compareJacobians(jacobian, expected_default_zero_jacobian);
+}
+
+TEST_F(RobotJacobianTest, ZeroJacobianEeReturnsCorrectValues) {
+  std::array<double, 42> jacobian = model->zeroJacobianEe(default_joint_configuration, identity_ee);
+  compareJacobians(jacobian, expected_default_zero_jacobian);
+}
+
+TEST_F(RobotJacobianTest, ZeroJacobianStiffnessReturnsCorrectValues) {
+  std::array<double, 42> jacobian =
+      model->zeroJacobianStiffness(default_joint_configuration, identity_ee, identity_stiffness);
+  compareJacobians(jacobian, expected_default_zero_jacobian);
+}
+
+TEST_F(RobotJacobianTest, ZeroJacobianEeWithRotatedFrameReturnsCorrectValues) {
+  // Zero Jacobian is expressed in base frame, so rotated EE transform doesn't affect it
+  std::array<double, 42> jacobian = model->zeroJacobianEe(default_joint_configuration, rotated_ee);
+  compareJacobians(jacobian, expected_default_zero_jacobian);
+}
+
+TEST_F(RobotJacobianTest, ZeroJacobianStiffnessWithRotatedFramesReturnsCorrectValues) {
+  // Zero Jacobian is expressed in base frame, so rotated transforms don't affect it
+  std::array<double, 42> jacobian =
+      model->zeroJacobianStiffness(default_joint_configuration, rotated_ee, rotated_stiffness);
+  compareJacobians(jacobian, expected_default_zero_jacobian);
 }
