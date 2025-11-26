@@ -1,0 +1,28 @@
+<map id="include/franka/robot_model.h" name="include/franka/robot_model.h">
+<area shape="rect" id="Node000001" title="Implements RobotModelBase using Pinocchio." alt="" coords="836,5,988,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="881,181,937,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="836,29,628,31,368,40,244,49,137,60,58,76,32,85,16,95,10,104,8,113,10,122,16,131,33,142,62,151,149,167,266,178,400,185,671,191,867,190,867,196,671,196,400,190,266,183,148,172,60,157,31,147,13,135,5,125,3,113,5,102,13,91,29,80,56,71,137,55,244,43,368,35,628,26,835,24"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="27,93,178,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="836,33,556,54,376,72,192,96,191,91,375,66,555,48,835,28"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="202,93,376,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="836,38,638,61,391,96,390,90,638,56,835,32"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="400,93,551,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="836,43,565,95,564,90,835,38"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="575,93,726,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="855,48,722,92,720,86,854,43"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="750,93,900,133"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="894,48,856,85,852,82,891,44"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="924,93,1075,133"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="933,44,972,82,969,86,929,48"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="1099,93,1250,133"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="970,43,1105,87,1103,92,969,48"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1274,93,1429,133"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="988,38,1262,90,1261,96,987,43"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1454,101,1647,126"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="988,33,1193,57,1441,91,1473,96,1473,101,1441,96,1193,62,988,38"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="1672,101,1730,126"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="988,28,1338,50,1525,68,1602,79,1660,91,1667,93,1666,98,1659,96,1601,84,1525,73,1338,55,988,33"/>
+<area shape="rect" id="Node000013" href="$robot__model__base_8h.html" title="Abstract interface class for robot dynamic parameters computed from the URDF model with Pinocchio." alt="" coords="1754,93,1904,133"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="988,27,1312,46,1524,64,1741,91,1740,96,1523,69,1312,51,988,32"/>
+<area shape="poly" id="edge13_Node000013_Node000002" title=" " alt="" coords="1754,134,1743,136,1509,163,1280,180,951,194,951,189,1279,175,1509,158,1742,131,1754,129"/>
+</map>
