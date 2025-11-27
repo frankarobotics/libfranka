@@ -69,7 +69,7 @@ class PyRobot {
   auto startCartesianPoseControl(franka::ControllerMode controller_mode)
       -> std::unique_ptr<franka::ActiveControlBase>;
 
-    /**
+  /**
    * Starts the Cartesian velocity control mode.
    * @param control_type The type of controller to use (JointImpedance or CartesianImpedance).
    */

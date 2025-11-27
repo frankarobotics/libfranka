@@ -7,6 +7,7 @@ import argparse
 
 import numpy as np
 from example_common import MotionGenerator, setDefaultBehaviour
+
 from pylibfranka import CartesianVelocities, ControllerMode, Robot
 
 
@@ -33,7 +34,6 @@ def main():
         # Create motion generator
         motion_generator = MotionGenerator(speed_factor=0.5, q_goal=q_goal)
         # First move the robot to a suitable joint configuration
-        
 
         control = robot.start_joint_position_control(ControllerMode.CartesianImpedance)
         while True:

@@ -1,6 +1,7 @@
 from typing import List, Tuple
 
 import numpy as np
+
 from pylibfranka import JointPositions, Robot, RobotState
 
 
