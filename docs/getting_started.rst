@@ -1,139 +1,120 @@
-Getting started
-===============
+.. _fci_setup_overview:
 
-After setting up the required software for :doc:`Linux <installation_linux>`.
-It is time to connect to the robot and test the whole setup
-by using FCI to read the current robot state.
+Setting Up the Robot System and Network for FCI
+===============================================
 
-Operating the robot
--------------------
+After completing the :ref:`real-time kernel setup <realtime_kernel_setup>`, ensuring proper network configuration (see :ref:`Network requirements <requirement-network>`), and installing :ref:`libfranka <libfranka_installation>`, you can connect to the robot and verify the setup by using FCI to read the current robot state.
 
-Before going further though, here are a few safety considerations.
-Always check the following things before powering on the robot:
+.. _operating_the_robot:
 
-1. Make sure that the Arm has been mounted on a stable base and cannot topple over, even
-   when performing fast motions or abrupt stops.
+Operating the Robot
+------------------
+
+Before proceeding, review the following safety considerations:
+
+1. Ensure the Arm is mounted on a stable base that cannot topple over, even during fast motions or abrupt stops.
 
 .. caution::
-   Only tabletop mounting is supported, i.e. the Arm must be mounted perpendicular to the
-   ground! Other mountings will **void your warranty** and **might cause damage
-   to the robot**!
+   Only tabletop mounting is supported (the Arm must be perpendicular to the ground).
+   Other mountings **void the warranty** and **may damage the robot**.
 
-2. Ensure that the cable connecting Arm and Control is firmly attached on both sides.
-3. Connect the external activation device to Arm's base and keep it next to you in order to be
-   able to stop the robot at any time.
+2. Verify that the cable connecting Arm and Control is firmly attached on both sides.
+3. Connect the external activation device to the Arm's base and keep it accessible to stop the robot at any time.
 
 .. hint::
    Activating the external activation device will disconnect the Arm from Control.
-   The joint motor controllers will then hold their current position.
-   **The external activation device is not an emergency stop!**
+   The joint motor controllers will hold their current position.
+   **The external activation device is not an emergency stop.**
 
-This list is non-exhaustive! The manual delivered with your robot contains a chapter dedicated
-to safety. Please read it carefully and follow the instructions. The manual can also be found in
-our `Franka World Hub <https://world.franka.de/resources>`_.
+This list is non-exhaustive. The robot manual contains a dedicated chapter on safety and is available via the
+`Franka World Hub <https://world.franka.de/resources>`_.
 
 .. important::
-   The workstation PC which commands your robot using the FCI must always be connected to the LAN
-   port of Control (shop floor network) and **not** to the LAN port of the Arm (robot network).
+   The workstation PC controlling the robot with FCI must be connected to the LAN port of Control
+   (shop floor network), **not** the LAN port of the Arm (robot network).
+
+.. _installing_fci_feature:
 
 Installing the FCI Feature
 --------------------------
-In order to be able to operate the robot through the Franka Control Interface, the corresponding
-Feature needs to be installed on your device. If it is already installed to the controller, it
-will be listed under Desk --> Settings --> System --> Installed Features.
-If FCI is not installed yet, you can synchronize it from your Franka World account to your
-controller. Therefore, you must have an available FCI license in your company/university account and have
-your controller registered in this account. The software (offline or online) synchronization
-process is described in more detail in the
-`Franka World user manual <https://download.franka.de/franka-world-manual/>`_.
 
+To operate the robot through the Franka Control Interface, the corresponding Feature must be installed.
+Check Desk --> Settings --> System --> Installed Features.
 
-.. _setting-up-the-network:
+If FCI is not installed, synchronize it from your Franka World account to your controller.
+You must have an FCI license and a registered controller in your account.
+Refer to the `Franka World user manual <https://download.franka.de/franka-world-manual/>`_ for details.
 
-Setting up the network
-----------------------
+.. _network_setup:
 
-Good network performance is crucial when controlling the robot using FCI.
-Therefore it is strongly recommended to use a direct connection between the
-workstation PC and Panda's Control. This section describes how to configure your
-network for this use case.
+Setting Up the Network
+---------------------
+
+Good network performance is critical when using FCI.
+A direct connection between the workstation PC and Franka's Control is recommended.
 
 .. figure:: assets/control.png
     :align: center
     :figclass: align-center
 
     Use Control's LAN port when controlling the robot through FCI.
-    Do not connect to the port in Arm's base.
+    Do not connect to the port in the Arm's base.
 
-The Control and your workstation must be configured to appear on the same
-network. Simplest way to achieve that is to use static IP addresses. Any two
-addresses on the same network would work, but the following values will be used
-for the purpose of this tutorial:
+The Control and workstation must appear on the same network.
+For this tutorial, the following static IP addresses are used:
 
 +---------+----------------+------------+
-|         | Workstation PC |  Control   |
+|         | Workstation PC | Control    |
 +=========+================+============+
 | Address | 172.16.0.1     | 172.16.0.2 |
 +---------+----------------+------------+
 | Netmask | 24             | 24         |
 +---------+----------------+------------+
 
-The Control's address (172.16.0.2) is called ``<fci-ip>`` in the following chapters.
+The Control's address (172.16.0.2) is referred to as ``<fci-ip>`` in the following sections.
 
 .. hint::
-    With this network configuration, Desk can be accessed via ``https://<fci-ip>``, although
-    you will see a certificate warning in your browser.
+    Desk can be accessed via ``https://<fci-ip>``, though your browser may display a certificate warning.
 
-The configuration process consists of two steps:
+The configuration consists of two steps:
 
-  * Configuring Control's network settings.
-  * Configuring your workstation's network settings.
+* Configuring Control's network settings.
+* Configuring your workstation's network settings.
 
-Control network configuration
+.. _control_network_config:
+
+Control Network Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For this step, the robot needs to be installed and tested. **Please read through
-the documents shipped with your robot and follow the setup instructions before
-continuing any further!**
+Before configuring, ensure the robot is installed and tested according to the documents shipped with it.
 
-With system version >= 5.5.0, the Control's network can be configured in the settings interface. For
-the duration of this step you can connect to the robot through the port in the
-robot's base. For details, consult the `Connecting a user interface device`
-section in the manual delivered with your robot.
+For system version >= 5.5.0, configure Control's network via the settings interface.
+You may temporarily connect through the Arm's base port.
+Refer to `Connecting a user interface device` in the robot manual.
 
 .. figure:: assets/FrankaUI_Settings_Bar.png
     :align: center
     :figclass: align-center
 
-    Accessing the Franka's settings interface through Desk.
-
-To set up a static address, enter the following values in the `Network` section:
+    Access the Franka settings interface through Desk.
 
 .. figure:: assets/FrankaUI_Settings_Network.png
     :align: center
     :figclass: align-center
 
-    Setting a static IP for the Control's LAN port (Shop Floor network).
+    Set a static IP for the Control's LAN port (Shop Floor network).
     DHCP Client option is deselected.
 
-Press `Apply`. After the settings are successfully applied, connect your
-workstation's LAN port to the robot's control unit.
+After applying the settings, connect the workstation LAN port to the Control unit.
 
-Linux workstation network configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _linux_network_config:
 
-This section describes how to set up a static IP address on Ubuntu 16.04
-using the GUI. Follow the official Ubuntu guide_ if you prefer to use the
-command line.
+Linux Workstation Network Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _guide: https://help.ubuntu.com/lts/serverguide/network-configuration.html
+On Ubuntu 16.04 (GUI):
 
-.. caution::
-    The following steps will modify your network settings. If in doubt,
-    contact your network's administrator.
-
-First, go to Network Connection widget. Select the wired connection you
-will be using and click edit.
+1. Open the Network Connection widget, select the wired connection, and click **Edit**.
 
 .. figure:: assets/edit-connections.png
     :align: center
@@ -141,105 +122,86 @@ will be using and click edit.
 
     Edit the connection in the Ethernet section.
 
-Next, click on the IPv4 settings tab, set the method to Manual, and enter the
-following values:
+2. In the IPv4 settings tab, set the method to **Manual** and enter the values:
 
 .. figure:: assets/static-ip-ubuntu.png
     :align: center
     :figclass: align-center
 
-    Setting a static IP for the Workstation PC. Method is set to Manual.
+    Set a static IP for the workstation PC.
 
 .. hint::
-   This step will disable DHCP, which means you will no longer obtain an address
-   when connecting to a DHCP server, like the one in Arm's base. When you no
-   longer use FCI, you can change the Method back to `Automatic (DHCP)`.
+   This disables DHCP. When no longer using FCI, revert the Method to `Automatic (DHCP)`.
 
-Save the changes, and close the Network Connection window. Click on the
-connection name from the drop down menu. It should now be possible to connect to
-the robot from your workstation. To verify this, perform the
-:ref:`network-bandwidth-delay-test`. From now on, you can also access Desk
-through this address in your browser.
+3. Save changes and reconnect. Test connectivity using :ref:`network-bandwidth-delay-test`.
+   Desk can now be accessed via the assigned IP in your browser.
 
 .. _preparing_robot_in_desk:
 
-Preparing the robot for FCI usage in Desk
------------------------------------------
+Preparing the Robot for FCI in Desk
+-----------------------------------
 
-In order to verify the connection, the robot's brakes need to be unlocked in Desk and the activation
-device needs to be relased so that the robot is ready for execution indicated by blue LED mode.
+Ensure the robot's brakes are unlocked and the activation device released.
+The robot is ready when the blue LED is active.
 
-Activating the FCI mode
-^^^^^^^^^^^^^^^^^^^^^^^
+.. _activating_fci_mode:
 
-To activate FCI mode, open Desk, then release the robot brakes, and expand the menu in the top bar. Finally, click on 'Activate FCI'.
+Activating FCI Mode
+^^^^^^^^^^^^^^^^^^
+
+In Desk:
+
+1. Release the robot brakes.
+2. Expand the top menu and click **Activate FCI**.
 
 .. figure:: assets/FrankaUI_System_ActivateFCI.png
     :align: center
     :figclass: align-center
     :width: 300px
 
-    Activating the FCI mode in the Desk topbar menu (system version >= 5.5.0)
+    Activating FCI mode in Desk (system version >= 5.5.0).
 
+.. _fci_mode_fer:
 
-FCI mode in Panda
-"""""""""""""""""
+FCI Mode in Franka Emika Robot (FER)
+""""""""""""""""""""""""""""""""""""
 
-After Activating the FCI mode, a pop-up as shown below is appearing. This pop-up indicates that the FCI mode
-is currently active and that Desk interactions are not allowed while it is active. This pop-up needs to
-remain open while working with FCI. Further information about Single Point of Control (SPoC) can be found
-in the manual shipped with the robot which can also be found in our
-`Franka World Hub <https://world.franka.de/resources>`_.
+Once FCI mode is activated, a pop-up confirms the mode is active and Desk interactions are disabled.
+The pop-up must remain open while working with FCI.
 
 .. figure:: assets/pop_up_fci.png
     :align: center
     :figclass: align-center
 
-    Pop-up when the FCI mode is activated
+    Pop-up when FCI mode is active.
 
-FCI mode in Franka Research 3
+.. _fci_mode_fr3:
+
+FCI Mode in Franka Research 3
 """""""""""""""""""""""""""""
 
-After Activating the FCI mode, a pop-up appears, then the user needs to confirm.
-
-.. figure:: assets/FrankaUI_System_ActivateFCI_Confirm.png
-   :class: hidden
-
 .. figure:: assets/FrankaUI_System_ActivateFCI_Done.png
-   :class: hidden
+    :align: center
+    :figclass: align-center
+    :scale: 35%
 
-.. raw:: html
+After activation, a pop-up appears requiring user confirmation.
 
-   <table style="margin-bottom: 25px;">
-            <tr>
-                <td><img src="../../_images/FrankaUI_System_ActivateFCI_Confirm.png" alt="FrankaUI_System_ActivateFCI_Confirm" style="width: 300px;"/></td>
-                <td><img src="../../_images/FrankaUI_System_ActivateFCI_Done.png" alt="FrankaUI_System_ActivateFCI_Done" style="width: 300px;"/></td>
-            </tr>
-        <caption style="caption-side: bottom; text-align: center;">Sidebar is green when the FCI mode is activated</caption>
-    </table>
+.. _verifying_fci_connection:
 
-Verifying the connection
-------------------------
+Verifying the Connection
+-----------------------
 
-The previous sections described how to specify the IP address of the Control's
-LAN port. In the following sections that address is referred to as ``<fci-ip>``.
+The IP of the Control's LAN port is referred to as ``<fci-ip>`` in the following examples.
 
-In order to verify that everything is correctly set up, be sure :ref:`the robot is prepared for FCI
-usage in Desk <preparing_robot_in_desk>` and run the ``echo_robot_state``
-example from ``libfranka``. If you decided to install ``franka_ros`` and ``libfranka`` from the ROS
-repository, you can instead read the instructions for
-:ref:`visualizing the robot in ros <ros_visualization>` .
-
-Change to the build directory of ``libfranka`` and execute the example:
+Ensure :ref:`the robot is prepared for FCI usage in Desk <preparing_robot_in_desk>`.
+Run the ``echo_robot_state`` example from ``libfranka``:
 
 .. code-block:: shell
 
     ./examples/echo_robot_state <fci-ip>
 
-The program will print the current state of the robot to the console and terminate after a few
-iterations. The fields are explained in the :api:`RobotState|structfranka_1_1RobotState.html`.
-
-Example output:
+The program prints the current robot state to the console. Refer to :api:`RobotState|structfranka_1_1RobotState.html` for field explanations.
 
 .. code-block:: json
 
@@ -251,31 +213,10 @@ Example output:
       "F_T_EE": [0.7071,-0.7071,0,0,0.7071,0.7071,0,0,0,0,1,0,0,0,0.1034,1],
       "EE_T_K": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
       "m_ee": 0.73, "F_x_Cee": [-0.01,0,0.03], "I_ee": [0.001,0,0,0,0.0025,0,0,0,0.0017],
-      "m_load": 0, "F_x_Cload": [0,0,0], "I_load": [0,0,0,0,0,0,0,0,0],
-      "m_total": 0.73, "F_x_Ctotal": [-0.01,0,0.03], "I_total": [0.001,0,0,0,0.0025,0,0,0,0.0017],
-      "elbow": [-0.0207622,-1], "elbow_d": [-0.0206678,-1],
-      "tau_J": [-0.00359774,-5.08582,0.105732,21.8135,0.63253,2.18121,-0.0481953],
-      "tau_J_d": [0,0,0,0,0,0,0],
-      "dtau_J": [-54.0161,-18.9808,-64.6899,-64.2609,14.1561,28.5654,-11.1858],
-      "q": [0.0167305,-0.762614,-0.0207622,-2.34352,-0.0305686,1.53975,0.753872],
-      "dq": [0.00785939,0.00189343,0.00932415,0.0135431,-0.00220327,-0.00492024,0.00213604],
-      "q_d": [0.0167347,-0.762775,-0.0206678,-2.34352,-0.0305677,1.53975,0.753862],
-      "dq_d": [0,0,0,0,0,0,0],
-      "joint_contact": [0,0,0,0,0,0,0], "cartesian_contact": [0,0,0,0,0,0],
-      "joint_collision": [0,0,0,0,0,0,0], "cartesian_collision": [0,0,0,0,0,0],
-      "tau_ext_hat_filtered": [0.00187271,-0.700316,0.386035,0.0914781,-0.117258,-0.00667777,
-                               -0.0252562],
-      "O_F_ext_hat_K": [-2.06065,0.45889,-0.150951,-0.482791,-1.39347,0.109695],
-      "K_F_ext_hat_K": [-2.03638,-0.529916,0.228266,-0.275938,0.434583,0.0317351],
-      "theta": [0.01673,-0.763341,-0.0207471,-2.34041,-0.0304783,1.54006,0.753865],
-      "dtheta": [0,0,0,0,0,0,0],
-      "current_errors": [], "last_motion_errors": [],
-      "control_command_success_rate": 0, "robot_mode": "Idle", "time": 3781435
+      ...
     }
 
 .. hint::
 
-    If an error occurs at this point, perform the
-    :ref:`ping test <troubleshooting_robot_not_reachable>` and ensure that the robot's fail-safe
-    safety locking system is opened. Further information are provided in the manual shipped with
-    the robot.
+    If an error occurs, perform the :ref:`ping test <troubleshooting_robot_not_reachable>` and ensure
+    the fail-safe locking system is open. Refer to the robot manual for additional instructions.
