@@ -13,6 +13,7 @@ Requires Franka Research 3 System Version >= 5.9.0
 
 ### pylibfranka - Python
 #### Added
+- Added Joint and Cartesian Velocity controller examples.
 
 ## [0.18.1]
 Requires Franka Research 3 System Version >= 5.9.0
@@ -25,8 +26,7 @@ Requires Franka Research 3 System Version >= 5.9.0
 
 ### pylibfranka - Python
 #### Added
-- Added API documentation section to the official docs: [API References](https://frankarobotics.github.io/docs/api_references.html)
-- Added Joint and Cartesian Velocity controller examples.
+- Added API documentation section to the official docs: [API References](https://frankarobotics.github.io/docs/libfranka/docs/api_references.html)
 
 ## [0.18.0]
 Requires Franka Research 3 System Version >= 5.9.0

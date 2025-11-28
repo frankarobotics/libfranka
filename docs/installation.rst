@@ -7,11 +7,11 @@ Build / Installation
 Plain CMake
 ~~~~~~~~~~~
 
-Before you begin, check the :ref:`system-requirements` and install the necessary dependencies listed in :ref:`dependencies`.
+Before you begin, check the :ref:`system-requirements` and install the necessary dependencies listed in :ref:`installing-dependencies`.
 
 After installing the dependencies, proceed to :ref:`building-from-source`.
 
-Once the build is complete, you can optionally create and install a Debian package as described in :ref:`debian-package`.
+Once the build is complete, you can optionally create and install a Debian package as described in :ref:`installing-debian-package`.
 
 .. _libfranka_installation_debian_package:
 Debian Package

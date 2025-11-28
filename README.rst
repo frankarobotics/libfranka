@@ -5,9 +5,9 @@ libfranka: C++ Library for Franka Robotics Research Robots
    :target: https://codecov.io/gh/frankarobotics/libfranka
    :alt: codecov
 
-**libfranka** is a C++ library that provides low-level control of Franka Robotics research robots. The `generated API documentation <https://frankarobotics.github.io/libfranka/0.15.0>`_ offers an overview of its capabilities, while the `Franka Control Interface (FCI) documentation <https://frankarobotics.github.io/docs>`_ provides more information on setting up the robot and utilizing its features and functionalities.
+**libfranka** is a C++ library that provides low-level control of Franka Robotics research robots. The `API References <https://frankarobotics.github.io/docs/libfranka/docs/api_references.html>`_ offers an overview of its capabilities, while the `Franka Control Interface (FCI) documentation <https://frankarobotics.github.io/docs>`_ provides more information on setting up the robot and utilizing its features and functionalities.
 
-To find the appropriate version to use, please refer to the `Compatibility Matrix <https://frankarobotics.github.io/docs/compatibility.html>`_.
+To find the appropriate version to use, please refer to the `Robot System Version Compatibility <https://frankarobotics.github.io/docs/libfranka/docs/compatibility_with_images.html>`_.
 
 Key Features
 ------------
@@ -25,7 +25,7 @@ Getting Started
 
 Before using **libfranka**, ensure your system meets the following requirements:
 
-- **Operating System**: `Linux with PREEMPT_RT patched kernel <https://frankarobotics.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel>`_  (Ubuntu 16.04 or later, Ubuntu 22.04 recommended)
+- **Operating System**: `Linux with PREEMPT_RT patched kernel <https://frankarobotics.github.io/docs/libfranka/docs/real_time_kernel.html>`_  (Ubuntu 16.04 or later, Ubuntu 22.04 recommended)
 - **Compiler**: GCC 7 or later
 - **CMake**: Version 3.10 or later
 - **Robot**: Franka Robotics robot with FCI feature installed
