@@ -90,6 +90,11 @@ auto PyRobot::startCartesianPoseControl(franka::ControllerMode controller_mode)
   return robot_->startCartesianPoseControl(convertControllerMode(controller_mode));
 }
 
+auto PyRobot::startCartesianVelocityControl(franka::ControllerMode controller_mode)
+    -> std::unique_ptr<franka::ActiveControlBase> {
+  return robot_->startCartesianVelocityControl(convertControllerMode(controller_mode));
+}
+
 void PyRobot::setCollisionBehavior(const std::array<double, 7>& lower_torque_thresholds,
                                    const std::array<double, 7>& upper_torque_thresholds,
                                    const std::array<double, 6>& lower_force_thresholds,
@@ -617,6 +622,12 @@ PYBIND11_MODULE(_pylibfranka, m) {
 
         @param control_type Controller mode (JointImpedance or CartesianImpedance)
         @return ActiveControlBase interface for sending Cartesian pose commands
+    )pbdoc")
+      .def("start_cartesian_velocity_control", &PyRobot::startCartesianVelocityControl, R"pbdoc(
+        Start Cartesian velocity control mode.
+
+        @param control_type Controller mode (JointImpedance or CartesianImpedance)
+        @return ActiveControlBase interface for sending Cartesian velocity commands
     )pbdoc")
       .def("set_collision_behavior", &PyRobot::setCollisionBehavior, R"pbdoc(
         Configure collision detection thresholds.

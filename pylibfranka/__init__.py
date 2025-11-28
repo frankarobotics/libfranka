@@ -5,8 +5,6 @@ enabling real-time control with torque, position, and velocity commands.
 
 """
 
-from ._version import __version__
-
 from ._pylibfranka import (
     ActiveControlBase,
     CartesianPose,
@@ -31,6 +29,7 @@ from ._pylibfranka import (
     RobotState,
     Torques,
 )
+from ._version import __version__
 
 __all__ = [
     "ActiveControlBase",

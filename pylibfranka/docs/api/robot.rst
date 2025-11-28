@@ -36,7 +36,7 @@ Constructor
 
        # Connect with real-time enforcement
        robot = pylibfranka.Robot("172.16.0.2")
-       
+
        # Connect without real-time enforcement (for testing)
        robot_test = pylibfranka.Robot(
            "172.16.0.2",
@@ -65,17 +65,17 @@ start_torque_control
    .. code-block:: python
 
        robot = pylibfranka.Robot("172.16.0.2")
-       
+
        # Start torque control mode (gravity is automatically compensated)
        control = robot.start_torque_control()
-       
+
        # Control loop at 1 kHz
        for i in range(5000):
            state, duration = control.readOnce()
-           
+
            # Send zero torque for compliant mode
            tau = pylibfranka.Torques([0, 0, 0, 0, 0, 0, 0])
-           
+
            # Send torque command
            control.writeOnce(tau)
 
@@ -105,6 +105,38 @@ start_joint_velocity_control
    :noindex:
 
    Starts a new joint velocity motion generator.
+
+   :param control_type: Controller mode for the operation
+   :type control_type: ControllerMode
+   :return: Active control interface for sending velocity commands
+   :rtype: ActiveControlBase
+   :raises ControlException: if an error related to motion generation occurred
+   :raises InvalidOperationException: if a conflicting operation is already running
+   :raises NetworkException: if the connection is lost, e.g. after a timeout
+
+start_cartesian_pose_control
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. py:method:: Robot.start_cartesian_pose_control(control_type)
+   :noindex:
+
+   Starts a new cartesian pose motion generator.
+
+   :param control_type: Controller mode for the operation
+   :type control_type: ControllerMode
+   :return: Active control interface for sending position commands
+   :rtype: ActiveControlBase
+   :raises ControlException: if an error related to motion generation occurred
+   :raises InvalidOperationException: if a conflicting operation is already running
+   :raises NetworkException: if the connection is lost, e.g. after a timeout
+
+start_cartesian_velocity_control
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. py:method:: Robot.start_cartesian_velocity_control(control_type)
+   :noindex:
+
+   Starts a new cartesian velocity motion generator.
 
    :param control_type: Controller mode for the operation
    :type control_type: ControllerMode
