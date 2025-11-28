@@ -437,8 +437,10 @@ TEST_F(RobotTests, ThrowsIfConflictingOperationIsRunning) {
       InvalidOperationException);
   EXPECT_THROW(default_robot.read(std::function<bool(const RobotState&)>()),
                InvalidOperationException);
-  EXPECT_THROW(default_robot.readOnce(), InvalidOperationException);
   EXPECT_THROW(default_robot.startTorqueControl(), InvalidOperationException);
+
+  // Technically, readOnce is possible but due to the other call blocking, it will time out.
+  EXPECT_THROW(default_robot.readOnce(), NetworkException);
 
   default_server.ignoreUdpBuffer();
 

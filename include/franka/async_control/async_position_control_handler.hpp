@@ -81,9 +81,10 @@ class AsyncPositionControlHandler {
   /**
    * Retrieves feedback about the current control state.
    *
+   * @param robot_state Optional robot state to use for feedback calculation.
    * @return TargetFeedback containing the current status and joint positions.
    */
-  auto getTargetFeedback() -> TargetFeedback;
+  auto getTargetFeedback(const std::optional<RobotState>& robot_state = {}) -> TargetFeedback;
 
   /**
    * Stops the asynchronous position control.
@@ -103,6 +104,7 @@ class AsyncPositionControlHandler {
   std::shared_ptr<Robot> robot_;
   std::unique_ptr<ActiveControlBase> active_robot_control_;
   TargetStatus control_status_{TargetStatus::kIdle};
+  franka::RobotState current_robot_state_{};
 
   std::array<double, Robot::kNumJoints> target_position_{};
 

@@ -37,17 +37,12 @@ auto AsyncPositionControlHandler::configure(const std::shared_ptr<Robot>& robot,
 
     result.handler = std::shared_ptr<AsyncPositionControlHandler>(new AsyncPositionControlHandler(
         std::move(active_robot_control), configuration.goal_tolerance));
-
-    return result;
+    logging::logInfo("Async position control initialized successfully.");
   } catch (const std::exception& e) {
     result.error_message = e.what();
     logging::logError("Error while constructing AsyncPositionControlHandler: {}",
                       result.error_message.value());
-
-    return result;
   }
-
-  logging::logInfo("Async position control initialized successfully.");
 
   return result;
 }
@@ -85,7 +80,8 @@ auto AsyncPositionControlHandler::setJointPositionTarget(const JointPositionTarg
   return result;
 }
 
-auto AsyncPositionControlHandler::getTargetFeedback() -> TargetFeedback {
+auto AsyncPositionControlHandler::getTargetFeedback(const std::optional<RobotState>& robot_state)
+    -> TargetFeedback {
   TargetFeedback feedback{};
 
   if (control_status_ == TargetStatus::kAborted || active_robot_control_ == nullptr) {
@@ -99,13 +95,19 @@ auto AsyncPositionControlHandler::getTargetFeedback() -> TargetFeedback {
   }
 
   try {
-    auto [robot_state, duration] = active_robot_control_->readOnce();
+    if (robot_state.has_value()) {
+      current_robot_state_ = robot_state.value();
+    } else {
+      std::tie(current_robot_state_, std::ignore) = active_robot_control_->readOnce();
+    }
 
-    switch (robot_state.robot_mode) {
+    switch (current_robot_state_.robot_mode) {
       case RobotMode::kMove: {
-        Eigen::Map<const Vector7d> current_position(robot_state.q_d.data(), Robot::kNumJoints);
+        Eigen::Map<const Vector7d> current_position(current_robot_state_.q_d.data(),
+                                                    Robot::kNumJoints);
         Eigen::Map<const Vector7d> target_position(target_position_.data(), Robot::kNumJoints);
-        Eigen::Map<const Vector7d> current_velocity(robot_state.dq_d.data(), Robot::kNumJoints);
+        Eigen::Map<const Vector7d> current_velocity(current_robot_state_.dq_d.data(),
+                                                    Robot::kNumJoints);
         auto position_error = (current_position - target_position).norm();
         auto current_speed = current_velocity.norm();
 
@@ -143,10 +145,9 @@ auto AsyncPositionControlHandler::getTargetFeedback() -> TargetFeedback {
 
 auto AsyncPositionControlHandler::stopControl() -> void {
   try {
-    // ToDo(kuhn_an): Stop motion gracefully
-    // auto motion_finished = JointPositions{target_position_};
-    // motion_finished.motion_finished = true;
-    // active_robot_control_->writeOnce(motion_finished);
+    auto motion_finished = JointPositions{target_position_};
+    motion_finished.motion_finished = true;
+    active_robot_control_->writeOnce(motion_finished);
 
     active_robot_control_.reset();
     logging::logInfo("Async position control stopped successfully.");

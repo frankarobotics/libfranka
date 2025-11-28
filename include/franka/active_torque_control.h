@@ -20,6 +20,8 @@ namespace franka {
  */
 class ActiveTorqueControl : public ActiveControl {
  public:
+  ~ActiveTorqueControl() override = default;
+
   /**
    * Updates the joint-level based torque commands of an active joint effort control
    *
