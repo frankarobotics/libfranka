@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <mutex>
 #include <sstream>
 #include <type_traits>
 
@@ -238,6 +239,7 @@ class Robot::Impl : public RobotControl {
   bool controllerRunning() const noexcept;
 
  private:
+  mutable std::mutex message_id_mutex_;
   RobotState current_state_;
 
   template <typename MotionGeneratorType>

@@ -21,6 +21,8 @@ namespace franka {
 template <typename MotionGeneratorType>
 class ActiveMotionGenerator : public ActiveControl {
  public:
+  ~ActiveMotionGenerator() override = default;
+
   /**
    * Updates the motion generator commands of an active control
    *
