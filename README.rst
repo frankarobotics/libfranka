@@ -57,9 +57,181 @@ To use libfranka version ``0.14.0`` or later, you will need to install `pinocchi
    sudo apt-get update
    sudo apt-get install -y robotpkg-pinocchio
 
+.. _building-in-docker:
+
+3. Building libfranka Inside Docker
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you prefer to build **libfranka** inside a Docker container, you can use the provided Docker setup. This ensures a consistent build environment and avoids dependency conflicts on your host system.
+
+Docker creates a self-contained environment, which is helpful if:
+
+- Your system doesn't meet the requirements
+- You want to avoid installing dependencies on your main system
+- You prefer a clean, reproducible setup
+
+If you haven't already, clone the **libfranka** repository:
+
+   .. code-block:: bash
+
+      git clone --recurse-submodules https://github.com/frankarobotics/libfranka.git
+      cd libfranka
+      git checkout <desired-tag-or-branch>
+
+Using Docker command line
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. **Build the Docker image**:
+
+   .. code-block:: bash
+
+      cd .ci
+      docker build -t libfranka:latest -f Dockerfile.focal .
+      cd ..
+
+2. **Run the Docker container**:
+
+   .. code-block:: bash
+
+      docker run --rm -it -v $(pwd):/workspace libfranka:latest
+
+   If you already have a build folder, you must remove it first to avoid issues:
+
+   .. code-block:: bash
+
+      rm -rf /workspace/build
+      mkdir -p /workspace/build
+      cd /workspace/build
+      cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF /workspace
+      make
+
+   To generate a Debian package:
+
+   .. code-block:: bash
+
+      sudo cpack -G DEB
+
+   Exit the Docker container by typing ``exit`` in the terminal.
+
+3. **Install libfranka on your host system**:
+
+   Inside the libfranka build folder ``cd build`` on your host system, run:
+
+   .. code-block:: bash
+
+      sudo dpkg -i libfranka*.deb
+
+
+Using Visual Studio Code
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can also build **libfranka** inside Docker using **VS Code** with the **Dev Containers** extension. This provides an integrated development environment inside the container.
+
+1. **Install Visual Studio Code**:
+
+   - Download and install **Visual Studio Code** from the official website: https://code.visualstudio.com/.
+   - Follow the installation instructions for your operating system.
+
+2. **Open the Project in VS Code**:
+
+   Inside the libfranka folder, open a new terminal and run:
+
+   .. code-block:: bash
+
+      code .
+
+   This will open the project in VS Code.
+
+3. **Install the Dev Containers Extension**:
+
+   Install the "Dev Containers" extension in VS Code from the Extensions Marketplace.
+
+4. **Open the Project in a Dev Container**:
+
+   - Open the **Command Palette** (``Ctrl+Shift+P``).
+   - Select **Dev Containers: Reopen in Container**.
+   - VS Code will build the Docker image and start a container based on the provided ``.ci/Dockerfile``.
+
+5. **Build libfranka**:
+
+   - Open a terminal in VS Code.
+   - Run the following commands:
+
+   .. code-block:: bash
+
+      mkdir build && cd build
+      cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF ..
+      make
+
+6. **Install libfranka**:
+
+   If you want to install **libfranka** inside the container, you can run:
+
+   .. code-block:: bash
+
+      sudo make install
+
+   If you want to install **libfranka** on your host system, you can run:
+
+   .. code-block:: bash
+
+      sudo cpack -G DEB
+
+   Then in a new terminal on your host system, navigate to the libfranka ``build`` folder and run:
+
+   .. code-block:: bash
+
+      sudo dpkg -i libfranka*.deb
+
+.. _verifying-installation:
+Verify the installation on your local system
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To verify its installation, you can run:
+
+.. code-block:: bash
+
+   ls /usr/lib/libfranka.so
+
+Expected output:
+
+.. code-block:: text
+
+   /usr/lib/libfranka.so
+
+Check the installed headers:
+
+.. code-block:: bash
+
+   ls /usr/include/franka/
+
+Expected output:
+
+.. code-block:: text
+
+   active_control_base.h      active_torque_control.h  control_tools.h      errors.h
+   gripper_state.h            lowpass_filter.h         robot.h              robot_state.h
+   active_control.h           async_control            control_types.h      exception.h
+   joint_velocity_limits.h    model.h                  robot_model_base.h   vacuum_gripper.h
+   active_motion_generator.h  commands                 duration.h           gripper.h
+   logging                    rate_limiting.h          robot_model.h        vacuum_gripper_state.h
+
+You can check the version of the installed library:
+
+.. code-block:: bash
+
+   dpkg -l | grep libfranka
+
+Expected output:
+
+.. code-block:: text
+
+   ii  libfranka  0.18.1-9-g722bf63  amd64  libfranka built using CMake
+
+
 .. _building-from-source:
 
-3. Building and Installation from Source
+4. Building and Installation from Source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Before building and installing from source, please uninstall existing installations of libfranka to avoid conflicts:
@@ -131,7 +303,7 @@ Installing via a Debian package simplifies the process compared to building from
 
 .. _usage:
 
-4. Usage
+5. Usage
 ~~~~~~~~
 
 After installation, check the `Minimum System and Network Requirements <https://frankarobotics.github.io/docs/requirements.html>`_ for network settings, the `Operating System and PC Configuration <https://frankarobotics.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel>`_ for system setup, and the `Getting Started Manual <https://frankarobotics.github.io/docs/getting_started.html#>`_ for initial steps. Once configured, you can control the robot using the example applications provided in the examples folder.
@@ -144,14 +316,14 @@ To run a sample program, navigate to the build folder and execute the following 
 
 .. _pylibfranka:
 
-5. Pylibfranka
+6. Pylibfranka
 ~~~~~~~~~~~~~~
 
 Pylibfranka is a Python binding for libfranka, allowing you to control Franka robots using Python. It is included in the libfranka repository and can be built alongside libfranka. For more details, see ``pylibfranka`` and its `README <pylibfranka/README.md>`_. The `generated API documentation <https://frankarobotics.github.io/libfranka/pylibfranka/latest>`_ offers an overview of its capabilities.
 
 .. _development-information:
 
-6. Development Information
+7. Development Information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you actively contribute to this repository, you should install and set up pre-commit hooks:

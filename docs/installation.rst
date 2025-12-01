@@ -3,6 +3,41 @@
 Build / Installation
 --------------------
 
+.. _libfranka_installation_debian_package:
+Debian Package
+~~~~~~~~~~~~~~
+
+Starting with version 0.18.1, **libfranka** releases are provided as pre-built Debian packages.
+You can find the packaged artifacts on the `libfranka releases <https://github.com/frankarobotics/libfranka/releases/>`_ page on GitHub.
+
+Download the Debian package:
+
+.. code-block:: bash
+
+   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.1/libfranka_0.18.1_amd64.deb
+
+Install the package on your system:
+
+.. code-block:: bash
+
+   sudo dpkg -i libfranka_0.18.1_amd64.deb
+
+For other versions or architectures, use the following pattern:
+
+.. code-block:: bash
+
+   wget https://github.com/frankarobotics/libfranka/releases/download/<version>/libfranka_<version>_<architecture>.deb
+   sudo dpkg -i libfranka_<version>_<architecture>.deb
+
+This is the recommended installation method for **libfranka** if you do not need to modify the source code.
+
+.. _libfranka_installation_docker:
+Inside docker container
+~~~~~~~~~~~~~~~~~~~~~~~
+If you prefer to build **libfranka** inside a Docker container, you can use the
+provided Docker setup. Follow :ref:`building-in-docker` for detailed building
+and installation instructions.
+
 .. _libfranka_installation_plain_cmake:
 Plain CMake
 ~~~~~~~~~~~
@@ -12,21 +47,6 @@ Before you begin, check the :ref:`system-requirements` and install the necessary
 After installing the dependencies, proceed to :ref:`building-from-source`.
 
 Once the build is complete, you can optionally create and install a Debian package as described in :ref:`installing-debian-package`.
-
-.. _libfranka_installation_debian_package:
-Debian Package
-~~~~~~~~~~~~~~
-
-Starting with version 0.18.1, **libfranka** releases are provided as pre-built Debian packages.
-You can find the packaged artifacts on the `libfranka releases <https://github.com/frankarobotics/libfranka/releases/>`_ page on GitHub.
-
-To install the Debian package directly on your system, run:
-
-.. code-block:: bash
-
-   sudo dpkg -i libfranka_<version>_<architecture>.deb
-
-This is the recommended installation method for **libfranka** if you do not need to modify the source code.
 
 .. _libfranka_installation_pip:
 Python Package (pip)
