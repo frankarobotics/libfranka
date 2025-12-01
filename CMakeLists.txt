@@ -52,7 +52,7 @@ find_package(console_bridge REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Poco REQUIRED COMPONENTS Net Foundation)
 find_package(pinocchio REQUIRED)
-find_package(tinyxml2 REQUIRED)
+find_package(TinyXML2 REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -144,7 +144,7 @@ target_include_directories(franka PUBLIC
 )
 
 target_link_libraries(franka PRIVATE
-  tinyxml2
+  TinyXML2::TinyXML2
   Poco::Foundation
   Poco::Net
   Eigen3::Eigen3
