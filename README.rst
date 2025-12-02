@@ -5,7 +5,9 @@ libfranka: C++ Library for Franka Robotics Research Robots
    :target: https://codecov.io/gh/frankarobotics/libfranka
    :alt: codecov
 
-**libfranka** is a C++ library that provides low-level control of Franka Robotics research robots. The `API References <https://frankarobotics.github.io/docs/libfranka/docs/api_references.html>`_ offers an overview of its capabilities, while the `Franka Control Interface (FCI) documentation <https://frankarobotics.github.io/docs>`_ provides more information on setting up the robot and utilizing its features and functionalities.
+**libfranka** is a C++ library that provides low-level control of Franka Robotics research robots.
+The `API References <https://frankarobotics.github.io/docs/libfranka/docs/api_references.html>`_ offers an overview of its capabilities,
+while the `Franka Control Interface (FCI) documentation <https://frankarobotics.github.io/docs>`_ provides more information on setting up the robot and utilizing its features and functionalities.
 
 To find the appropriate version to use, please refer to the `Robot System Version Compatibility <https://frankarobotics.github.io/docs/libfranka/docs/compatibility_with_images.html>`_.
 
@@ -40,26 +42,33 @@ Before using **libfranka**, ensure your system meets the following requirements:
    sudo apt-get update
    sudo apt-get install -y build-essential cmake git libpoco-dev libeigen3-dev libfmt-dev
 
-To use libfranka version ``0.14.0`` or later, you will need to install `pinocchio <https://stack-of-tasks.github.io/pinocchio/download.html>`_ and some more dependencies:
+3. Install from Debian Package - Generic Pattern
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Check your architecture:**
 
 .. code-block:: bash
 
-   sudo apt-get install -y lsb-release curl
-   sudo mkdir -p /etc/apt/keyrings
-   curl -fsSL http://robotpkg.openrobots.org/packages/debian/robotpkg.asc | sudo tee /etc/apt/keyrings/robotpkg.asc
+   dpkg --print-architecture
+
+**Download and install:**
 
 .. code-block:: bash
 
-   echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/robotpkg.asc] http://robotpkg.openrobots.org/packages/debian/pub $(lsb_release -cs) robotpkg" | sudo tee /etc/apt/sources.list.d/robotpkg.list
+   wget https://github.com/frankarobotics/libfranka/releases/download/<version>/libfranka_<version>_<architecture>.deb
+   sudo dpkg -i libfranka_<version>_<architecture>.deb
+
+Replace ``<version>`` with the desired release version (e.g., ``0.18.1``) and ``<architecture>`` with your system architecture (e.g., ``amd64`` or ``arm64``).
+
+**Example for version 0.18.1 on amd64:**
 
 .. code-block:: bash
 
-   sudo apt-get update
-   sudo apt-get install -y robotpkg-pinocchio
+   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.1/libfranka_0.18.1_amd64.deb
+   sudo dpkg -i libfranka_0.18.1_amd64.deb
 
 .. _building-in-docker:
-
-3. Building libfranka Inside Docker
+4. Building libfranka Inside Docker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you prefer to build **libfranka** inside a Docker container, you can use the provided Docker setup. This ensures a consistent build environment and avoids dependency conflicts on your host system.
@@ -231,7 +240,7 @@ Expected output:
 
 .. _building-from-source:
 
-4. Building and Installation from Source
+5. Building and Installation from Source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Before building and installing from source, please uninstall existing installations of libfranka to avoid conflicts:
@@ -299,14 +308,18 @@ This command creates a Debian package named libfranka-<version>-<architecture>.d
 
    sudo dpkg -i libfranka*.deb
 
-Installing via a Debian package simplifies the process compared to building from source every time. Additionally the package integrates better with system tools and package managers, which can help manage updates and dependencies more effectively.
+Installing via a Debian package simplifies the process compared to building from source every time. Additionally the package integrates better with
+system tools and package managers, which can help manage updates and dependencies more effectively.
 
 .. _usage:
 
-5. Usage
+6. Usage
 ~~~~~~~~
 
-After installation, check the `Minimum System and Network Requirements <https://frankarobotics.github.io/docs/requirements.html>`_ for network settings, the `Operating System and PC Configuration <https://frankarobotics.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel>`_ for system setup, and the `Getting Started Manual <https://frankarobotics.github.io/docs/getting_started.html#>`_ for initial steps. Once configured, you can control the robot using the example applications provided in the examples folder.
+After installation, check the `Minimum System and Network Requirements <https://frankarobotics.github.io/docs/libfranka/docs/system_requirements.html>`_ for network settings,
+the `Setting up the Real-Time Kernel <https://frankarobotics.github.io/docs/libfranka/docs/real_time_kernel.html>`_ for system setup,
+and the `Getting Started Manual <https://frankarobotics.github.io/docs/libfranka/docs/getting_started.html>`_ for initial steps. Once configured,
+you can control the robot using the example applications provided in the examples folder (`Usage Examples <https://frankarobotics.github.io/docs/libfranka/docs/usage_examples.html>`_).
 
 To run a sample program, navigate to the build folder and execute the following command:
 
@@ -316,14 +329,16 @@ To run a sample program, navigate to the build folder and execute the following 
 
 .. _pylibfranka:
 
-6. Pylibfranka
+7. Pylibfranka
 ~~~~~~~~~~~~~~
 
-Pylibfranka is a Python binding for libfranka, allowing you to control Franka robots using Python. It is included in the libfranka repository and can be built alongside libfranka. For more details, see ``pylibfranka`` and its `README <pylibfranka/README.md>`_. The `generated API documentation <https://frankarobotics.github.io/libfranka/pylibfranka/latest>`_ offers an overview of its capabilities.
+Pylibfranka is a Python binding for libfranka, allowing you to control Franka robots using Python. It is included in the libfranka repository and
+can be built alongside libfranka. For more details, see ``pylibfranka`` and its `README <pylibfranka/README.md>`_.
+The `generated API documentation <https://frankarobotics.github.io/libfranka/pylibfranka/latest>`_ offers an overview of its capabilities.
 
 .. _development-information:
 
-7. Development Information
+8. Development Information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you actively contribute to this repository, you should install and set up pre-commit hooks:
@@ -333,7 +348,8 @@ If you actively contribute to this repository, you should install and set up pre
    pip install pre-commit
    pre-commit install
 
-This will install pre-commit and set up the git hooks to automatically run checks before each commit. The hooks will help maintain code quality by running various checks like code formatting, linting, and other validations.
+This will install pre-commit and set up the git hooks to automatically run checks before each commit.
+The hooks will help maintain code quality by running various checks like code formatting, linting, and other validations.
 
 To manually run the pre-commit checks on all files:
 
