@@ -2,7 +2,7 @@
 
 All notable changes to libfranka and pylibfranka will be documented in this file.
 
-## [0.18.2]- Unreleased
+## [0.18.2]
 Requires Franka Research 3 System Version >= 5.9.0
 
 ### libfranka - C++
@@ -13,7 +13,7 @@ Requires Franka Research 3 System Version >= 5.9.0
 - upload debian packages automatically to releases
 
 #### Fixed
-- Resolved a compile issue with TinyXML2 dependency (see [github](https://github.com/frankarobotics/libfranka/issues/215))
+- Fixed a compile issue with TinyXML2 dependency (see [github](https://github.com/frankarobotics/libfranka/issues/215))
 
 
 ### pylibfranka - Python
