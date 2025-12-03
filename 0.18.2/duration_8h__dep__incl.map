@@ -1,0 +1,32 @@
+<map id="include/franka/duration.h" name="include/franka/duration.h">
+<area shape="rect" id="Node000001" title="Contains the franka::Duration type." alt="" coords="349,5,533,31"/>
+<area shape="rect" id="Node000002" href="$examples__common_8h.html" title="Contains common types and functions for the examples." alt="" coords="5,262,236,287"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="339,36,278,53,217,79,189,96,164,117,142,140,124,168,117,192,115,218,120,262,115,262,109,219,111,191,120,166,138,137,160,113,186,92,215,74,277,48,337,31"/>
+<area shape="rect" id="Node000003" href="$gripper__state_8h.html" title="Contains the franka::GripperState type." alt="" coords="541,79,705,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="481,34,580,76,578,81,479,39"/>
+<area shape="rect" id="Node000005" href="$robot_8h.html" title="Contains the franka::Robot type." alt="" coords="341,174,505,199"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="441,45,427,174,422,174,435,44"/>
+<area shape="rect" id="Node000010" href="$robot__state_8h.html" title="Contains the franka::RobotState types." alt="" coords="251,79,403,119"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="414,41,356,81,353,76,411,36"/>
+<area shape="rect" id="Node000012" href="$vacuum__gripper__state_8h.html" title="Contains the franka::VacuumGripperState type." alt="" coords="763,79,934,119"/>
+<area shape="poly" id="edge16_Node000001_Node000012" title=" " alt="" coords="514,31,764,78,763,84,513,36"/>
+<area shape="rect" id="Node000004" href="$gripper_8h.html" title="Contains the franka::Gripper type." alt="" coords="581,174,756,199"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="642,129,665,172,660,175,637,132"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="370,206,162,264,161,259,369,201"/>
+<area shape="rect" id="Node000006" href="$active__control_8h.html" title="Implements the ActiveControlBase abstract class." alt="" coords="267,255,425,295"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="406,211,365,256,361,252,402,208"/>
+<area shape="rect" id="Node000009" href="$model_8h.html" title="Contains model library types." alt="" coords="454,262,625,287"/>
+<area shape="poly" id="edge9_Node000005_Node000009" title=" " alt="" coords="451,205,525,260,522,264,448,210"/>
+<area shape="rect" id="Node000007" href="$active__motion__generator_8h.html" title="Contains the franka::ActiveMotionGenerator type." alt="" coords="175,343,333,383"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="318,306,276,344,273,340,314,302"/>
+<area shape="rect" id="Node000008" href="$active__torque__control_8h.html" title="Contains the franka::ActiveTorqueControl type." alt="" coords="357,343,516,383"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="378,302,418,341,415,344,374,306"/>
+<area shape="poly" id="edge11_Node000010_Node000002" title=" " alt="" coords="239,117,190,136,167,151,148,168,134,191,126,217,123,262,117,262,121,216,129,189,144,165,164,146,187,132,237,112"/>
+<area shape="poly" id="edge15_Node000010_Node000005" title=" " alt="" coords="361,126,412,172,408,176,357,130"/>
+<area shape="poly" id="edge14_Node000010_Node000009" title=" " alt="" coords="418,110,472,130,497,145,519,165,533,189,541,216,543,262,538,262,535,217,528,191,515,168,494,149,469,134,416,115"/>
+<area shape="rect" id="Node000011" href="$active__control__base_8h.html" title="Abstract interface class as the base of the active controllers." alt="" coords="159,167,317,207"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="299,130,260,168,256,165,296,127"/>
+<area shape="poly" id="edge13_Node000011_Node000006" title=" " alt="" coords="274,213,324,252,320,257,271,217"/>
+<area shape="rect" id="Node000013" href="$vacuum__gripper_8h.html" title="Contains the franka::VacuumGripper type." alt="" coords="781,167,951,207"/>
+<area shape="poly" id="edge17_Node000012_Node000013" title=" " alt="" coords="858,132,865,166,860,167,853,133"/>
+</map>

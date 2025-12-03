@@ -1,0 +1,18 @@
+<map id="include/franka/robot_model_base.h" name="include/franka/robot_model_base.h">
+<area shape="rect" id="Node000001" title="Abstract interface class for robot dynamic parameters computed from the URDF model with Pinocchio." alt="" coords="213,5,365,45"/>
+<area shape="rect" id="Node000002" href="$model_8h.html" title="Contains model library types." alt="" coords="5,189,176,214"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="250,55,196,95,143,147,103,190,99,186,139,143,193,91,247,51"/>
+<area shape="rect" id="Node000003" href="$robot_8h.html" title="Contains the franka::Robot type." alt="" coords="207,101,371,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="292,59,292,100,287,100,287,59"/>
+<area shape="rect" id="Node000008" href="$robot__model_8h.html" title="Implements RobotModelBase using Pinocchio." alt="" coords="396,93,548,133"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="343,49,433,91,431,96,341,54"/>
+<area shape="poly" id="edge7_Node000003_Node000002" title=" " alt="" coords="251,134,119,191,117,186,249,129"/>
+<area shape="rect" id="Node000004" href="$examples__common_8h.html" title="Contains common types and functions for the examples." alt="" coords="201,189,431,214"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="299,138,315,187,310,189,294,140"/>
+<area shape="rect" id="Node000005" href="$active__control_8h.html" title="Implements the ActiveControlBase abstract class." alt="" coords="455,181,614,221"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="336,128,481,179,480,184,334,133"/>
+<area shape="rect" id="Node000006" href="$active__motion__generator_8h.html" title="Contains the franka::ActiveMotionGenerator type." alt="" coords="363,269,522,309"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="506,233,465,271,461,267,503,229"/>
+<area shape="rect" id="Node000007" href="$active__torque__control_8h.html" title="Contains the franka::ActiveTorqueControl type." alt="" coords="546,269,705,309"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="566,229,607,267,603,271,563,233"/>
+</map>
