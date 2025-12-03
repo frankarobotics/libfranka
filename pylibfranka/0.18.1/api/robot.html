@@ -603,6 +603,14 @@ and velocity control modes.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylibfranka.Robot.start_cartesian_velocity_control">
+<span class="sig-name descname"><span class="pre">start_cartesian_velocity_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylibfranka.Robot" title="pylibfranka._pylibfranka.Robot"><span class="pre">pylibfranka._pylibfranka.Robot</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylibfranka.ControllerMode" title="pylibfranka._pylibfranka.ControllerMode"><span class="pre">pylibfranka._pylibfranka.ControllerMode</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="control.html#pylibfranka.ActiveControlBase" title="pylibfranka._pylibfranka.ActiveControlBase"><span class="pre">pylibfranka._pylibfranka.ActiveControlBase</span></a></span></span><a class="headerlink" href="#pylibfranka.Robot.start_cartesian_velocity_control" title="Permalink to this definition">#</a></dt>
+<dd><p>Start Cartesian velocity control mode.</p>
+<p>&#64;param control_type Controller mode (JointImpedance or CartesianImpedance)
+&#64;return ActiveControlBase interface for sending Cartesian velocity commands</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylibfranka.Robot.start_joint_position_control">
 <span class="sig-name descname"><span class="pre">start_joint_position_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylibfranka.Robot" title="pylibfranka._pylibfranka.Robot"><span class="pre">pylibfranka._pylibfranka.Robot</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylibfranka.ControllerMode" title="pylibfranka._pylibfranka.ControllerMode"><span class="pre">pylibfranka._pylibfranka.ControllerMode</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="control.html#pylibfranka.ActiveControlBase" title="pylibfranka._pylibfranka.ActiveControlBase"><span class="pre">pylibfranka._pylibfranka.ActiveControlBase</span></a></span></span><a class="headerlink" href="#pylibfranka.Robot.start_joint_position_control" title="Permalink to this definition">#</a></dt>
 <dd><p>Start joint position control mode.</p>
@@ -750,6 +758,60 @@ and velocity control modes.</p>
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">start_joint_velocity_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">control_type</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Starts a new joint velocity motion generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>control_type</strong> (<a class="reference internal" href="#pylibfranka.ControllerMode" title="pylibfranka.ControllerMode"><em>ControllerMode</em></a>) – Controller mode for the operation</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Active control interface for sending velocity commands</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="control.html#pylibfranka.ActiveControlBase" title="pylibfranka.ActiveControlBase">ActiveControlBase</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="exceptions.html#pylibfranka.ControlException" title="pylibfranka.ControlException"><strong>ControlException</strong></a> – if an error related to motion generation occurred</p></li>
+<li><p><a class="reference internal" href="exceptions.html#pylibfranka.InvalidOperationException" title="pylibfranka.InvalidOperationException"><strong>InvalidOperationException</strong></a> – if a conflicting operation is already running</p></li>
+<li><p><a class="reference internal" href="exceptions.html#pylibfranka.NetworkException" title="pylibfranka.NetworkException"><strong>NetworkException</strong></a> – if the connection is lost, e.g. after a timeout</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="start-cartesian-pose-control">
+<h3>start_cartesian_pose_control<a class="headerlink" href="#start-cartesian-pose-control" title="Permalink to this heading">#</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">start_cartesian_pose_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">control_type</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Starts a new cartesian pose motion generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>control_type</strong> (<a class="reference internal" href="#pylibfranka.ControllerMode" title="pylibfranka.ControllerMode"><em>ControllerMode</em></a>) – Controller mode for the operation</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Active control interface for sending position commands</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="control.html#pylibfranka.ActiveControlBase" title="pylibfranka.ActiveControlBase">ActiveControlBase</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="exceptions.html#pylibfranka.ControlException" title="pylibfranka.ControlException"><strong>ControlException</strong></a> – if an error related to motion generation occurred</p></li>
+<li><p><a class="reference internal" href="exceptions.html#pylibfranka.InvalidOperationException" title="pylibfranka.InvalidOperationException"><strong>InvalidOperationException</strong></a> – if a conflicting operation is already running</p></li>
+<li><p><a class="reference internal" href="exceptions.html#pylibfranka.NetworkException" title="pylibfranka.NetworkException"><strong>NetworkException</strong></a> – if the connection is lost, e.g. after a timeout</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="start-cartesian-velocity-control">
+<h3>start_cartesian_velocity_control<a class="headerlink" href="#start-cartesian-velocity-control" title="Permalink to this heading">#</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">start_cartesian_velocity_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">control_type</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Starts a new cartesian velocity motion generator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>control_type</strong> (<a class="reference internal" href="#pylibfranka.ControllerMode" title="pylibfranka.ControllerMode"><em>ControllerMode</em></a>) – Controller mode for the operation</p>
@@ -1153,6 +1215,7 @@ and velocity control modes.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Robot.set_joint_impedance"><code class="docutils literal notranslate"><span class="pre">Robot.set_joint_impedance()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Robot.set_load"><code class="docutils literal notranslate"><span class="pre">Robot.set_load()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Robot.start_cartesian_pose_control"><code class="docutils literal notranslate"><span class="pre">Robot.start_cartesian_pose_control()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Robot.start_cartesian_velocity_control"><code class="docutils literal notranslate"><span class="pre">Robot.start_cartesian_velocity_control()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Robot.start_joint_position_control"><code class="docutils literal notranslate"><span class="pre">Robot.start_joint_position_control()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Robot.start_joint_velocity_control"><code class="docutils literal notranslate"><span class="pre">Robot.start_joint_velocity_control()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pylibfranka.Robot.start_torque_control"><code class="docutils literal notranslate"><span class="pre">Robot.start_torque_control()</span></code></a></li>
@@ -1166,6 +1229,8 @@ and velocity control modes.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start-torque-control">start_torque_control</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start-joint-position-control">start_joint_position_control</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start-joint-velocity-control">start_joint_velocity_control</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start-cartesian-pose-control">start_cartesian_pose_control</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start-cartesian-velocity-control">start_cartesian_velocity_control</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#state-and-model">State and Model</a><ul class="visible nav section-nav flex-column">
