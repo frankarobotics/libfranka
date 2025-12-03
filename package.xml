@@ -4,7 +4,7 @@
    schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>libfranka</name>
-  <version>0.18.1</version>
+  <version>0.18.2</version>
   <description>libfranka is a C++ library for Franka Robotics research robots</description>
   <maintainer email="support@franka.de">Franka Robotics GmbH</maintainer>
   <license>Apache 2.0</license>
