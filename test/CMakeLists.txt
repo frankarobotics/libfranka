@@ -12,10 +12,12 @@ endforeach()
 set(TEST_OUTPUT_DIR ${PROJECT_BINARY_DIR}/test_results)
 set(TEST_DEPENDENCIES
   ${GTEST_LIBRARIES}
+  TinyXML2::TinyXML2
   Poco::Foundation
   Poco::Net
   Eigen3::Eigen3
   Threads::Threads
+  pinocchio::pinocchio
   franka
   libfranka-common
 )

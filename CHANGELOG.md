@@ -8,8 +8,12 @@ Requires Franka Research 3 System Version >= 5.9.0
 ### libfranka - C++
 #### Documentation
 - Enhanced documentation with expanded installation methods, and reorganized getting started guide
-#### Changed
+
+#### Added
 - upload debian packages automatically to releases
+
+#### Fixed
+- Resolved a compile issue with TinyXML2 dependency (see [github](https://github.com/frankarobotics/libfranka/issues/215))
 
 
 ### pylibfranka - Python
