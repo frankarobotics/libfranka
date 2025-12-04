@@ -45,6 +45,10 @@ Before using **libfranka**, ensure your system meets the following requirements:
 3. Install from Debian Package - Generic Pattern
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. note::
+
+   The installation packages currently only support Ubuntu 20 (focal). Please ensure you are using this version to avoid compatibility issues.
+
 **Check your architecture:**
 
 .. code-block:: bash
@@ -55,17 +59,17 @@ Before using **libfranka**, ensure your system meets the following requirements:
 
 .. code-block:: bash
 
-   wget https://github.com/frankarobotics/libfranka/releases/download/<version>/libfranka_<version>_<architecture>.deb
-   sudo dpkg -i libfranka_<version>_<architecture>.deb
+   wget https://github.com/frankarobotics/libfranka/releases/download/<version>/libfranka_<version>_<Ubuntu_version>_<architecture>.deb
+   sudo dpkg -i libfranka_<version>_<Ubuntu_version>_<architecture>.deb
 
-Replace ``<version>`` with the desired release version (e.g., ``0.18.1``) and ``<architecture>`` with your system architecture (e.g., ``amd64`` or ``arm64``).
+Replace ``<version>`` with the desired release version (e.g., ``0.18.2``, <Ubuntu_version> with ``focal`` and ``<architecture>`` with your system architecture (e.g., ``amd64`` or ``arm64``).
 
-**Example for version 0.18.1 on amd64:**
+**Example for version 0.18.2 on amd64:**
 
 .. code-block:: bash
 
-   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.1/libfranka_0.18.1_amd64.deb
-   sudo dpkg -i libfranka_0.18.1_amd64.deb
+   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.2/libfranka_0.18.2_focal_amd64.deb
+   sudo dpkg -i libfranka_0.18.2_focal_amd64.deb
 
 .. _building-in-docker:
 4. Building libfranka Inside Docker
@@ -235,7 +239,7 @@ Expected output:
 
 .. code-block:: text
 
-   ii  libfranka  0.18.1-9-g722bf63  amd64  libfranka built using CMake
+   ii  libfranka  0.18.2-9-g722bf63  amd64  libfranka built using CMake
 
 
 .. _building-from-source:

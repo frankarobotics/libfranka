@@ -3,31 +3,35 @@
 Build / Installation
 --------------------
 
+.. note::
+
+   The installation currently only support Ubuntu 20.04. Please ensure you are using this version to avoid compatibility issues.
+
 .. _libfranka_installation_debian_package:
 Debian Package
 ~~~~~~~~~~~~~~
 
-Starting with version 0.18.1, **libfranka** releases are provided as pre-built Debian packages.
+**libfranka** releases are provided as pre-built Debian packages.
 You can find the packaged artifacts on the `libfranka releases <https://github.com/frankarobotics/libfranka/releases/>`_ page on GitHub.
 
 Download the Debian package:
 
 .. code-block:: bash
 
-   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.1/libfranka_0.18.1_amd64.deb
+   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.2/libfranka_0.18.2_focal_amd64.deb
 
 Install the package on your system:
 
 .. code-block:: bash
 
-   sudo dpkg -i libfranka_0.18.1_amd64.deb
+   sudo dpkg -i libfranka_0.18.2_focal_amd64.deb
 
 For other versions or architectures, use the following pattern:
 
 .. code-block:: bash
 
-   wget https://github.com/frankarobotics/libfranka/releases/download/<version>/libfranka_<version>_<architecture>.deb
-   sudo dpkg -i libfranka_<version>_<architecture>.deb
+   wget https://github.com/frankarobotics/libfranka/releases/download/<version>/libfranka_<version>_<Ubuntu_version>_<architecture>.deb
+   sudo dpkg -i libfranka_<version>_<Ubuntu_version>_<architecture>.deb
 
 This is the recommended installation method for **libfranka** if you do not need to modify the source code.
 
