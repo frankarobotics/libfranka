@@ -182,9 +182,6 @@ void Robot::read(std::function<bool(const RobotState&)> read_callback) {
 }
 
 RobotState Robot::readOnce() {
-  std::unique_lock<std::mutex> control_lock(control_mutex_, std::try_to_lock);
-  assertOwningLock(control_lock);
-
   return impl_->readOnce();
 }
 
