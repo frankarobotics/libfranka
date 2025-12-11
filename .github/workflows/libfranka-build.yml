@@ -9,6 +9,10 @@ on:
 jobs:
   build-deb:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: ["20.04", "22.04", "24.04"]
 
     steps:
       - name: Checkout repository
@@ -21,15 +25,17 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .ci/
-          file: .ci/Dockerfile.focal
-          tags: libfranka-build:latest
+          file: .ci/Dockerfile
+          build-args: |
+            UBUNTU_VERSION=${{ matrix.ubuntu_version }}
+          tags: libfranka-build:${{ matrix.ubuntu_version }}
           push: false
           load: true
 
       - name: Build and package in container
         uses: addnab/docker-run-action@v3
         with:
-          image: libfranka-build:latest
+          image: libfranka-build:${{ matrix.ubuntu_version }}
           options: -v ${{ github.workspace }}:/workspaces
           run: |
             cd /workspaces
@@ -43,7 +49,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
-          name: libfranka-deb
+          name: libfranka-deb-${{ matrix.ubuntu_version }}
           path: build/*.deb
 
       # Create release for tag pushes
