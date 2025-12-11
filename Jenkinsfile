@@ -24,8 +24,9 @@ pipeline {
         agent {
           dockerfile {
             dir ".ci"
-            filename "Dockerfile.${env.DISTRO}"
+            filename "Dockerfile"
             reuseNode true
+            additionalBuildArgs "--build-arg UBUNTU_VERSION=${env.UBUNTU_VERSION}"
             args '--privileged ' +
                  '--cap-add=SYS_PTRACE ' +
                  '--security-opt seccomp=unconfined ' +
@@ -34,11 +35,22 @@ pipeline {
         }
         axes {
           axis {
-            name 'DISTRO'
-            values 'focal'
+            name 'UBUNTU_VERSION'
+            values '20.04', '22.04', '24.04'
           }
         }
         stages {
+          stage('Init Distro') {
+            steps {
+              script {
+                def map = ['20.04': 'focal', '22.04': 'jammy', '24.04': 'noble']
+                env.DISTRO = map[env.UBUNTU_VERSION]
+                if (!env.DISTRO) {
+                  error "Unknown UBUNTU_VERSION=${env.UBUNTU_VERSION}"
+                }
+              }
+            }
+          }
           stage('Setup') {
             stages {
               stage('Notify Stash') {
@@ -50,7 +62,7 @@ pipeline {
               }
               stage('Clean Workspace') {
                 steps {
-                  sh "rm -rf build-*${DISTRO}"
+                  sh "rm -rf build-*${env.DISTRO}"
                 }
               }
             }
