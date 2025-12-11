@@ -75,6 +75,9 @@ if(BUILD_COVERAGE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
 endif()
 
+# Suppress false positive warnings about string operations (aka GetRobotModel)
+add_compile_options(-Wno-stringop-overflow)
+
 ## Load dependencies
 include(FetchFMT)
 

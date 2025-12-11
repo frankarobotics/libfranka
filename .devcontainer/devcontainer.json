@@ -1,10 +1,10 @@
 {
-    "name": "libfranka - Ubuntu ${localEnv:DISTRO_NAME:focal}",
-    "dockerComposeFile": "docker-compose.yml",
-    "service": "libfranka",
+    "name": "libfranka - Ubuntu 20.04",
+    "dockerComposeFile": "docker-compose-focal.yml",
+    "service": "libfranka_project",
     "workspaceFolder": "/workspaces",
     "remoteUser": "user",
-    "initializeCommand": "echo \"USER_UID=$(id -u)\nUSER_GID=$(id -g)\n${localEnv:DISTRO:DISTRO=Dockerfile.focal}\n${localEnv:DISTRO_NAME:DISTRO_NAME=focal}\" > .devcontainer/.env",
+    "initializeCommand": "echo \"USER_UID=$(id -u $USER)\nUSER_GID=$(id -g $USER)\" > .devcontainer/.env",
     "customizations": {
         "vscode": {
             "extensions": [
