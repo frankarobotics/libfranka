@@ -33,10 +33,8 @@ RUN apt-get update \
     && apt-get install -y \
     bash-completion \
     build-essential \
-    clang-14 \
-    clang-format-14 \
-    clang-tidy-14 \
     curl \
+    cmake \
     doxygen \
     dpkg \
     git \
@@ -44,7 +42,6 @@ RUN apt-get update \
     lcov \
     libeigen3-dev \
     libpoco-dev \
-    lsb-release \
     libfmt-dev \
     python3-dev \
     python3-pip \
@@ -59,13 +56,6 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s $(which clang-tidy-14) /usr/bin/clang-tidy \
     && ln -s $(which clang-format-14) /usr/bin/clang-format
-
-RUN apt-get update && \
-    apt-get install -y wget gnupg && \
-    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc | apt-key add - && \
-    apt-add-repository 'deb https://apt.kitware.com/ubuntu/ jammy main' && \
-    apt-get update && \
-    apt-get install -y cmake cmake-data
 
 # Add the necessary 3rd party dependencies for the robot-service
 # Note: the order is important, change at your own risk.
@@ -84,10 +74,8 @@ RUN git clone --branch 10.0.0 https://github.com/leethomason/tinyxml2.git \
     && cd ../.. \
     && rm -rf tinyxml2
 
-COPY ./console-bridge-Modernize-CMake-minimum-version-set-CMP0048-CMP0054-.patch /tmp/console-bridge-Modernize-CMake-minimum-version-set-CMP0048-CMP0054-.patch
 RUN git clone --branch 1.0.2 https://github.com/ros/console_bridge.git \
     && cd console_bridge \
-    && git apply  /tmp/console-bridge-Modernize-CMake-minimum-version-set-CMP0048-CMP0054-.patch \
     && mkdir build && cd build \
     && cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
     && make -j4 \
@@ -95,10 +83,8 @@ RUN git clone --branch 1.0.2 https://github.com/ros/console_bridge.git \
     && cd ../.. \
     && rm -rf console_bridge
 
-COPY ./urdfdom-Modernize-CMake-minimum-version-set-CMP0048-CMP0054-.patch /tmp/urdfdom-Modernize-CMake-minimum-version-set-CMP0048-CMP0054-.patch
 RUN git clone --branch 1.0.5 https://github.com/ros/urdfdom_headers.git \
     && cd urdfdom_headers \
-    && git apply  /tmp/urdfdom-Modernize-CMake-minimum-version-set-CMP0048-CMP0054-.patch \
     && mkdir build && cd build \
     && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
     && make -j4 && make install \
