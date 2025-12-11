@@ -1,12 +1,12 @@
 services:
-  libfranka_project:
+  libfranka:
     build:
       context: ../.ci/
-      dockerfile: ../.ci/Dockerfile.focal
+      dockerfile: ../.ci/${DISTRO:-Dockerfile.focal}
       args:
-        USER_UID: ${USER_UID}
-        USER_GID: ${USER_GID}
-    container_name: libfranka
+        USER_UID: ${USER_UID:-1000}
+        USER_GID: ${USER_GID:-1000}
+    container_name: libfranka-${DISTRO_NAME:-focal}
     network_mode: "host"
     shm_size: 512m
     privileged: true
