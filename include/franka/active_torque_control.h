@@ -52,7 +52,7 @@ class ActiveTorqueControl : public ActiveControl {
   ActiveTorqueControl(std::shared_ptr<Robot::Impl> robot_impl,
                       uint32_t motion_id,
                       std::unique_lock<std::mutex> control_lock)
-      : ActiveControl(std::move(robot_impl), motion_id, std::move(control_lock)){};
+      : ActiveControl(std::move(robot_impl), motion_id, std::move(control_lock)) {};
 };
 
 }  // namespace franka
