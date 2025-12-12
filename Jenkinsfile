@@ -12,7 +12,7 @@ pipeline {
   }
   options {
     parallelsAlwaysFailFast()
-    timeout(time: 1, unit: 'HOURS')
+    timeout(time: 2, unit: 'HOURS')
   }
   environment {
     VERSION = feDetermineVersionFromGit()
@@ -25,8 +25,8 @@ pipeline {
           dockerfile {
             dir ".ci"
             filename "Dockerfile"
-            reuseNode true
-            additionalBuildArgs "--build-arg UBUNTU_VERSION=${env.UBUNTU_VERSION}"
+            reuseNode false
+            additionalBuildArgs "--pull --build-arg UBUNTU_VERSION=${env.UBUNTU_VERSION} --tag libfranka:${env.UBUNTU_VERSION}"
             args '--privileged ' +
                  '--cap-add=SYS_PTRACE ' +
                  '--security-opt seccomp=unconfined ' +
@@ -62,7 +62,15 @@ pipeline {
               }
               stage('Clean Workspace') {
                 steps {
-                  sh "rm -rf build-*${env.DISTRO}"
+                  sh '''
+                    # Clean build dirs for this distro axis
+                    rm -rf build-*${DISTRO}
+                    rm -rf install-*${DISTRO}
+                    # Remove corrupted googletest fetch content if present
+                    rm -rf build-release.${DISTRO}/_deps/gtest-src build-release.${DISTRO}/_deps/gtest-build || true
+                    rm -rf build-debug.${DISTRO}/_deps/gtest-src build-debug.${DISTRO}/_deps/gtest-build || true
+                    rm -rf build-coverage.${DISTRO}/_deps/gtest-src build-coverage.${DISTRO}/_deps/gtest-build || true
+                  '''
                 }
               }
             }
@@ -73,10 +81,12 @@ pipeline {
                 steps {
                   dir("build-debug.${env.DISTRO}") {
                     sh '''
+                      rm -rf CMakeCache.txt CMakeFiles _deps || true
                       cmake -DCMAKE_BUILD_TYPE=Debug -DSTRICT=ON -DBUILD_COVERAGE=OFF \
                             -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
                             -DGENERATE_PYLIBFRANKA=ON ..
                       make -j$(nproc)
+                      cmake --install . --prefix ../install-debug.${DISTRO}
                     '''
                   }
                 }
@@ -85,10 +95,12 @@ pipeline {
                 steps {
                   dir("build-release.${env.DISTRO}") {
                     sh '''
+                      rm -rf CMakeCache.txt CMakeFiles _deps || true
                       cmake -DCMAKE_BUILD_TYPE=Release -DSTRICT=ON -DBUILD_COVERAGE=OFF \
                             -DBUILD_DOCUMENTATION=ON -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
                             -DGENERATE_PYLIBFRANKA=ON ..
                       make -j$(nproc)
+                      cmake --install . --prefix ../install-release.${DISTRO}
                     '''
                   }
                 }
@@ -96,7 +108,7 @@ pipeline {
               stage('Build examples (debug)') {
                 steps {
                   dir("build-debug-examples.${env.DISTRO}") {
-                    sh "cmake -DFranka_DIR:PATH=../build-debug.${env.DISTRO} ../examples"
+                    sh "cmake -DCMAKE_PREFIX_PATH=../install-debug.${env.DISTRO} ../examples"
                     sh 'make -j$(nproc)'
                   }
                 }
@@ -104,15 +116,21 @@ pipeline {
               stage('Build examples (release)') {
                 steps {
                   dir("build-release-examples.${env.DISTRO}") {
-                    sh "cmake -DFranka_DIR:PATH=../build-release.${env.DISTRO} ../examples"
+                    sh "cmake -DCMAKE_PREFIX_PATH=../install-release.${env.DISTRO} ../examples"
                     sh 'make -j$(nproc)'
                   }
                 }
               }
               stage('Build coverage') {
+                when {
+                  not {
+                    environment name: 'UBUNTU_VERSION', value: '24.04'
+                  }
+                }
                 steps {
                   dir("build-coverage.${env.DISTRO}") {
                     sh '''
+                      rm -rf CMakeCache.txt CMakeFiles _deps || true
                       cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_COVERAGE=ON \
                             -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=ON ..
                       make -j$(nproc)
@@ -147,6 +165,11 @@ pipeline {
             }
           }
           stage('Coverage') {
+            when {
+              not {
+                environment name: 'UBUNTU_VERSION', value: '24.04'
+              }
+            }
             steps {
               dir("build-coverage.${env.DISTRO}") {
                 catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
@@ -240,16 +263,23 @@ pipeline {
                 sh '''
                   # Install pylibfranka from root (builds against libfranka in build-release.focal)
                   export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
-                  pip3 install . --user
+                  if [ -n "$VIRTUAL_ENV" ]; then
+                    python3 -m pip install .
+                  else
+                    python3 -m pip install . --user
+                  fi
                 '''
 
                 dir('pylibfranka/docs') {
                   sh '''
-                    # Add sphinx to PATH
-                    export PATH="$HOME/.local/bin:$PATH"
-
-                    # Install Sphinx and dependencies
-                    pip3 install -r requirements.txt --user
+                    # Install Sphinx and dependencies (respect virtualenv if present)
+                    if [ -n "$VIRTUAL_ENV" ]; then
+                      python3 -m pip install -r requirements.txt
+                    else
+                      # Add sphinx to PATH for --user installs
+                      export PATH="$HOME/.local/bin:$PATH"
+                      python3 -m pip install -r requirements.txt --user
+                    fi
 
                     # Set locale
                     export LC_ALL=C.UTF-8

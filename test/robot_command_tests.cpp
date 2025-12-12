@@ -30,6 +30,8 @@ using research_interface::robot::SetNEToEE;
 using research_interface::robot::StopMove;
 
 const std::string kExpectedModelString = "test_string";
+constexpr research_interface::robot::Move::Deviation kDefaultDeviation1(1, 2, 3);
+constexpr research_interface::robot::Move::Deviation kDefaultDeviation2(4, 5, 6);
 
 template <typename T>
 class Command : public ::testing::Test {
@@ -152,8 +154,8 @@ bool Command<StopMove>::compare(const StopMove::Request&, const StopMove::Reques
 template <>
 Move::Request Command<Move>::getExpected() {
   return Move::Request(Move::ControllerMode::kJointImpedance,
-                       Move::MotionGeneratorMode::kJointVelocity, Move::Deviation(1, 2, 3),
-                       Move::Deviation(4, 5, 6));
+                       Move::MotionGeneratorMode::kJointVelocity, kDefaultDeviation1,
+                       kDefaultDeviation2);
 }
 
 template <>
@@ -390,8 +392,8 @@ TEST_F(MoveCommand, CanReceiveMotionStarted) {
       franka::RealtimeConfig::kIgnore);
 
   Move::Request request(Move::ControllerMode::kJointImpedance,
-                        Move::MotionGeneratorMode::kJointVelocity, Move::Deviation(1, 2, 3),
-                        Move::Deviation(4, 5, 6));
+                        Move::MotionGeneratorMode::kJointVelocity, kDefaultDeviation1,
+                        kDefaultDeviation2);
 
   server
       .waitForCommand<research_interface::robot::Move>(
@@ -412,8 +414,8 @@ TEST_P(MoveCommand, CanReceiveErrorResponses) {
       franka::RealtimeConfig::kIgnore);
 
   Move::Request request(Move::ControllerMode::kJointImpedance,
-                        Move::MotionGeneratorMode::kJointVelocity, Move::Deviation(1, 2, 3),
-                        Move::Deviation(4, 5, 6));
+                        Move::MotionGeneratorMode::kJointVelocity, kDefaultDeviation1,
+                        kDefaultDeviation2);
 
   server
       .waitForCommand<::Move>([this](const Move::Request& request) -> Move::Response {

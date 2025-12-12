@@ -27,7 +27,7 @@ class ActiveMotionGeneratorTest : public ::testing::Test {
             std::move(std::make_unique<Network>("127.0.0.1", robot::kCommandPort)),
             0,
             RealtimeConfig::kIgnore)),
-        robot_(RobotMock(robot_impl_mock_)){};
+        robot_(RobotMock(robot_impl_mock_)) {};
 
   std::unique_ptr<ActiveControlBase> startControl(
       research_interface::robot::Move::ControllerMode controller_mode);
