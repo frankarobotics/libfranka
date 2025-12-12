@@ -1,10 +1,10 @@
 {
-    "name": "libfranka - Ubuntu 20.04",
-    "dockerComposeFile": "docker-compose-focal.yml",
+    "name": "libfranka",
+    "dockerComposeFile": "docker-compose.yml",
     "service": "libfranka_project",
     "workspaceFolder": "/workspaces",
     "remoteUser": "user",
-    "initializeCommand": "echo \"USER_UID=$(id -u $USER)\nUSER_GID=$(id -g $USER)\" > .devcontainer/.env",
+    "initializeCommand": "bash -c 'ENV_FILE=\".devcontainer/.env\"; if [ ! -f \"$ENV_FILE\" ]; then echo -e \"UBUNTU_VERSION=20.04\\nUBUNTU_CODENAME=focal\\nUSER_UID=$(id -u)\\nUSER_GID=$(id -g)\" > \"$ENV_FILE\"; else sed -i.bak \"s/^USER_UID=.*/USER_UID=$(id -u)/\" \"$ENV_FILE\"; sed -i.bak \"s/^USER_GID=.*/USER_GID=$(id -g)/\" \"$ENV_FILE\"; rm -f \"$ENV_FILE.bak\"; fi'",
     "customizations": {
         "vscode": {
             "extensions": [
