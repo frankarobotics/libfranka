@@ -1,7 +1,25 @@
 // Copyright (c) 2025 Franka Robotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include "franka/robot_model.h"
+
 #include <algorithm>
+
+// Ignore warnings from Pinocchio includes
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+#include <pinocchio/algorithm/centroidal.hpp>
+#include <pinocchio/algorithm/compute-all-terms.hpp>
+#include <pinocchio/algorithm/crba.hpp>
+#include <pinocchio/algorithm/frames.hpp>
+#include <pinocchio/algorithm/jacobian.hpp>
+#include <pinocchio/algorithm/kinematics.hpp>
+#include <pinocchio/algorithm/rnea.hpp>
+#include <pinocchio/parsers/urdf.hpp>
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 namespace franka {
 

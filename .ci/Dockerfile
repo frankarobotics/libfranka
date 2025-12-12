@@ -47,13 +47,13 @@ RUN apt-get update \
     graphviz \
     lcov \
     libeigen3-dev \
+    libfmt-dev \
     libpoco-dev \
     lsb-release \
-    libfmt-dev \
+    pybind11-dev \
     python3-dev \
     python3-pip \
     python3-venv \
-    pybind11-dev \
     rename \
     valgrind \
     wget \
