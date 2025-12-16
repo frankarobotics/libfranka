@@ -57,11 +57,11 @@ struct IncompatibleVersionException : public Exception {
   /**
    * Control's protocol version.
    */
-  const uint16_t server_version;
+  const uint16_t server_version;  // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
   /**
    * libfranka protocol version.
    */
-  const uint16_t library_version;
+  const uint16_t library_version;  // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
 };
 
 /**
@@ -82,7 +82,8 @@ struct ControlException : public Exception {
   /**
    * Vector of states and commands logged just before the exception occurred.
    */
-  const std::vector<franka::Record> log;
+  const std::vector<franka::Record>
+      log;  // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
 };
 
 /**

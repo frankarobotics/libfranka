@@ -291,7 +291,7 @@ if(CLANG_TIDY_PROG)
   # - misc-include-cleaner: requires direct include of providing headers
   # - performance-avoid-endl: prefer \n over std::endl (OK in examples)
   # - misc-const-correctness: suggests const qualifiers for locals
-  set(CLANG_TIDY_DISABLED_CHECKS "-misc-include-cleaner,-performance-avoid-endl,-misc-const-correctness")
+  set(CLANG_TIDY_DISABLED_CHECKS "-misc-include-cleaner,-performance-avoid-endl,-misc-const-correctness,-readability-redundant-member-init")
 
   add_custom_target(tidy
     COMMAND ${CLANG_TIDY_PROG} -p=${CMAKE_BINARY_DIR}

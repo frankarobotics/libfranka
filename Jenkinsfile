@@ -261,7 +261,7 @@ pipeline {
               // Build and publish pylibfranka documentation
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
                 sh '''
-                  # Install pylibfranka from root (builds against libfranka in build-release.focal)
+                  # Install pylibfranka from root (builds against libfranka in build-release.${DISTRO})
                   export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
                   if [ -n "$VIRTUAL_ENV" ]; then
                     python3 -m pip install .
@@ -288,8 +288,12 @@ pipeline {
                     # Add libfranka to library path
                     export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
 
-                    # Build the documentation
-                    make html
+                    # Build the documentation only on Ubuntu 20.04
+                    if [ "${UBUNTU_VERSION}" = "20.04" ]; then
+                      make html
+                    else
+                      echo "Skipping docs build on ${UBUNTU_VERSION}"
+                    fi
                   '''
 
                   publishHTML([allowMissing: false,

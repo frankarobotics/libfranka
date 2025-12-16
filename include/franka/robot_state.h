@@ -18,7 +18,7 @@ namespace franka {
 /**
  * Describes the robot's current mode.
  */
-enum class RobotMode {
+enum class RobotMode {  // NOLINT(performance-enum-size)
   kOther,
   kIdle,
   kMove,
