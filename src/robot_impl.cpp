@@ -466,7 +466,7 @@ void Robot::Impl::cancelMotion(uint32_t motion_id) {
   }
 
   research_interface::robot::RobotState robot_state;
-  do {
+  do {  // NOLINT(cppcoreguidelines-avoid-do-while)
     robot_state = receiveRobotState();
   } while (motionGeneratorRunning() || controllerRunning());
 

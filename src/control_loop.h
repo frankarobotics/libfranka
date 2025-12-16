@@ -105,11 +105,17 @@ class ControlLoop {
       research_interface::robot::MotionGeneratorCommand& motion_generation_command) -> bool;
 
  private:
-  RobotControl& robot_;
-  const MotionGeneratorCallback motion_callback_;  // NOLINT(readability-identifier-naming)
-  const ControlCallback control_callback_;         // NOLINT(readability-identifier-naming)
-  const bool limit_rate_;                          // NOLINT(readability-identifier-naming)
-  const double cutoff_frequency_;                  // NOLINT(readability-identifier-naming)
+  RobotControl& robot_;  // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
+  const MotionGeneratorCallback
+      motion_callback_; /* NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members,
+                           readability-identifier-naming) */
+  const ControlCallback
+      control_callback_;          /* NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members,
+                                     readability-identifier-naming) */
+  const bool limit_rate_;         /* NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members,
+                                     readability-identifier-naming) */
+  const double cutoff_frequency_; /* NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members,
+                                     readability-identifier-naming) */
   uint32_t motion_id_ = 0;
   bool initialized_filter_{false};
 
