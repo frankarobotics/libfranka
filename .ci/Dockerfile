@@ -148,9 +148,12 @@ RUN python3 -m venv /opt/venv && \
             flake8 \
             numpy \
             pybind11 && \
-        /opt/venv/bin/python --version && /opt/venv/bin/pip --version
+    /opt/venv/bin/python --version && /opt/venv/bin/pip --version && \
+    chown -R $USER_UID:$USER_GID /opt/venv
 
-ENV PATH="/opt/venv/bin:${PATH}"
+# Expose the virtualenv via env var for downstream scripts (e.g., Jenkinsfile)
+ENV VIRTUAL_ENV="/opt/venv"
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 RUN apt-get update && \
     apt-get install -y wget gnupg lsb-release software-properties-common && \
     wget https://apt.llvm.org/llvm.sh && \

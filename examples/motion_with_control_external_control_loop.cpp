@@ -40,7 +40,7 @@ class Controller {
     dq_buffer_ = std::vector<double>(dq_filter_size_ * 7, 0.0);
   }
 
-  inline franka::Torques step(const franka::RobotState& state) {
+  franka::Torques step(const franka::RobotState& state) {
     updateDQFilter(state);
 
     std::array<double, 7> tau_J_d;  // NOLINT(readability-identifier-naming)
@@ -69,8 +69,8 @@ class Controller {
   size_t dq_current_filter_position_{0};
   size_t dq_filter_size_;
 
-  const std::array<double, 7> K_P_;  // NOLINT(readability-identifier-naming)
-  const std::array<double, 7> K_D_;  // NOLINT(readability-identifier-naming)
+  std::array<double, 7> K_P_;  // NOLINT(readability-identifier-naming)
+  std::array<double, 7> K_D_;  // NOLINT(readability-identifier-naming)
 
   std::array<double, 7> dq_d_;
   std::vector<double> dq_buffer_;

@@ -19,7 +19,7 @@ namespace franka {
 /**
  * Enumerates the seven joints, the flange, and the end effector of a robot.
  */
-enum class Frame {
+enum class Frame {  // NOLINT(performance-enum-size)
   kJoint1,
   kJoint2,
   kJoint3,

@@ -254,7 +254,7 @@ typename T::Response Network::tcpBlockingReceiveResponse(uint32_t command_id,
   using namespace std::literals::chrono_literals;  // NOLINT(google-build-using-namespace)
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::defer_lock);
   decltype(received_responses_)::const_iterator received_response;
-  do {
+  do {  // NOLINT(cppcoreguidelines-avoid-do-while)
     lock.lock();
     tcpReadFromBuffer<T>(kTimeout);
     received_response = received_responses_.find(command_id);
@@ -287,7 +287,7 @@ Network::tcpBlockingReceiveResponse<research_interface::robot::GetRobotModel>(
   using namespace std::literals::chrono_literals;  // NOLINT(google-build-using-namespace)
   std::unique_lock<std::mutex> lock(tcp_mutex_, std::defer_lock);
   decltype(received_responses_)::const_iterator received_response;
-  do {
+  do {  // NOLINT(cppcoreguidelines-avoid-do-while)
     lock.lock();
     tcpReadFromBuffer<research_interface::robot::GetRobotModel>(kTimeout);
     received_response = received_responses_.find(command_id);
