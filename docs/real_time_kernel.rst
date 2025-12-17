@@ -11,7 +11,13 @@ Different kernel versions are compatible with specific Ubuntu releases. The tabl
 +----------------+-------------------------+
 | Kernel Version | Ubuntu Version          |
 +================+=========================+
+| Pro Kernel     | 24.04 (Noble Numbat)    |
++----------------+-------------------------+
+| 6.8.0          | 24.04 (Noble Numbat)    |
++----------------+-------------------------+
 | Pro Kernel     | 22.04 (Jammy Jellyfish) |
++----------------+-------------------------+
+| 6.8.0          | 22.04 (Jammy Jellyfish) |
 +----------------+-------------------------+
 | 5.9.1          | 20.04 (Focal Fossa)     |
 +----------------+-------------------------+
@@ -37,25 +43,6 @@ Then decide which kernel version to use. Check your current version with ``uname
 Real-time patches are only available for select versions: `RT Kernel Patches <https://www.kernel.org/pub/linux/kernel/projects/rt/>`_.
 Choose the version closest to your current kernel. Use ``curl`` to download the sources.
 
-.. note::
-   Ubuntu 16.04 (tested with kernel 4.14.12):
-
-   .. code-block:: bash
-
-      curl -LO https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.14.12.tar.xz
-      curl -LO https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.14.12.tar.sign
-      curl -LO https://www.kernel.org/pub/linux/kernel/projects/rt/4.14/older/patch-4.14.12-rt10.patch.xz
-      curl -LO https://www.kernel.org/pub/linux/kernel/projects/rt/4.14/older/patch-4.14.12-rt10.patch.sign
-
-.. note::
-   Ubuntu 18.04 (tested with kernel 5.4.19):
-
-   .. code-block:: bash
-
-      curl -LO https://www.kernel.org/pub/linux/kernel/v5.x/linux-5.4.19.tar.xz
-      curl -LO https://www.kernel.org/pub/linux/kernel/v5.x/linux-5.4.19.tar.sign
-      curl -LO https://www.kernel.org/pub/linux/kernel/projects/rt/5.4/older/patch-5.4.19-rt10.patch.xz
-      curl -LO https://www.kernel.org/pub/linux/kernel/projects/rt/5.4/older/patch-5.4.19-rt10.patch.sign
 
 .. note::
    Ubuntu 20.04 (tested with kernel 5.9.1):
@@ -68,7 +55,7 @@ Choose the version closest to your current kernel. Use ``curl`` to download the 
       curl -LO https://www.kernel.org/pub/linux/kernel/projects/rt/5.9/patch-5.9.1-rt20.patch.sign
 
 .. note::
-   Ubuntu 22.04: We recommend using the `Ubuntu Pro real-time kernel <https://ubuntu.com/real-time>`_.
+   Ubuntu 22.04 and 24.04: We recommend using the `Ubuntu Pro real-time kernel <https://ubuntu.com/real-time>`_.
    After enabling it, you can skip directly to :ref:`installation-real-time`.
    If you prefer not to use Ubuntu Pro, you can patch manually (tested with kernel 6.8.0):
 
