@@ -587,55 +587,9 @@ Example:
 Troubleshooting
 ~~~~~~~~~~~~~~~
 
-**Cannot find libfranka.so**
-
-Update library cache:
-
-.. code-block:: bash
-
-   sudo ldconfig
-
-**CMake cannot find dependencies**
-
-Set the prefix path:
-
-.. code-block:: bash
-
-   cmake -DCMAKE_PREFIX_PATH=/usr/local ..
-
-Or set library path:
-
-.. code-block:: bash
-
-   export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-
 **Network connection issues**
 
 See the `Troubleshooting Network <https://frankarobotics.github.io/docs/libfranka/docs/troubleshooting.html>`_ guide.
-
-Uninstalling
-~~~~~~~~~~~~
-
-**Debian package:**
-
-.. code-block:: bash
-
-   sudo apt-get remove libfranka
-
-**Built from source:**
-
-.. code-block:: bash
-
-   cd libfranka/build
-   sudo cmake --build . --target uninstall
-
-Or manually:
-
-.. code-block:: bash
-
-   sudo rm -rf /usr/local/include/franka
-   sudo rm -f /usr/local/lib/libfranka.*
-   sudo rm -f /usr/local/lib/cmake/Franka
 
 License
 -------
