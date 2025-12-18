@@ -20,8 +20,10 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .ci/
-        file: .ci/Dockerfile.focal
+        file: .ci/Dockerfile
         tags: pylibfranka:latest
+        build-args: |
+            UBUNTU_VERSION=20.04
         push: false
         load: true
 
