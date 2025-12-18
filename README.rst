@@ -42,16 +42,17 @@ Before using **libfranka**, ensure your system meets the following requirements:
 .. _installation-debian-package:
 
 2. Installation from Debian Package (Recommended)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The easiest way to install **libfranka** is using pre-built Debian packages. This method is recommended for most users.
+The easiest way to install **libfranka** is by using the pre-built Debian packages
+published on GitHub.
 
 Supported Platforms
 ^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
    :header-rows: 1
-   :widths: 25 25 25 25
+   :widths: 28 18 18 26
 
    * - Ubuntu Version
      - Codename
@@ -60,77 +61,59 @@ Supported Platforms
    * - 20.04 LTS
      - focal
      - amd64
-     - ✅ Supported
+     - Supported
    * - 22.04 LTS
      - jammy
      - amd64
-     - ✅ Supported
+     - Supported
    * - 24.04 LTS
      - noble
      - amd64
-     - ✅ Supported
+     - Supported
 
-Installation Steps
-^^^^^^^^^^^^^^^^^^
+Quick Install
+^^^^^^^^^^^^^
 
-**Step 1: Check your Ubuntu version**
-
-.. code-block:: bash
-
-   lsb_release -a
-
-**Step 2: Download and install the appropriate package**
-
-**For Ubuntu 20.04 (Focal):**
+Use the follwing scripts to set the desired **libfranka** version. The script automatically detects your
+Ubuntu codename, downloads the matching Debian package, verifies its checksum,
+and installs it.
 
 .. code-block:: bash
 
-   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.3/libfranka_0.18.3_focal_amd64.deb
-   sudo dpkg -i libfranka_0.18.3_focal_amd64.deb
+   VERSION=0.19.0
+   CODENAME=$(lsb_release -cs)
 
-**For Ubuntu 22.04 (Jammy):**
-
-.. code-block:: bash
-
-   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.3/libfranka_0.18.3_jammy_amd64.deb
-   sudo dpkg -i libfranka_0.18.3_jammy_amd64.deb
-
-**For Ubuntu 24.04 (Noble):**
-
-.. code-block:: bash
-
-   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.3/libfranka_0.18.3_noble_amd64.deb
-   sudo dpkg -i libfranka_0.18.3_noble_amd64.deb
-
-**Step 3 (Optional): Verify checksum**
-
-.. code-block:: bash
-
-   # Download checksum file
-   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.3/libfranka_0.18.3_focal_amd64.deb.sha256
-
-   # Verify integrity
-   sha256sum -c libfranka_0.18.3_focal_amd64.deb.sha256
-
-Generic Installation Pattern
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-For other versions, use this pattern:
-
-.. code-block:: bash
-
-   # Set your version and Ubuntu codename
-   VERSION=0.18.3
-   CODENAME=focal  # or jammy, noble
-
+   # Download package
    wget https://github.com/frankarobotics/libfranka/releases/download/${VERSION}/libfranka_${VERSION}_${CODENAME}_amd64.deb
+
+   # Download checksum
+   wget https://github.com/frankarobotics/libfranka/releases/download/${VERSION}/libfranka_${VERSION}_${CODENAME}_amd64.deb.sha256
+
+   # Verify package integrity
+   sha256sum -c libfranka_${VERSION}_${CODENAME}_amd64.deb.sha256
+
+   # Install package
    sudo dpkg -i libfranka_${VERSION}_${CODENAME}_amd64.deb
+
+Example
+^^^^^^^
+
+The following example installs **libfranka 0.19.0** on **Ubuntu 22.04 (Jammy)**:
+
+.. code-block:: bash
+
+   VERSION=0.19.0
+
+   wget https://github.com/frankarobotics/libfranka/releases/download/${VERSION}/libfranka_${VERSION}_jammy_amd64.deb
+   wget https://github.com/frankarobotics/libfranka/releases/download/${VERSION}/libfranka_${VERSION}_jammy_amd64.deb.sha256
+   sha256sum -c libfranka_${VERSION}_jammy_amd64.deb.sha256
+   sudo dpkg -i libfranka_${VERSION}_jammy_amd64.deb
 
 .. tip::
 
-   This is the **recommended installation method** if you don't need to modify the source code.
+   All released versions, packages, and checksums are available on the
+   `GitHub Releases page <https://github.com/frankarobotics/libfranka/releases>`_.
 
-Find all available releases on the `GitHub Releases page <https://github.com/frankarobotics/libfranka/releases>`_.
 
 .. _building-with-docker:
 
@@ -156,7 +139,7 @@ Clone the Repository
 
    git clone --recurse-submodules https://github.com/frankarobotics/libfranka.git
    cd libfranka
-   git checkout 0.18.3  # or your desired version
+   git checkout 0.19.0  # or your desired version
 
 Method A: Using Visual Studio Code (Recommended)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -402,7 +385,7 @@ Build libfranka
 
    git clone --recurse-submodules https://github.com/frankarobotics/libfranka.git
    cd libfranka
-   git checkout 0.18.3
+   git checkout 0.19.0
    git submodule update --init --recursive
 
    mkdir build && cd build
@@ -439,7 +422,7 @@ Expected output:
 
 .. code-block:: text
 
-   /usr/lib/libfranka.so -> libfranka.so.0.18.3
+   /usr/lib/libfranka.so -> libfranka.so.0.19.0
 
 **Check header files:**
 
@@ -465,7 +448,7 @@ Expected output:
 
 .. code-block:: text
 
-   ii  libfranka  0.18.3  amd64  libfranka - Franka Robotics C++ library
+   ii  libfranka  0.19.0  amd64  libfranka - Franka Robotics C++ library
 
 **Test with pkg-config:**
 
