@@ -1,8 +1,8 @@
 # CHANGELOG
 
-All notable changes to libfranka and pylibfranka will be documented in this file.
+All notable changes to libfranka in this file.
 
-## UNRELEASED
+## [0.19.0]
 ### libfranka - C++
 #### Changed
 - To support franka_ros2, we added an option for the async position control to base the `getFeedback` function on a robot state received via `franka_hardware` instead of querying the robot directly.

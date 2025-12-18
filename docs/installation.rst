@@ -33,7 +33,7 @@ For the supported ubuntu versions, use the following pattern:
 .. code-block:: bash
 
    # Replace with your desired version and Ubuntu codename
-   VERSION=0.18.2
+   VERSION=0.19.0
    CODENAME=focal  # or jammy, noble
 
    wget https://github.com/frankarobotics/libfranka/releases/download/${VERSION}/libfranka_${VERSION}_${CODENAME}_amd64.deb
