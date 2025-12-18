@@ -168,7 +168,7 @@ Method A: Using Visual Studio Code (Recommended)
    - Open the project in VS Code: ``code .``
    - Press ``Ctrl+Shift+P``
    - Select "Dev Containers: Reopen in Container"
-   - Wait for the container to build (first time takes ~15-20 minutes)
+   - Wait for the container to build
 
 5. **Build libfranka**
 
@@ -231,28 +231,10 @@ Method B: Using Docker Command Line
       cd build
       sudo dpkg -i libfranka*.deb
 
-Quick Docker Build Script
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-For automated builds:
-
-.. code-block:: bash
-
-   # Build for specific Ubuntu version
-   docker build --build-arg UBUNTU_VERSION=22.04 -t libfranka-build .ci/ && \
-   docker run --rm -v $(pwd):/workspaces -w /workspaces libfranka-build bash -c "\
-       cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -B build -S . && \
-       cmake --build build -- -j\$(nproc) && \
-       cd build && cpack -G DEB"
-
 .. _building-from-source:
 
 4. Building from Source (Advanced)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. warning::
-
-   Building from source is complex and requires building multiple dependencies. **We strongly recommend using the Debian package or Docker method** unless you need to modify the source code.
 
 Prerequisites
 ^^^^^^^^^^^^^
@@ -272,26 +254,26 @@ Prerequisites
        libfmt-dev \
        pybind11-dev
 
-**For Ubuntu 20.04, install CMake >= 3.22:**
+**Ubuntu 20.04:** ensure CMake >= 3.22:
 
 .. code-block:: bash
 
-   wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc | sudo gpg --dearmor -o /usr/share/keyrings/kitware-archive-keyring.gpg
+   wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc | gpg --dearmor -o /usr/share/keyrings/kitware-archive-keyring.gpg
    echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main" | sudo tee /etc/apt/sources.list.d/kitware.list
    sudo apt-get update
-   sudo apt-get install cmake
+   sudo apt-get install -y cmake
 
 Remove Existing Installations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
-   sudo apt-get remove "*libfranka*"
+   sudo apt-get remove -y "*libfranka*"
 
 Build Dependencies from Source
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-libfranka requires several dependencies built with static linking. Follow these steps **in order**:
+Follow these steps **in order**. All dependencies are built with static linking.
 
 **1. Boost 1.77.0**
 
@@ -309,10 +291,18 @@ libfranka requires several dependencies built with static linking. Follow these 
 .. code-block:: bash
 
    git clone --depth 1 --branch 10.0.0 https://github.com/leethomason/tinyxml2.git
-   cd tinyxml2 && mkdir build && cd build
-   cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF \
-       -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-   make -j$(nproc) && sudo make install
+   cd tinyxml2
+   mkdir build && cd build
+
+   cmake .. \
+     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+     -DBUILD_SHARED_LIBS=OFF \
+     -DCMAKE_BUILD_TYPE=Release \
+     -DCMAKE_INSTALL_PREFIX=/usr/local
+
+   make -j$(nproc)
+   sudo make install
+
    cd ../.. && rm -rf tinyxml2
 
 **3. console_bridge**
@@ -320,34 +310,64 @@ libfranka requires several dependencies built with static linking. Follow these 
 .. code-block:: bash
 
    git clone --depth 1 --branch 1.0.2 https://github.com/ros/console_bridge.git
-   cd console_bridge && mkdir build && cd build
-   cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF \
-       -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-   make -j$(nproc) && sudo make install
-   cd ../.. && rm -rf console_bridge
+   cd console_bridge
+   mkdir build && cd build
+
+   cmake .. \
+     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+     -DBUILD_SHARED_LIBS=OFF \
+     -DCMAKE_BUILD_TYPE=Release \
+     -DCMAKE_INSTALL_PREFIX=/usr/local
+
+   make -j$(nproc)
+   sudo make install
+
+   cd ../..
+   rm -rf console_bridge
+
 
 **4. urdfdom_headers**
 
 .. code-block:: bash
 
    git clone --depth 1 --branch 1.0.5 https://github.com/ros/urdfdom_headers.git
-   cd urdfdom_headers && mkdir build && cd build
-   cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-   make -j$(nproc) && sudo make install
-   cd ../.. && rm -rf urdfdom_headers
+   cd urdfdom_headers
+   mkdir build && cd build
+
+   cmake .. \
+     -DCMAKE_BUILD_TYPE=Release \
+     -DCMAKE_INSTALL_PREFIX=/usr/local
+
+   make -j$(nproc)
+   sudo make install
+
+   cd ../..
+   rm -rf urdfdom_headers
+
 
 **5. urdfdom (with patch)**
 
 .. code-block:: bash
 
    wget https://raw.githubusercontent.com/frankarobotics/libfranka/main/.ci/urdfdom.patch
+
    git clone --depth 1 --branch 4.0.0 https://github.com/ros/urdfdom.git
-   cd urdfdom && git apply ../urdfdom.patch
+   cd urdfdom
+
+   git apply ../urdfdom.patch
+
    mkdir build && cd build
-   cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF \
-       -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-   make -j$(nproc) && sudo make install
-   cd ../.. && rm -rf urdfdom
+   cmake .. \
+     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+     -DBUILD_SHARED_LIBS=OFF \
+     -DCMAKE_BUILD_TYPE=Release \
+     -DCMAKE_INSTALL_PREFIX=/usr/local
+
+   make -j$(nproc)
+   sudo make install
+   cd ../..
+   rm -rf urdfdom
+
 
 **6. Assimp**
 
@@ -391,17 +411,15 @@ Build libfranka
    mkdir build && cd build
    cmake -DCMAKE_BUILD_TYPE=Release \
          -DBUILD_TESTS=OFF \
-         -DCMAKE_INSTALL_PREFIX=/usr/local \
-         ..
+         -DCMAKE_INSTALL_PREFIX=/usr/local ..
    cmake --build . -- -j$(nproc)
-   sudo cmake --install .
 
 Create Debian Package (Optional)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Inside the build folder, run:
 
 .. code-block:: bash
 
-   cd build
    cpack -G DEB
    sudo dpkg -i libfranka*.deb
 
@@ -449,12 +467,6 @@ Expected output:
 .. code-block:: text
 
    ii  libfranka  0.19.0  amd64  libfranka - Franka Robotics C++ library
-
-**Test with pkg-config:**
-
-.. code-block:: bash
-
-   pkg-config --modversion libfranka
 
 .. _usage:
 
