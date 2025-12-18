@@ -35,7 +35,7 @@ class VacuumGripper {
   /**
    * Vacuum production setup profile.
    */
-  enum class ProductionSetupProfile { kP0, kP1, kP2, kP3 };
+  enum class ProductionSetupProfile { kP0, kP1, kP2, kP3 };  // NOLINT(performance-enum-size)
 
   /**
    * Establishes a connection with a vacuum gripper connected to a robot.

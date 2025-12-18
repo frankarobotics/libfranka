@@ -13,7 +13,7 @@ class RobotImplMock : public Robot::Impl {
  public:
   virtual ~RobotImplMock() = default;
   RobotImplMock(std::unique_ptr<Network> network, size_t log_size, RealtimeConfig realtime_config)
-      : Robot::Impl(std::move(network), log_size, realtime_config){};
+      : Robot::Impl(std::move(network), log_size, realtime_config) {};
   MOCK_METHOD(uint32_t,
               startMotion,
               (research_interface::robot::Move::ControllerMode,

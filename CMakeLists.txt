@@ -75,6 +75,9 @@ if(BUILD_COVERAGE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
 endif()
 
+# Suppress false positive warnings about string operations (aka GetRobotModel)
+add_compile_options(-Wno-stringop-overflow -Wno-array-bounds)
+
 ## Load dependencies
 include(FetchFMT)
 
@@ -284,16 +287,32 @@ if(CLANG_TIDY_PROG)
   string(REPLACE ";" "\"},{\"name\":\"" TIDY_LINE_FILTER "${TIDY_FILES}")
   set(TIDY_LINE_FILTER "[{\"name\":\"${TIDY_LINE_FILTER}\"}]")
 
+  # Disable noisy checks reported in tidy summary
+  # - misc-include-cleaner: requires direct include of providing headers
+  # - performance-avoid-endl: prefer \n over std::endl (OK in examples)
+  # - misc-const-correctness: suggests const qualifiers for locals
+  set(CLANG_TIDY_DISABLED_CHECKS "-misc-include-cleaner,-performance-avoid-endl,-misc-const-correctness,-readability-redundant-member-init")
+
   add_custom_target(tidy
     COMMAND ${CLANG_TIDY_PROG} -p=${CMAKE_BINARY_DIR}
-                               -line-filter=${TIDY_LINE_FILTER} ${SOURCES}
+                               -quiet
+                               -line-filter=${TIDY_LINE_FILTER}
+                               -checks=${CLANG_TIDY_DISABLED_CHECKS}
+                               --extra-arg=-Wno-unknown-warning-option
+                               --extra-arg=-Wno-unused-command-line-argument
+                               ${SOURCES}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Running clang-tidy"
     VERBATIM
   )
   add_custom_target(check-tidy
     COMMAND scripts/fail-on-output.sh ${CLANG_TIDY_PROG} -p=${CMAKE_BINARY_DIR}
-                                      -line-filter=${TIDY_LINE_FILTER} ${SOURCES}
+                                      -quiet
+                                      -line-filter=${TIDY_LINE_FILTER}
+                                      -checks=${CLANG_TIDY_DISABLED_CHECKS}
+                                      --extra-arg=-Wno-unknown-warning-option
+                                      --extra-arg=-Wno-unused-command-line-argument
+                                      ${SOURCES}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Running clang-tidy"
     VERBATIM

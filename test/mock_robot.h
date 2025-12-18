@@ -9,5 +9,5 @@ using namespace franka;
 class RobotMock : public Robot {
  public:
   ~RobotMock() = default;
-  RobotMock(std::shared_ptr<Robot::Impl> robot_impl) : Robot(robot_impl){};
+  RobotMock(std::shared_ptr<Robot::Impl> robot_impl) : Robot(robot_impl) {};
 };

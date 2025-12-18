@@ -7,6 +7,7 @@ All notable changes to libfranka and pylibfranka will be documented in this file
 #### Changed
 - To support franka_ros2, we added an option for the async position control to base the `getFeedback` function on a robot state received via `franka_hardware` instead of querying the robot directly.
 - Format libfranka debian package to inlclude ubuntu code name and arch: libfranka_VERSION_CODENAME_ARCH.deb
+- Added build containers to support Ubuntu 22.04 and 24.04
 
 ## [0.18.2]
 Requires Franka Research 3 System Version >= 5.9.0

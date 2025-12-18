@@ -59,7 +59,7 @@ class ActiveMotionGenerator : public ActiveControl {
                         std::unique_lock<std::mutex> control_lock,
                         research_interface::robot::Move::ControllerMode controller_type)
       : ActiveControl(robot_impl, motion_id, std::move(control_lock)),
-        controller_type_(controller_type){};
+        controller_type_(controller_type) {};
 
   bool isTorqueControlFinished(const std::optional<const Torques>& control_input);
 

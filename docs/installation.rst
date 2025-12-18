@@ -5,35 +5,52 @@ Build / Installation
 
 .. note::
 
-   The installation currently only support Ubuntu 20.04. Please ensure you are using this version to avoid compatibility issues.
+   **libfranka** supports Ubuntu 20.04 (focal), 22.04 (jammy), and 24.04 (noble) LTS versions. Pre-built **amd64** Debian packages are available for all supported versions.
 
 .. _libfranka_installation_debian_package:
+
 Debian Package
 ~~~~~~~~~~~~~~
 
-**libfranka** releases are provided as pre-built Debian packages.
+**libfranka** releases are provided as pre-built Debian packages for multiple Ubuntu LTS versions.
 You can find the packaged artifacts on the `libfranka releases <https://github.com/frankarobotics/libfranka/releases/>`_ page on GitHub.
 
-Download the Debian package:
+
+Installation Instructions
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Step 1: Check your Ubuntu version**
 
 .. code-block:: bash
 
-   wget https://github.com/frankarobotics/libfranka/releases/download/0.18.2/libfranka_0.18.2_focal_amd64.deb
+   lsb_release -a
 
-Install the package on your system:
+**Step 2: Download and install the appropriate package**
 
-.. code-block:: bash
 
-   sudo dpkg -i libfranka_0.18.2_focal_amd64.deb
-
-For other versions or architectures, use the following pattern:
+For the supported ubuntu versions, use the following pattern:
 
 .. code-block:: bash
 
-   wget https://github.com/frankarobotics/libfranka/releases/download/<version>/libfranka_<version>_<Ubuntu_version>_<architecture>.deb
-   sudo dpkg -i libfranka_<version>_<Ubuntu_version>_<architecture>.deb
+   # Replace with your desired version and Ubuntu codename
+   VERSION=0.18.2
+   CODENAME=focal  # or jammy, noble
 
-This is the recommended installation method for **libfranka** if you do not need to modify the source code.
+   wget https://github.com/frankarobotics/libfranka/releases/download/${VERSION}/libfranka_${VERSION}_${CODENAME}_amd64.deb
+   sudo dpkg -i libfranka_${VERSION}_${CODENAME}_amd64.deb
+
+.. tip::
+
+   This is the recommended installation method for **libfranka** if you do not need to modify the source code.
+
+Verify Installation
+^^^^^^^^^^^^^^^^^^^
+
+After installation, verify that libfranka is correctly installed:
+
+.. code-block:: bash
+
+   dpkg -l | grep libfranka
 
 .. _libfranka_installation_docker:
 Inside docker container

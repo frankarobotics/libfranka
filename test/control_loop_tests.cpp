@@ -756,14 +756,12 @@ TYPED_TEST(ControlLoops, CanNotConstructWithoutMotionCallback) {
   StrictMock<MockRobotControl> robot;
   setupJointVelocityLimitsMock(robot);
 
-  EXPECT_THROW(typename TestFixture::Loop loop(
-                   robot,
-                   [](const RobotState&, Duration) {
-                     return Torques({0, 1, 2, 3, 4, 5, 6});
-                   },
-                   typename TestFixture::MotionGeneratorCallback(), TestFixture::kLimitRate,
-                   getCutoffFreq(TestFixture::kFilter)),
-               std::invalid_argument);
+  EXPECT_THROW(
+      typename TestFixture::Loop loop(
+          robot, [](const RobotState&, Duration) { return Torques({0, 1, 2, 3, 4, 5, 6}); },
+          typename TestFixture::MotionGeneratorCallback(), TestFixture::kLimitRate,
+          getCutoffFreq(TestFixture::kFilter)),
+      std::invalid_argument);
 
   EXPECT_THROW(
       typename TestFixture::Loop loop(robot, ControllerMode::kCartesianImpedance,
@@ -792,10 +790,7 @@ TYPED_TEST(ControlLoops, CanConstructWithMotionAndControllerCallback) {
       .WillOnce(Return(100));
 
   EXPECT_NO_THROW(typename TestFixture::Loop(
-      robot,
-      [](const RobotState&, Duration) {
-        return Torques({0, 1, 2, 3, 4, 5, 6});
-      },
+      robot, [](const RobotState&, Duration) { return Torques({0, 1, 2, 3, 4, 5, 6}); },
       std::bind(&TestFixture::createMotion, this), TestFixture::kLimitRate,
       getCutoffFreq(TestFixture::kFilter)));
 }
@@ -823,10 +818,7 @@ TYPED_TEST(ControlLoops, CanConstructWithControlCallback) {
       .WillOnce(Return(200));
 
   EXPECT_NO_THROW(typename TestFixture::Loop(
-      robot,
-      [](const RobotState&, Duration) {
-        return Torques({0, 1, 2, 3, 4, 5, 6});
-      },
+      robot, [](const RobotState&, Duration) { return Torques({0, 1, 2, 3, 4, 5, 6}); },
       TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter)));
 }
 

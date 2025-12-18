@@ -16,14 +16,17 @@ namespace franka {
 /**
  * Available controller modes for a franka::Robot.
  */
-enum class ControllerMode { kJointImpedance, kCartesianImpedance };
+enum class ControllerMode {  // NOLINT(performance-enum-size)
+  kJointImpedance,
+  kCartesianImpedance
+};
 
 /**
  * Used to decide whether to enforce realtime mode for a control loop thread.
  *
  * @see Robot::Robot
  */
-enum class RealtimeConfig { kEnforce, kIgnore };
+enum class RealtimeConfig { kEnforce, kIgnore };  // NOLINT(performance-enum-size)
 
 /**
  * Helper type for control and motion generation loops.
