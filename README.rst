@@ -74,26 +74,23 @@ Supported Platforms
 Quick Install
 ^^^^^^^^^^^^^
 
-Use the follwing scripts to set the desired **libfranka** version. The script automatically detects your
-Ubuntu codename, downloads the matching Debian package, verifies its checksum,
-and installs it.
+substitute `<libfranka_version>` with the desired version number (e.g., `0.19.0`). And
+substitute `<ubuntu_codename>` with your Ubuntu codename (e.g., `focal`, `jammy`, `noble`). you can find it by running `lsb_release -cs`.
+
 
 .. code-block:: bash
 
-   VERSION=0.19.0
-   CODENAME=$(lsb_release -cs)
-
    # Download package
-   wget https://github.com/frankarobotics/libfranka/releases/download/${VERSION}/libfranka_${VERSION}_${CODENAME}_amd64.deb
+   wget https://github.com/frankarobotics/libfranka/releases/download/<libfranka_version>/libfranka_<libfranka_version>_<ubuntu_codename>_amd64.deb
 
    # Download checksum
-   wget https://github.com/frankarobotics/libfranka/releases/download/${VERSION}/libfranka_${VERSION}_${CODENAME}_amd64.deb.sha256
+   wget https://github.com/frankarobotics/libfranka/releases/download/<libfranka_version>/libfranka_<libfranka_version>_<ubuntu_codename>_amd64.deb.sha256
 
    # Verify package integrity
-   sha256sum -c libfranka_${VERSION}_${CODENAME}_amd64.deb.sha256
+   sha256sum -c libfranka_<libfranka_version>_<ubuntu_codename>_amd64.deb.sha256
 
    # Install package
-   sudo dpkg -i libfranka_${VERSION}_${CODENAME}_amd64.deb
+   sudo dpkg -i libfranka_<libfranka_version>_<ubuntu_codename>_amd64.deb
 
 Example
 ^^^^^^^
@@ -102,12 +99,11 @@ The following example installs **libfranka 0.19.0** on **Ubuntu 22.04 (Jammy)**:
 
 .. code-block:: bash
 
-   VERSION=0.19.0
 
-   wget https://github.com/frankarobotics/libfranka/releases/download/${VERSION}/libfranka_${VERSION}_jammy_amd64.deb
-   wget https://github.com/frankarobotics/libfranka/releases/download/${VERSION}/libfranka_${VERSION}_jammy_amd64.deb.sha256
-   sha256sum -c libfranka_${VERSION}_jammy_amd64.deb.sha256
-   sudo dpkg -i libfranka_${VERSION}_jammy_amd64.deb
+   wget https://github.com/frankarobotics/libfranka/releases/download/0.19.0/libfranka_0.19.0_jammy_amd64.deb
+   wget https://github.com/frankarobotics/libfranka/releases/download/0.19.0/libfranka_0.19.0_jammy_amd64.deb.sha256
+   sha256sum -c libfranka_0.19.0_jammy_amd64.deb.sha256
+   sudo dpkg -i libfranka_0.19.0_jammy_amd64.deb
 
 .. tip::
 
