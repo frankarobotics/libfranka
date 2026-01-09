@@ -28,6 +28,7 @@ from ._pylibfranka import (
     RobotMode,
     RobotState,
     Torques,
+    AsyncPositionControlHandler
 )
 from ._version import __version__
 
@@ -55,4 +56,5 @@ __all__ = [
     "RobotMode",
     "RobotState",
     "Torques",
+    "AsyncPositionControlHandler"
 ]
