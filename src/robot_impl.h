@@ -54,7 +54,7 @@ class Robot::Impl : public RobotControl {
                    const research_interface::robot::Move::Deviation& maximum_path_deviation,
                    const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation,
                    bool use_async_motion_generator,
-                   const std::optional<std::vector<double>>& maximum_velocities)
+                   const std::optional<std::array<double, kNumJoints>>& maximum_velocities)
       -> uint32_t override;
   auto cancelMotion(uint32_t motion_id) -> void override;
   auto finishMotion(

@@ -83,7 +83,7 @@ def main():
         sys.exit(-1)
 
     position_control_handler = result.handler
-    target_feedback = position_control_handler.getTargetFeedback()
+    target_feedback = position_control_handler.get_target_feedback()
 
     time_step = 0.020  # 20 ms, 50 Hz
 
@@ -91,21 +91,22 @@ def main():
     while not motion_finished:
         loop_start = time.monotonic()
 
-        target_feedback = position_control_handler.getTargetFeedback()
+        target_feedback = position_control_handler.get_target_feedback()
         if target_feedback.error_message is not None:
             print(target_feedback.error_message)
             sys.exit(-1)
 
         next_target = calculate_joint_position_target(time_step)
-        command_result = position_control_handler.setJointPositionTarget(next_target)
+        command_result = position_control_handler.set_joint_position_target(next_target)
 
         if command_result.error_message is not None:
             print(command_result.error_message)
             sys.exit(-1)
 
         if time_elapsed > 10.0:
-            position_control_handler.stopControl()
+            position_control_handler.stop_control()
             motion_finished = True
+            print("Control finished")
             break
 
         sleep_time = time_step - (time.monotonic() - loop_start)

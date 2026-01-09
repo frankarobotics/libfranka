@@ -17,7 +17,7 @@
 
 using namespace std::chrono_literals;
 
-const std::vector<double> kDefaultMaximumVelocities{0.655, 0.655, 0.655, 0.655,
+const std::array<double, franka::Robot::kNumJoints> kDefaultMaximumVelocities{0.655, 0.655, 0.655, 0.655,
                                                     1.315, 1.315, 1.315};
 constexpr double kDefaultGoalTolerance = 10.0;
 
