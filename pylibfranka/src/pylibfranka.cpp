@@ -689,16 +689,31 @@ PYBIND11_MODULE(_pylibfranka, m) {
         @return Server version information
     )pbdoc");
 
-  auto async_position_control_handler = py::class_<franka::AsyncPositionControlHandler>(m, "AsyncPositionControlHandler", R"pbdoc(
+  auto async_position_control_handler = py::class_<franka::AsyncPositionControlHandler, std::shared_ptr<franka::AsyncPositionControlHandler>>(m, "AsyncPositionControlHandler", R"pbdoc(
     Handler for asynchronous joint position control
     )pbdoc")
     .def_static("configure", &franka::AsyncPositionControlHandler::configure)
     .def("set_joint_position_target", &franka::AsyncPositionControlHandler::setJointPositionTarget)
-    .def("get_target_feedback", &franka::AsyncPositionControlHandler::getTargetFeedback)
+    .def("get_target_feedback", &franka::AsyncPositionControlHandler::getTargetFeedback, py::arg("robot_state") = std::nullopt)
     .def("stop_control", &franka::AsyncPositionControlHandler::stopControl);
 
   py::class_<franka::AsyncPositionControlHandler::Configuration>(async_position_control_handler, "Configuration")
-    .def(py::init<const std::vector<double>&, double>(), py::arg("maximum_joint_velocities"), py::arg("goal_tolerance"))
+    .def(py::init([](const std::vector<double>& maximum_joint_velocities, double goal_tolerance)
+    {
+          if (maximum_joint_velocities.size() != franka::Robot::kNumJoints) {
+            throw std::invalid_argument("joint_velocities must have exactly 7 values");
+          }
+          franka::AsyncPositionControlHandler::Configuration config;
+
+          std::array<double, franka::Robot::kNumJoints> arr{};
+          std::copy(maximum_joint_velocities.begin(),
+                    maximum_joint_velocities.end(),
+                    arr.begin());
+
+          config.maximum_joint_velocities = arr;
+          config.goal_tolerance = goal_tolerance;
+          return config;
+    }), py::arg("maximum_joint_velocities"), py::arg("goal_tolerance"))
     .def_readwrite("maximum_joint_velocities", &franka::AsyncPositionControlHandler::Configuration::maximum_joint_velocities)
     .def_readwrite("goal_tolerance", &franka::AsyncPositionControlHandler::Configuration::goal_tolerance);
 
@@ -707,6 +722,14 @@ PYBIND11_MODULE(_pylibfranka, m) {
     .def_readwrite("error_message", &franka::AsyncPositionControlHandler::ConfigurationResult::error_message);
 
   py::class_<franka::AsyncPositionControlHandler::JointPositionTarget>(async_position_control_handler, "JointPositionTarget")
+    .def(py::init([](const std::vector<double>& joints) {
+        if (joints.size() != franka::Robot::kNumJoints) {
+          throw std::invalid_argument("joint_positions must have exactly 7 values");
+        }
+        franka::AsyncPositionControlHandler::JointPositionTarget tgt;
+        std::copy(joints.begin(), joints.end(), tgt.joint_positions.begin());
+        return tgt;
+    }), py::arg("joint_positions"))
     .def_readwrite("joint_positions", &franka::AsyncPositionControlHandler::JointPositionTarget::joint_positions);
 
   py::class_<franka::AsyncPositionControlHandler::CommandResult>(async_position_control_handler, "CommandResult")

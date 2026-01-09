@@ -26,7 +26,7 @@ class AsyncPositionControlHandler {
   struct Configuration {
     // Maximum joint velocities for the position control. If no values are provided, the maximum
     // velocities of the robot will be used.
-    std::optional<std::vector<double>> maximum_joint_velocities{};
+    std::optional<std::array<double, Robot::kNumJoints>> maximum_joint_velocities{};
     std::optional<double> goal_tolerance{};
   };
 

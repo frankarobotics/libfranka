@@ -39,7 +39,7 @@ class RobotControl {
       const research_interface::robot::Move::Deviation& maximum_path_deviation,
       const research_interface::robot::Move::Deviation& maximum_goal_pose_deviation,
       bool use_async_motion_generator,
-      const std::optional<std::vector<double>>& maximum_velocities) = 0;
+      const std::optional<std::array<double, kNumJoints>>& maximum_velocities) = 0;
 
   /**
    * Receives the new motion/control command to send to the robot while updating the robot state.
