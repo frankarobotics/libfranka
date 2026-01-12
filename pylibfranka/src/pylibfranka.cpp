@@ -18,14 +18,17 @@
 #include <franka/active_motion_generator.h>
 #include <franka/active_torque_control.h>
 #include <franka/control_types.h>
-#include <franka/model.h>
-#include <franka/robot.h>
-#include <franka/gripper.h>
 #include <franka/duration.h>
 #include <franka/exception.h>
-#include <franka/async_control/async_position_control_handler.hpp>
+#include <franka/model.h>
+#include <franka/robot.h>
 
+// common
 #include <research_interface/robot/service_types.h>
+
+// Pylibfranka
+#include <pylibfranka/async_control.hpp>
+#include <pylibfranka/gripper.hpp>
 
 namespace py = pybind11;
 
@@ -50,7 +53,6 @@ auto convertControllerMode(franka::ControllerMode mode)
 }  // namespace
 
 namespace pylibfranka {
-
 
 PYBIND11_MODULE(_pylibfranka, m) {
   m.doc() = "Python bindings for Franka Robotics Robot Control Library";
@@ -495,7 +497,8 @@ PYBIND11_MODULE(_pylibfranka, m) {
                      "End effector twist [m/s, rad/s] (6,)")
       .def_readwrite("motion_finished", &franka::CartesianVelocities::motion_finished,
                      "Set to True to finish motion");
-  // Bind PyRobot
+
+  // Bind Robot
   py::class_<franka::Robot, std::shared_ptr<franka::Robot>>(m, "Robot", R"pbdoc(
         Main interface for controlling a Franka robot.
 
@@ -514,45 +517,57 @@ PYBIND11_MODULE(_pylibfranka, m) {
 
         @return ActiveControlBase interface for sending torque commands
     )pbdoc")
-      .def("start_joint_position_control", [](franka::Robot& self, franka::ControllerMode mode)
-        {return self.startJointPositionControl(convertControllerMode(mode));}, R"pbdoc(
+      .def(
+          "start_joint_position_control",
+          [](franka::Robot& self, franka::ControllerMode mode) {
+            return self.startJointPositionControl(convertControllerMode(mode));
+          },
+          R"pbdoc(
         Start joint position control mode.
 
         @param control_type Controller mode (JointImpedance or CartesianImpedance)
         @return ActiveControlBase interface for sending position commands
     )pbdoc")
-      .def("start_joint_velocity_control", [](franka::Robot& self, franka::ControllerMode mode)
-        {return self.startJointVelocityControl(convertControllerMode(mode));}, R"pbdoc(
+      .def(
+          "start_joint_velocity_control",
+          [](franka::Robot& self, franka::ControllerMode mode) {
+            return self.startJointVelocityControl(convertControllerMode(mode));
+          },
+          R"pbdoc(
         Start joint velocity control mode.
 
         @param control_type Controller mode (JointImpedance or CartesianImpedance)
         @return ActiveControlBase interface for sending velocity commands
     )pbdoc")
-      .def("start_cartesian_pose_control", [](franka::Robot& self, franka::ControllerMode mode)
-        {return self.startCartesianPoseControl(convertControllerMode(mode));}, R"pbdoc(
+      .def(
+          "start_cartesian_pose_control",
+          [](franka::Robot& self, franka::ControllerMode mode) {
+            return self.startCartesianPoseControl(convertControllerMode(mode));
+          },
+          R"pbdoc(
         Start Cartesian pose control mode.
 
         @param control_type Controller mode (JointImpedance or CartesianImpedance)
         @return ActiveControlBase interface for sending Cartesian pose commands
     )pbdoc")
-      .def("start_cartesian_velocity_control", [](franka::Robot& self, franka::ControllerMode mode)
-        {return self.startCartesianVelocityControl(convertControllerMode(mode));}, R"pbdoc(
+      .def(
+          "start_cartesian_velocity_control",
+          [](franka::Robot& self, franka::ControllerMode mode) {
+            return self.startCartesianVelocityControl(convertControllerMode(mode));
+          },
+          R"pbdoc(
         Start Cartesian velocity control mode.
 
         @param control_type Controller mode (JointImpedance or CartesianImpedance)
         @return ActiveControlBase interface for sending Cartesian velocity commands
     )pbdoc")
-    .def("set_collision_behavior", py::overload_cast<
-          const std::array<double,7>&,
-          const std::array<double,7>&,
-          const std::array<double,6>&,
-          const std::array<double,6>&
-      >(&franka::Robot::setCollisionBehavior),
-      py::arg("lower_torque_thresholds"),
-      py::arg("upper_torque_thresholds"),
-      py::arg("lower_force_thresholds"),
-      py::arg("upper_force_thresholds"),
-      R"pbdoc(
+      .def("set_collision_behavior",
+           py::overload_cast<const std::array<double, 7>&, const std::array<double, 7>&,
+                             const std::array<double, 6>&, const std::array<double, 6>&>(
+               &franka::Robot::setCollisionBehavior),
+           py::arg("lower_torque_thresholds"), py::arg("upper_torque_thresholds"),
+           py::arg("lower_force_thresholds"), py::arg("upper_force_thresholds"),
+           R"pbdoc(
       Configure collision detection thresholds.
 
       @param lower_torque_thresholds Lower torque thresholds [Nm] (7,)
@@ -604,142 +619,11 @@ PYBIND11_MODULE(_pylibfranka, m) {
         Stop currently running motion.
     )pbdoc");
 
-  // Bind franka::GripperState
-  py::class_<franka::GripperState>(m, "GripperState", R"pbdoc(
-        Current state of the Franka Hand gripper.
-    )pbdoc")
-      .def_readwrite("width", &franka::GripperState::width, "Current gripper width [m]")
-      .def_readwrite("max_width", &franka::GripperState::max_width, "Maximum gripper width [m]")
-      .def_readwrite("is_grasped", &franka::GripperState::is_grasped, "True if object is grasped")
-      .def_readwrite("temperature", &franka::GripperState::temperature, "Gripper temperature [°C]")
-      .def_readwrite("time", &franka::GripperState::time, "Timestamp");
+  // Gripper bindings
+  bind_gripper(m);
 
-  // Bind franka::Gripper
-  py::class_<franka::Gripper>(m, "Gripper", R"pbdoc(
-        Interface for controlling a Franka Hand gripper.
-    )pbdoc")
-      .def(py::init<const std::string&>(), R"pbdoc(
-        Connect to gripper.
-
-        Establishes connection to the Franka Hand gripper at the specified address.
-
-        @param franka_address IP address or hostname of the robot
-        :raises NetworkException: if the connection cannot be established
-    )pbdoc")
-      .def("homing", &franka::Gripper::homing, R"pbdoc(
-        Perform homing to find maximum width.
-
-        Homing moves the gripper fingers to the maximum width to calibrate the position.
-        This should be performed after powering on the gripper or when the gripper state is uncertain.
-
-        @return True if successful
-        :raises CommandException: if the command fails
-        :raises NetworkException: if the connection is lost
-    )pbdoc")
-      .def("grasp", &franka::Gripper::grasp, py::arg("width"), py::arg("speed"), py::arg("force"),
-           py::arg("epsilon_inner") = 0.005, py::arg("epsilon_outer") = 0.005, R"pbdoc(
-        Grasp an object.
-
-        The gripper closes at the specified speed and force until an object is detected
-        or the target width is reached. The grasp is considered successfulsetCurrentThreadToHighestSchedulerPriority if the final
-        width is within the specified tolerances.
-
-        @param width Target grasp width [m]
-        @param speed Closing speed [m/s]
-        @param force Grasping force [N]
-        @param epsilon_inner Inner tolerance for grasp check [m] (default: 0.005)
-        @param epsilon_outer Outer tolerance for grasp check [m] (default: 0.005)
-        @return True if grasp successful
-        :raises CommandException: if the command fails
-        :raises NetworkException: if the connection is lost
-    )pbdoc")
-      .def("read_once", &franka::Gripper::readOnce, R"pbdoc(
-        Read current gripper state once.
-
-        Queries the gripper for its current state including width, temperature,
-        and grasp status.
-
-        @return Current gripper state
-        :raises NetworkException: if the connection is lost
-    )pbdoc")
-      .def("stop", &franka::Gripper::stop, R"pbdoc(
-        Stop current gripper motion.
-
-        Stops any ongoing gripper movement immediately.
-
-        @return True if successful
-        :raises CommandException: if the command fails
-        :raises NetworkException: if the connection is lost
-    )pbdoc")
-      .def("move", &franka::Gripper::move, R"pbdoc(
-        Move gripper fingers to a specific width.
-
-        Moves the gripper to the specified width at the given speed. Use this for
-        opening and closing the gripper without force control.
-
-        @param width Target width [m]
-        @param speed Movement speed [m/s]
-        @return True if successful
-        :raises CommandException: if the command fails
-        :raises NetworkException: if the connection is lost
-    )pbdoc")
-      .def("server_version", &franka::Gripper::serverVersion, R"pbdoc(
-        Get gripper server version.
-
-        @return Server version information
-    )pbdoc");
-
-  auto async_position_control_handler = py::class_<franka::AsyncPositionControlHandler, std::shared_ptr<franka::AsyncPositionControlHandler>>(m, "AsyncPositionControlHandler", R"pbdoc(
-    Handler for asynchronous joint position control
-    )pbdoc")
-    .def_static("configure", &franka::AsyncPositionControlHandler::configure)
-    .def("set_joint_position_target", &franka::AsyncPositionControlHandler::setJointPositionTarget)
-    .def("get_target_feedback", &franka::AsyncPositionControlHandler::getTargetFeedback, py::arg("robot_state") = std::nullopt)
-    .def("stop_control", &franka::AsyncPositionControlHandler::stopControl);
-
-  py::class_<franka::AsyncPositionControlHandler::Configuration>(async_position_control_handler, "Configuration")
-    .def(py::init([](const std::vector<double>& maximum_joint_velocities, double goal_tolerance)
-    {
-          if (maximum_joint_velocities.size() != franka::Robot::kNumJoints) {
-            throw std::invalid_argument("joint_velocities must have exactly 7 values");
-          }
-          franka::AsyncPositionControlHandler::Configuration config;
-
-          std::array<double, franka::Robot::kNumJoints> arr{};
-          std::copy(maximum_joint_velocities.begin(),
-                    maximum_joint_velocities.end(),
-                    arr.begin());
-
-          config.maximum_joint_velocities = arr;
-          config.goal_tolerance = goal_tolerance;
-          return config;
-    }), py::arg("maximum_joint_velocities"), py::arg("goal_tolerance"))
-    .def_readwrite("maximum_joint_velocities", &franka::AsyncPositionControlHandler::Configuration::maximum_joint_velocities)
-    .def_readwrite("goal_tolerance", &franka::AsyncPositionControlHandler::Configuration::goal_tolerance);
-
-  py::class_<franka::AsyncPositionControlHandler::ConfigurationResult>(async_position_control_handler, "ConfigurationResult")
-    .def_readwrite("handler", &franka::AsyncPositionControlHandler::ConfigurationResult::handler)
-    .def_readwrite("error_message", &franka::AsyncPositionControlHandler::ConfigurationResult::error_message);
-
-  py::class_<franka::AsyncPositionControlHandler::JointPositionTarget>(async_position_control_handler, "JointPositionTarget")
-    .def(py::init([](const std::vector<double>& joints) {
-        if (joints.size() != franka::Robot::kNumJoints) {
-          throw std::invalid_argument("joint_positions must have exactly 7 values");
-        }
-        franka::AsyncPositionControlHandler::JointPositionTarget tgt;
-        std::copy(joints.begin(), joints.end(), tgt.joint_positions.begin());
-        return tgt;
-    }), py::arg("joint_positions"))
-    .def_readwrite("joint_positions", &franka::AsyncPositionControlHandler::JointPositionTarget::joint_positions);
-
-  py::class_<franka::AsyncPositionControlHandler::CommandResult>(async_position_control_handler, "CommandResult")
-    .def_readwrite("motion_uuid", &franka::AsyncPositionControlHandler::CommandResult::motion_uuid)
-    .def_readwrite("was_successful", &franka::AsyncPositionControlHandler::CommandResult::was_successful)
-    .def_readwrite("error_message", &franka::AsyncPositionControlHandler::CommandResult::error_message);
-
-  py::class_<franka::AsyncPositionControlHandler::TargetFeedback>(async_position_control_handler, "TargetFeedback")
-    .def_readwrite("status", &franka::AsyncPositionControlHandler::TargetFeedback::status)
-    .def_readwrite("error_message", &franka::AsyncPositionControlHandler::TargetFeedback::error_message);
+  // Async Control bindings
+  bind_async_control(m);
 }
 
 }  // namespace pylibfranka

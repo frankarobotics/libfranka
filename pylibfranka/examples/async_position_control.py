@@ -1,10 +1,16 @@
-# Copyright (c) 2025 Franka Robotics GmbH
+# Copyright (c) 2026 Franka Robotics GmbH
 # Apache-2.0
+
+# This example demonstrates asynchronous position control of a Franka robot using the
+# pylibfranka library. It connects to the robot, sets up an asynchronous position control
+# handler, and continuously updates joint position targets in a loop until interrupted, leveraging
+# the latest low-rate control API.
 
 import signal
 import sys
 import time
 import math
+import argparse
 import threading
 from datetime import timedelta
 
@@ -24,14 +30,14 @@ def signal_handler(sig, frame):
 
 
 def main():
-    if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <robot-hostname>")
-        sys.exit(-1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ip", type=str, default="localhost", help="Robot IP address")
+    args = parser.parse_args()
 
     signal.signal(signal.SIGINT, signal_handler)
 
     try:
-        robot = franka.Robot(sys.argv[1], franka.RealtimeConfig.kIgnore)
+        robot = franka.Robot(args.ip, franka.RealtimeConfig.kIgnore)
     except Exception as e:
         print(f"Could not connect to robot: {e}")
         sys.exit(-1)
