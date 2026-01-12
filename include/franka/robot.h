@@ -716,7 +716,7 @@ class Robot {
    */
   virtual std::unique_ptr<ActiveControlBase> startAsyncJointPositionControl(
       const research_interface::robot::Move::ControllerMode& control_type,
-      const std::optional<std::array<double, kNumJoints>>& maximum_velocities);
+      const std::optional<std::vector<double>>& maximum_velocities);
 
   /**
    * Starts a new joint velocity motion generator
@@ -857,7 +857,7 @@ class Robot {
    */
   template <typename MotionGeneratorType>
   auto startAsyncControl(const research_interface::robot::Move::ControllerMode& controller_type,
-                         const std::optional<std::array<double, kNumJoints>>& maximum_velocities)
+                         const std::optional<std::vector<double>>& maximum_velocities)
       -> std::unique_ptr<ActiveControlBase>;
 };
 

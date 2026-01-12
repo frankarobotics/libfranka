@@ -20,6 +20,9 @@ find_package(pinocchio REQUIRED)
 # Create Python module
 pybind11_add_module(_pylibfranka
     src/pylibfranka.cpp
+    src/async_control.cpp
+    src/gripper.cpp
+    # add more source files as needed for next splits
 )
 
 # Include directories
