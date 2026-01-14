@@ -37,12 +37,15 @@ constexpr double kTolNumberPacketsLost = 0.0;
  * Factor for the definition of rotational limits using the Cartesian Pose interface
  */
 constexpr double kFactorCartesianRotationPoseInterface = 0.99;
+
+constexpr double kTorqueLimitEps = 3e-3;
+
 /**
  * Maximum torque rate
  */
 constexpr std::array<double, 7> kMaxTorqueRate{
-    {1000 - kLimitEps, 1000 - kLimitEps, 1000 - kLimitEps, 1000 - kLimitEps, 1000 - kLimitEps,
-     1000 - kLimitEps, 1000 - kLimitEps}};
+    {1000 - kTorqueLimitEps, 1000 - kTorqueLimitEps, 1000 - kTorqueLimitEps, 1000 - kTorqueLimitEps,
+     1000 - kTorqueLimitEps, 1000 - kTorqueLimitEps, 1000 - kTorqueLimitEps}};
 /**
  * Maximum joint jerk
  */
