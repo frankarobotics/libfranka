@@ -1,3 +1,5 @@
+DISTRO_VERSIONS = ['20.04': 'focal', '22.04': 'jammy', '24.04': 'noble']
+
 pipeline {
   libraries {
     lib('fe-pipeline-steps@1.0.0')
@@ -43,11 +45,11 @@ pipeline {
           stage('Init Distro') {
             steps {
               script {
-                def map = ['20.04': 'focal', '22.04': 'jammy', '24.04': 'noble']
-                env.DISTRO = map[env.UBUNTU_VERSION]
-                if (!env.DISTRO) {
+                def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                if (!distro) {
                   error "Unknown UBUNTU_VERSION=${env.UBUNTU_VERSION}"
                 }
+                echo "Distro for ${env.UBUNTU_VERSION}: ${distro}"
               }
             }
           }
@@ -62,15 +64,20 @@ pipeline {
               }
               stage('Clean Workspace') {
                 steps {
-                  sh '''
-                    # Clean build dirs for this distro axis
-                    rm -rf build-*${DISTRO}
-                    rm -rf install-*${DISTRO}
-                    # Remove corrupted googletest fetch content if present
-                    rm -rf build-release.${DISTRO}/_deps/gtest-src build-release.${DISTRO}/_deps/gtest-build || true
-                    rm -rf build-debug.${DISTRO}/_deps/gtest-src build-debug.${DISTRO}/_deps/gtest-build || true
-                    rm -rf build-coverage.${DISTRO}/_deps/gtest-src build-coverage.${DISTRO}/_deps/gtest-build || true
-                  '''
+                  script {
+                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                    withEnv(["DISTRO=${distro}"]) {
+                      sh '''
+                        # Clean build dirs for this distro axis
+                        rm -rf build-*${DISTRO}
+                        rm -rf install-*${DISTRO}
+                        # Remove corrupted googletest fetch content if present
+                        rm -rf build-release.${DISTRO}/_deps/gtest-src build-release.${DISTRO}/_deps/gtest-build || true
+                        rm -rf build-debug.${DISTRO}/_deps/gtest-src build-debug.${DISTRO}/_deps/gtest-build || true
+                        rm -rf build-coverage.${DISTRO}/_deps/gtest-src build-coverage.${DISTRO}/_deps/gtest-build || true
+                      '''
+                    }
+                  }
                 }
               }
             }
@@ -79,45 +86,61 @@ pipeline {
             stages {
               stage('Build debug') {
                 steps {
-                  dir("build-debug.${env.DISTRO}") {
-                    sh '''
-                      rm -rf CMakeCache.txt CMakeFiles _deps || true
-                      cmake -DCMAKE_BUILD_TYPE=Debug -DSTRICT=ON -DBUILD_COVERAGE=OFF \
-                            -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
-                            -DGENERATE_PYLIBFRANKA=ON ..
-                      make -j$(nproc)
-                      cmake --install . --prefix ../install-debug.${DISTRO}
-                    '''
+                  script {
+                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                    dir("build-debug.${distro}") {
+                      withEnv(["DISTRO=${distro}"]) {
+                        sh '''
+                          rm -rf CMakeCache.txt CMakeFiles _deps || true
+                          cmake -DCMAKE_BUILD_TYPE=Debug -DSTRICT=ON -DBUILD_COVERAGE=OFF \
+                                -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
+                                -DGENERATE_PYLIBFRANKA=ON ..
+                          make -j$(nproc)
+                          cmake --install . --prefix ../install-debug.${DISTRO}
+                        '''
+                      }
+                    }
                   }
                 }
               }
               stage('Build release') {
                 steps {
-                  dir("build-release.${env.DISTRO}") {
-                    sh '''
-                      rm -rf CMakeCache.txt CMakeFiles _deps || true
-                      cmake -DCMAKE_BUILD_TYPE=Release -DSTRICT=ON -DBUILD_COVERAGE=OFF \
-                            -DBUILD_DOCUMENTATION=ON -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
-                            -DGENERATE_PYLIBFRANKA=ON ..
-                      make -j$(nproc)
-                      cmake --install . --prefix ../install-release.${DISTRO}
-                    '''
+                  script {
+                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                    dir("build-release.${distro}") {
+                      withEnv(["DISTRO=${distro}"]) {
+                        sh '''
+                          rm -rf CMakeCache.txt CMakeFiles _deps || true
+                          cmake -DCMAKE_BUILD_TYPE=Release -DSTRICT=ON -DBUILD_COVERAGE=OFF \
+                                -DBUILD_DOCUMENTATION=ON -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
+                                -DGENERATE_PYLIBFRANKA=ON ..
+                          make -j$(nproc)
+                          cmake --install . --prefix ../install-release.${DISTRO}
+                        '''
+                      }
+                    }
                   }
                 }
               }
               stage('Build examples (debug)') {
                 steps {
-                  dir("build-debug-examples.${env.DISTRO}") {
-                    sh "cmake -DCMAKE_PREFIX_PATH=../install-debug.${env.DISTRO} ../examples"
-                    sh 'make -j$(nproc)'
+                  script {
+                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                    dir("build-debug-examples.${distro}") {
+                      sh "cmake -DCMAKE_PREFIX_PATH=../install-debug.${distro} ../examples"
+                      sh 'make -j$(nproc)'
+                    }
                   }
                 }
               }
               stage('Build examples (release)') {
                 steps {
-                  dir("build-release-examples.${env.DISTRO}") {
-                    sh "cmake -DCMAKE_PREFIX_PATH=../install-release.${env.DISTRO} ../examples"
-                    sh 'make -j$(nproc)'
+                  script {
+                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                    dir("build-release-examples.${distro}") {
+                      sh "cmake -DCMAKE_PREFIX_PATH=../install-release.${distro} ../examples"
+                      sh 'make -j$(nproc)'
+                    }
                   }
                 }
               }
@@ -128,13 +151,16 @@ pipeline {
                   }
                 }
                 steps {
-                  dir("build-coverage.${env.DISTRO}") {
-                    sh '''
-                      rm -rf CMakeCache.txt CMakeFiles _deps || true
-                      cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_COVERAGE=ON \
-                            -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=ON ..
-                      make -j$(nproc)
-                    '''
+                  script {
+                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                    dir("build-coverage.${distro}") {
+                      sh '''
+                        rm -rf CMakeCache.txt CMakeFiles _deps || true
+                        cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_COVERAGE=ON \
+                              -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=ON ..
+                        make -j$(nproc)
+                      '''
+                    }
                   }
                 }
               }
@@ -142,24 +168,30 @@ pipeline {
           }
           stage('Lint') {
             steps {
-              dir("build-lint.${env.DISTRO}") {
-                catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                  sh '''
-                    cmake -DBUILD_COVERAGE=OFF -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
-                    make check-tidy -j$(nproc)
-                  '''
+              script {
+                def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                dir("build-lint.${distro}") {
+                  catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
+                    sh '''
+                      cmake -DBUILD_COVERAGE=OFF -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
+                      make check-tidy -j$(nproc)
+                    '''
+                  }
                 }
               }
             }
           }
           stage('Format') {
             steps {
-              dir("build-format.${env.DISTRO}") {
-                catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                  sh '''
-                    cmake -DBUILD_COVERAGE=OFF -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
-                    make check-format -j$(nproc)
-                  '''
+              script {
+                def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                dir("build-format.${distro}") {
+                  catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
+                    sh '''
+                      cmake -DBUILD_COVERAGE=OFF -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
+                      make check-format -j$(nproc)
+                    '''
+                  }
                 }
               }
             }
@@ -171,18 +203,21 @@ pipeline {
               }
             }
             steps {
-              dir("build-coverage.${env.DISTRO}") {
-                catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                  sh '''
-                    cmake -DBUILD_COVERAGE=ON -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=ON ..
-                    make coverage -j$(nproc)
-                  '''
-                  publishHTML([allowMissing: false,
-                              alwaysLinkToLastBuild: false,
-                              keepAll: true,
-                              reportDir: 'coverage',
-                              reportFiles: 'index.html',
-                              reportName: "Code Coverage (${env.DISTRO})"])
+              script {
+                def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                dir("build-coverage.${distro}") {
+                  catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
+                    sh '''
+                      cmake -DBUILD_COVERAGE=ON -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=ON ..
+                      make coverage -j$(nproc)
+                    '''
+                    publishHTML([allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: true,
+                                reportDir: 'coverage',
+                                reportFiles: 'index.html',
+                                reportName: "Code Coverage (${distro})"])
+                  }
                 }
               }
             }
@@ -198,18 +233,21 @@ pipeline {
                     echo "[Debug Tests] ASLR status: $(cat /proc/sys/kernel/randomize_va_space)"
                   '''
 
-                  dir("build-debug.${env.DISTRO}") {
-                    sh '''
-                      echo "[Debug Tests] Running tests..."
-                      ctest -V
-                    '''
-                  }
+                  script {
+                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                    dir("build-debug.${distro}") {
+                      sh '''
+                        echo "[Debug Tests] Running tests..."
+                        ctest -V
+                      '''
+                    }
 
-                  dir("build-release.${env.DISTRO}") {
-                    sh '''
-                      echo "[Release Tests] Running tests..."
-                      ctest -V
-                    '''
+                    dir("build-release.${distro}") {
+                      sh '''
+                        echo "[Release Tests] Running tests..."
+                        ctest -V
+                      '''
+                    }
                   }
 
                   sh '''
@@ -224,8 +262,8 @@ pipeline {
             post {
               always {
                 catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                  junit "build-release.${env.DISTRO}/test_results/*.xml"
-                  junit "build-debug.${env.DISTRO}/test_results/*.xml"
+                  junit "build-release.${DISTRO_VERSIONS[env.UBUNTU_VERSION]}/test_results/*.xml"
+                  junit "build-debug.${DISTRO_VERSIONS[env.UBUNTU_VERSION]}/test_results/*.xml"
                 }
               }
             }
@@ -237,71 +275,79 @@ pipeline {
           }
           stage('Publish') {
             steps {
-              dir("build-release.${env.DISTRO}") {
-                catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                  sh 'cpack'
+              script {
+                def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                dir("build-release.${distro}") {
+                  catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
+                    sh 'cpack'
 
-                  // Publish Debian packages with Git commit hash in the name
-                  fePublishDebian('*.deb', 'fci', "deb.distribution=${env.DISTRO};deb.component=main;deb.architecture=amd64")
+                    // Publish Debian packages with Git commit hash in the name
+                    fePublishDebian('*.deb', 'fci', "deb.distribution=${distro};deb.component=main;deb.architecture=amd64")
 
-                  dir('doc') {
-                    sh 'mv docs/*/html/ html/'
-                    sh 'tar cfz ../libfranka-docs.tar.gz html'
+                    dir('doc') {
+                      sh 'mv docs/*/html/ html/'
+                      sh 'tar cfz ../libfranka-docs.tar.gz html'
+                    }
+                    sh "rename -e 's/(.tar.gz)\$/-${distro}\$1/' *.tar.gz"
+                    publishHTML([allowMissing: false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll: true,
+                                reportDir: 'doc/html',
+                                reportFiles: 'index.html',
+                                reportName: "API Documentation (${distro})"])
                   }
-                  sh "rename -e 's/(.tar.gz)\$/-${env.DISTRO}\$1/' *.tar.gz"
-                  publishHTML([allowMissing: false,
-                              alwaysLinkToLastBuild: false,
-                              keepAll: true,
-                              reportDir: 'doc/html',
-                              reportFiles: 'index.html',
-                              reportName: "API Documentation (${env.DISTRO})"])
                 }
               }
 
               // Build and publish pylibfranka documentation
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                sh '''
-                  # Install pylibfranka from root (builds against libfranka in build-release.${DISTRO})
-                  export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
-                  if [ -n "$VIRTUAL_ENV" ]; then
-                    python3 -m pip install .
-                  else
-                    python3 -m pip install . --user
-                  fi
-                '''
+                script {
+                  def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                  withEnv(["DISTRO=${distro}"]) {
+                    sh '''
+                      # Install pylibfranka from root (builds against libfranka in build-release.${DISTRO})
+                      export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
+                      if [ -n "$VIRTUAL_ENV" ]; then
+                        python3 -m pip install .
+                      else
+                        python3 -m pip install . --user
+                      fi
+                    '''
 
-                dir('pylibfranka/docs') {
-                  sh '''
-                    # Install Sphinx and dependencies (respect virtualenv if present)
-                    if [ -n "$VIRTUAL_ENV" ]; then
-                      python3 -m pip install -r requirements.txt
-                    else
-                      # Add sphinx to PATH for --user installs
-                      export PATH="$HOME/.local/bin:$PATH"
-                      python3 -m pip install -r requirements.txt --user
-                    fi
+                    dir('pylibfranka/docs') {
+                      sh '''
+                        # Install Sphinx and dependencies (respect virtualenv if present)
+                        if [ -n "$VIRTUAL_ENV" ]; then
+                          python3 -m pip install -r requirements.txt
+                        else
+                          # Add sphinx to PATH for --user installs
+                          export PATH="$HOME/.local/bin:$PATH"
+                          python3 -m pip install -r requirements.txt --user
+                        fi
 
-                    # Set locale
-                    export LC_ALL=C.UTF-8
-                    export LANG=C.UTF-8
+                        # Set locale
+                        export LC_ALL=C.UTF-8
+                        export LANG=C.UTF-8
 
-                    # Add libfranka to library path
-                    export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
+                        # Add libfranka to library path
+                        export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
 
-                    # Build the documentation only on Ubuntu 20.04
-                    if [ "${UBUNTU_VERSION}" = "20.04" ]; then
-                      make html
-                    else
-                      echo "Skipping docs build on ${UBUNTU_VERSION}"
-                    fi
-                  '''
+                        # Build the documentation only on Ubuntu 20.04
+                        if [ "${UBUNTU_VERSION}" = "20.04" ]; then
+                          make html
+                        else
+                          echo "Skipping docs build on ${UBUNTU_VERSION}"
+                        fi
+                      '''
 
-                  publishHTML([allowMissing: false,
-                              alwaysLinkToLastBuild: false,
-                              keepAll: true,
-                              reportDir: '_build/html',
-                              reportFiles: 'index.html',
-                              reportName: "pylibfranka Documentation (${env.DISTRO})"])
+                      publishHTML([allowMissing: false,
+                                  alwaysLinkToLastBuild: false,
+                                  keepAll: true,
+                                  reportDir: '_build/html',
+                                  reportFiles: 'index.html',
+                                  reportName: "pylibfranka Documentation (${distro})"])
+                    }
+                  }
                 }
               }
             }
