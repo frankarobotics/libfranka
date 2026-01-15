@@ -161,3 +161,14 @@ The gripper example:
 - Attempts to grasp an object with specified parameters
 - Verifies successful grasping
 - Releases the object
+
+### Async Joint Position Control Example
+
+You can also use the async API to control the robot in a low-rate fashion, e.g. 50Hz.
+This allows you to specify joint position setpoints without the need for a blocking loop.
+
+```bash
+cd examples
+python3 async_position_control.py --ip <robot_ip> 
+```
+
