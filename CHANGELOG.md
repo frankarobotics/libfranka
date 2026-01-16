@@ -2,7 +2,7 @@
 
 All notable changes to libfranka in this file.
 
-## [Unreleased]
+## [0.20.0]
 ### libfranka - C++
 #### Changed
 - Hotfix to avoid torques discontinuity false positives due to robot state float precision change.
