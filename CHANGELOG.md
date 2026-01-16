@@ -2,6 +2,12 @@
 
 All notable changes to libfranka in this file.
 
+## [0.20.1]
+
+### libfranka - C++
+
+- Fixed tinyxml2 dependency for ros users using `rosdep install`
+
 ## [0.20.0]
 ### libfranka - C++
 #### Changed
