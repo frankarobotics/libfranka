@@ -80,8 +80,7 @@ jobs:
           echo "Generated packages and checksums:"
           ls -lh build/*.deb build/*.sha256
 
-      - name: Upload Debian package and checksum (manual runs)
-        if: github.event_name == 'workflow_dispatch'
+      - name: Upload Debian package and checksum
         uses: actions/upload-artifact@v4
         with:
           name: libfranka-${{ matrix.ubuntu_version }}
@@ -90,16 +89,54 @@ jobs:
             build/*.sha256
           retention-days: 30
 
-      - name: Upload to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
+  release:
+    name: Create GitHub Release
+    needs: [build-deb]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag != '')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get release info
+        id: get_release_info
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="${{ github.event.inputs.release_tag }}"
+          else
+            TAG=${GITHUB_REF#refs/tags/}
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Release tag: $TAG"
+        shell: bash
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: packages/
+          pattern: libfranka-*
+          merge-multiple: true
+
+      - name: Generate checksums summary
+        run: |
+          echo "Packages to upload:"
+          ls -la packages/
+          echo ""
+          echo "Checksums:"
+          cat packages/*.sha256
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            build/*.deb
-            build/*.sha256
-          generate_release_notes: true
+          tag_name: ${{ steps.get_release_info.outputs.tag }}
+          name: libfranka ${{ steps.get_release_info.outputs.tag }}
           draft: false
           prerelease: false
+          files: packages/*
+          generate_release_notes: true
           fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
