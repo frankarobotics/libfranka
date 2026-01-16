@@ -1,0 +1,5 @@
+<map id="franka::VacuumGripperState" name="franka::VacuumGripperState">
+<area shape="rect" id="Node000001" title="Describes the vacuum gripper state." alt="" coords="5,93,211,119"/>
+<area shape="rect" id="Node000002" href="$classfranka_1_1Duration.html" title="Represents a duration with millisecond resolution." alt="" coords="45,5,171,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,45,111,93,105,93,105,45"/>
+</map>

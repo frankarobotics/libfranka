@@ -1,0 +1,7 @@
+<map id="include/franka/lowpass_filter.h" name="include/franka/lowpass_filter.h">
+<area shape="rect" id="Node000001" title="Contains functions for filtering signals with a low&#45;pass filter." alt="" coords="5,5,176,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="21,93,77,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,47,64,82,60,80,78,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="102,93,165,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="103,44,123,80,118,83,99,47"/>
+</map>
