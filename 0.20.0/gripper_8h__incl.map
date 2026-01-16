@@ -1,0 +1,21 @@
+<map id="include/franka/gripper.h" name="include/franka/gripper.h">
+<area shape="rect" id="Node000001" title="Contains the franka::Gripper type." alt="" coords="17,5,192,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="112,225,179,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,33,47,46,24,62,10,81,8,92,11,103,31,138,59,169,88,195,116,215,113,220,85,200,55,173,27,141,6,105,3,92,5,79,20,58,44,41,70,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="20,79,98,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="99,32,76,69,71,66,94,30"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="122,79,180,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="114,30,138,66,134,69,110,32"/>
+<area shape="rect" id="Node000005" href="$gripper__state_8h.html" title="Contains the franka::GripperState type." alt="" coords="204,79,370,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="135,28,245,71,243,76,133,33"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="248,107,208,125,189,138,173,154,158,182,150,212,145,211,153,180,169,150,186,134,205,120,246,102"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="184,152,260,177"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="278,106,243,144,239,140,274,103"/>
+<area shape="rect" id="Node000007" href="$duration_8h.html" title="Contains the franka::Duration type." alt="" coords="284,152,418,177"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="299,103,333,140,329,144,295,106"/>
+<area shape="poly" id="edge9_Node000007_Node000002" title=" " alt="" coords="319,180,193,223,191,218,317,175"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="275,225,342,251"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="346,179,324,215,320,212,342,176"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="366,225,418,251"/>
+<area shape="poly" id="edge10_Node000007_Node000009" title=" " alt="" coords="360,176,381,212,376,215,355,179"/>
+</map>
