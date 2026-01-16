@@ -2,10 +2,13 @@
 
 All notable changes to libfranka in this file.
 
-## [Unreleased]
+## [0.20.2]
+### libfranka - C++
+- Fix the github workflow to push all the debian packages from 20.4, 22.04 and 24.04
 ### pylibfranka - Python
 #### Added
 - Automated publishing to PyPI via GitHub Actions workflow. When a version tag is pushed, the workflow automatically builds wheels for Python 3.9, 3.10, 3.11, and 3.12, and publishes them to PyPI. Users can now install pylibfranka directly from PyPI using `pip install pylibfranka`.
+- Fix the pylibfranka pybind error with std::nullopt
 
 ## [0.20.1]
 
