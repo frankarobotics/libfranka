@@ -27,7 +27,7 @@ void bind_async_control(py::module& m) {
     @return CommandResult containing the motion UUID, success flag, and error message
       )pbdoc")
           .def("get_target_feedback", &franka::AsyncPositionControlHandler::getTargetFeedback,
-               py::arg("robot_state") = std::nullopt, R"pbdoc(
+               py::arg("robot_state") = py::none(), R"pbdoc(
     Get feedback on the current target.
 
     @param robot_state Optional current robot state for more detailed feedback
