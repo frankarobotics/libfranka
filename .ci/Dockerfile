@@ -1,8 +1,10 @@
 ARG UBUNTU_VERSION="20.04"
+ARG PYTHON_VERSION="3.10"
 
 # Start with a base image
 FROM ubuntu:${UBUNTU_VERSION}
 ARG UBUNTU_VERSION
+ARG PYTHON_VERSION
 
 # Set non-interactive mode
 ENV DEBIAN_FRONTEND=noninteractive
@@ -35,7 +37,9 @@ RUN apt-get update && \
     && ln -s $(which clang-tidy-18) /usr/bin/clang-tidy \
     && ln -s $(which clang-format-18) /usr/bin/clang-format
 
-# Install necessary packages
+# Install necessary packages (without Python - we'll install specific version later)
+# Note: pybind11-dev kept for devcontainer users (works with Ubuntu's default Python)
+# For CI wheel builds, pip-installed pybind11 in venv is used for each Python version
 RUN apt-get update \
     && apt-get install -y \
     bash-completion \
@@ -51,14 +55,41 @@ RUN apt-get update \
     libpoco-dev \
     lsb-release \
     pybind11-dev \
-    python3-dev \
-    python3-pip \
-    python3-venv \
     rename \
     valgrind \
     wget \
+    software-properties-common \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
+
+# Install specific Python version
+# On Ubuntu 22.04, Python 3.10 is the default system Python (packages are python3-dev, python3-venv)
+# For other versions, use deadsnakes PPA (packages are python3.X-dev, python3.X-venv)
+RUN set -ex && \
+    # Check if Python version is already available as system default
+    SYSTEM_PYTHON_VERSION=$(python3 --version 2>/dev/null | grep -oP '\d+\.\d+' || echo "none") && \
+    echo "System Python: $SYSTEM_PYTHON_VERSION, Requested: ${PYTHON_VERSION}" && \
+    if [ "$SYSTEM_PYTHON_VERSION" = "${PYTHON_VERSION}" ]; then \
+        echo "Python ${PYTHON_VERSION} is already the system default, installing dev packages..." && \
+        apt-get update && \
+        apt-get install -y python3-dev python3-venv && \
+        apt-get clean -y && \
+        rm -rf /var/lib/apt/lists/*; \
+    else \
+        echo "Installing Python ${PYTHON_VERSION} from deadsnakes PPA..." && \
+        add-apt-repository ppa:deadsnakes/ppa -y && \
+        apt-get update && \
+        apt-get install -y \
+            python${PYTHON_VERSION} \
+            python${PYTHON_VERSION}-dev \
+            python${PYTHON_VERSION}-venv && \
+        (apt-get install -y python${PYTHON_VERSION}-distutils 2>/dev/null || true) && \
+        apt-get clean -y && \
+        rm -rf /var/lib/apt/lists/* && \
+        update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 1 && \
+        update-alternatives --set python3 /usr/bin/python${PYTHON_VERSION}; \
+    fi && \
+    echo "Installed Python version:" && python3 --version
 
 # Install CMake; use Kitware repo on Ubuntu 20.04 for >=3.22
 RUN if [ "${UBUNTU_VERSION}" = "20.04" ]; then \
@@ -137,6 +168,7 @@ RUN git clone --depth 1 --recurse-submodules --shallow-submodules --branch v3.4.
     && rm -rf pinocchio
 
 # Install Python wheel building tools inside a virtualenv to satisfy PEP 668
+# Note: python3 -m venv uses ensurepip to bootstrap pip automatically
 RUN python3 -m venv /opt/venv && \
         /opt/venv/bin/pip install --upgrade pip setuptools wheel && \
         /opt/venv/bin/pip install \
@@ -147,19 +179,15 @@ RUN python3 -m venv /opt/venv && \
             patchelf \
             flake8 \
             numpy \
-            pybind11 && \
-    /opt/venv/bin/python --version && /opt/venv/bin/pip --version && \
+            pybind11 \
+            cmake && \
+    echo "Python version in venv:" && \
+    /opt/venv/bin/python --version && \
+    /opt/venv/bin/pip --version && \
     chown -R $USER_UID:$USER_GID /opt/venv
 
 # Expose the virtualenv via env var for downstream scripts (e.g., Jenkinsfile)
 ENV VIRTUAL_ENV="/opt/venv"
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
-RUN apt-get update && \
-    apt-get install -y wget gnupg lsb-release software-properties-common && \
-    wget https://apt.llvm.org/llvm.sh && \
-    chmod +x llvm.sh && \
-    ./llvm.sh 18 && \
-    apt-get update && \
-    apt-get install -y clang-format-18 clang-tidy-18
 
 USER $USERNAME

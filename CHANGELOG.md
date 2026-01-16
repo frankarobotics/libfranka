@@ -2,6 +2,11 @@
 
 All notable changes to libfranka in this file.
 
+## [Unreleased]
+### pylibfranka - Python
+#### Added
+- Automated publishing to PyPI via GitHub Actions workflow. When a version tag is pushed, the workflow automatically builds wheels for Python 3.9, 3.10, 3.11, and 3.12, and publishes them to PyPI. Users can now install pylibfranka directly from PyPI using `pip install pylibfranka`.
+
 ## [0.20.1]
 
 ### libfranka - C++
@@ -11,7 +16,8 @@ All notable changes to libfranka in this file.
 ## [0.20.0]
 ### libfranka - C++
 #### Changed
-- Hotfix to avoid torques discontinuity false positives due to robot state float precision change.
+- Hotfix to avoid torques discontinuity false positives due to robot state float precision change (was again reverted).
+- Breaking change: Fixed a wrong torque discontinuity trigger by reverting the float change within the robot state back to doubles.
 
 ### pylibfranka - Python
 #### Added

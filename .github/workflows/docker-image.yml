@@ -1,0 +1,110 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - '.ci/Dockerfile'
+      - '.ci/*.patch'
+      - '.github/workflows/docker-image.yml'
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force rebuild all images'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/pylibfranka-build
+
+jobs:
+  build-and-push:
+    name: Build ${{ matrix.name }} image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Python wheel build images
+          - python-version: '3.9'
+            ubuntu-version: '20.04'  # Ubuntu 20.04 for glibc 2.31 compatibility
+            name: 'Python 3.9'
+            tag-prefix: 'py'
+          - python-version: '3.10'
+            ubuntu-version: '22.04'
+            name: 'Python 3.10'
+            tag-prefix: 'py'
+          - python-version: '3.11'
+            ubuntu-version: '22.04'
+            name: 'Python 3.11'
+            tag-prefix: 'py'
+          - python-version: '3.12'
+            ubuntu-version: '22.04'
+            name: 'Python 3.12'
+            tag-prefix: 'py'
+          # Debian package build images (Ubuntu version specific)
+          - python-version: '3.8'
+            ubuntu-version: '20.04'
+            name: 'Ubuntu 20.04'
+            tag-prefix: 'ubuntu'
+          - python-version: '3.10'
+            ubuntu-version: '22.04'
+            name: 'Ubuntu 22.04'
+            tag-prefix: 'ubuntu'
+          - python-version: '3.12'
+            ubuntu-version: '24.04'
+            name: 'Ubuntu 24.04'
+            tag-prefix: 'ubuntu'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ matrix.tag-prefix }}${{ matrix.tag-prefix == 'py' && matrix.python-version || matrix.ubuntu-version }}
+            type=sha,prefix=${{ matrix.tag-prefix }}${{ matrix.tag-prefix == 'py' && matrix.python-version || matrix.ubuntu-version }}-
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .ci/
+          file: .ci/Dockerfile
+          build-args: |
+            UBUNTU_VERSION=${{ matrix.ubuntu-version }}
+            PYTHON_VERSION=${{ matrix.python-version }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=docker-${{ matrix.tag-prefix }}${{ matrix.tag-prefix == 'py' && matrix.python-version || matrix.ubuntu-version }}
+          cache-to: type=gha,mode=max,scope=docker-${{ matrix.tag-prefix }}${{ matrix.tag-prefix == 'py' && matrix.python-version || matrix.ubuntu-version }}
+
+      - name: Verify pushed image
+        env:
+          IMAGE_TAG: ${{ matrix.tag-prefix }}${{ matrix.tag-prefix == 'py' && matrix.python-version || matrix.ubuntu-version }}
+        run: |
+          echo "Verifying image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG} python3 --version

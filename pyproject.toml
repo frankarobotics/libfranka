@@ -14,28 +14,35 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pylibfranka"
 dynamic = ["version"]
-description = "Python bindings for libfranka with automatic dependency bundling"
+description = "Python bindings for libfranka - Control Franka robots with Python"
+readme = "pylibfranka/README.md"
 authors = [{name = "Franka Robotics GmbH", email = "info@franka.de"}]
 license = {text = "Apache-2.0"}
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "numpy>=1.19.0",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python :: 3.8",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Topic :: Scientific/Engineering :: Robotics",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C++",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 [project.urls]
 Homepage = "https://github.com/frankarobotics/libfranka"
+Documentation = "https://frankarobotics.github.io/libfranka/pylibfranka/latest"
 Repository = "https://github.com/frankarobotics/libfranka"
 Issues = "https://github.com/frankarobotics/libfranka/issues"
+Changelog = "https://github.com/frankarobotics/libfranka/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
@@ -53,37 +60,37 @@ packages = ["pylibfranka"]
 zip-safe = false
 
 [tool.setuptools.dynamic]
-version = {attr = "pylibfranka._version.__version__"}
+version = {file = "pylibfranka/VERSION"}
 
 [tool.setuptools.package-data]
 pylibfranka = ["*.so", "*.pyd", "_pylibfranka*"]
 
 [tool.cibuildwheel]
-# Build only on modern Python versions
-build = "cp38-* cp39-* cp310-* cp311-*"
-skip = "pp* *-manylinux_i686"
+# Build for Python 3.9 through 3.12 (3.8 EOL)
+build = "cp39-* cp310-* cp311-* cp312-*"
+skip = "pp* *-manylinux_i686 *-musllinux*"
 
 # Install system dependencies before building
 before-all = [
     "yum install -y eigen3-devel poco-devel || true",
     "apt-get update && apt-get install -y libeigen3-dev libpoco-dev || true",
-    "pip install pybind11 cmake"
+    "pip install pybind11 cmake numpy"
 ]
 
 # Build requirements
 build-verbosity = 1
 
 [tool.cibuildwheel.linux]
-# Use manylinux2014 for better compatibility
-manylinux-x86_64-image = "manylinux2014"
-manylinux-aarch64-image = "manylinux2014"
+# Use manylinux_2_17 for broader compatibility
+manylinux-x86_64-image = "manylinux_2_17"
+manylinux-aarch64-image = "manylinux_2_17"
 
-# Let auditwheel bundle dependencies automatically
-repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel} --lib-sdir ."
+# Repair wheel to bundle shared libraries with unique hashes
+repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel} --plat manylinux_2_17_x86_64"
 
 [tool.black]
 line-length = 100
-target-version = ["py38", "py39", "py310", "py311"]
+target-version = ["py39", "py310", "py311", "py312"]
 
 [tool.isort]
 profile = "black"

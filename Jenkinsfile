@@ -1,4 +1,4 @@
-DISTRO_VERSIONS = ['20.04': 'focal', '22.04': 'jammy', '24.04': 'noble']
+def PYTHON_VERSION_BY_UBUNTU = ['20.04': '3.9', '22.04': '3.10', '24.04': '3.12']
 
 pipeline {
   libraries {
@@ -23,33 +23,38 @@ pipeline {
   stages {
     stage('Matrix') {
       matrix {
-        agent {
-          dockerfile {
-            dir ".ci"
-            filename "Dockerfile"
-            reuseNode false
-            additionalBuildArgs "--pull --build-arg UBUNTU_VERSION=${env.UBUNTU_VERSION} --tag libfranka:${env.UBUNTU_VERSION}"
-            args '--privileged ' +
-                 '--cap-add=SYS_PTRACE ' +
-                 '--security-opt seccomp=unconfined ' +
-                 '--shm-size=2g '
-         }
-        }
         axes {
           axis {
             name 'UBUNTU_VERSION'
             values '20.04', '22.04', '24.04'
           }
         }
+        environment {
+          DISTRO = "${['20.04': 'focal', '22.04': 'jammy', '24.04': 'noble'][UBUNTU_VERSION]}"
+          PYTHON_VERSION = "${PYTHON_VERSION_BY_UBUNTU[UBUNTU_VERSION]}"
+        }
+        agent {
+          dockerfile {
+            dir ".ci"
+            filename "Dockerfile"
+            reuseNode false
+            additionalBuildArgs "--pull --build-arg UBUNTU_VERSION=${env.UBUNTU_VERSION} --build-arg PYTHON_VERSION=${PYTHON_VERSION_BY_UBUNTU[env.UBUNTU_VERSION]} --tag libfranka:${env.UBUNTU_VERSION}"
+            args '--privileged ' +
+                 '--cap-add=SYS_PTRACE ' +
+                 '--security-opt seccomp=unconfined ' +
+                 '--shm-size=2g '
+         }
+        }
         stages {
           stage('Init Distro') {
             steps {
               script {
-                def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
-                if (!distro) {
+                if (!env.DISTRO) {
                   error "Unknown UBUNTU_VERSION=${env.UBUNTU_VERSION}"
                 }
-                echo "Distro for ${env.UBUNTU_VERSION}: ${distro}"
+                if (!env.PYTHON_VERSION) {
+                  error "Unknown PYTHON_VERSION for UBUNTU_VERSION=${env.UBUNTU_VERSION}"
+                }
               }
             }
           }
@@ -86,39 +91,29 @@ pipeline {
             stages {
               stage('Build debug') {
                 steps {
-                  script {
-                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
-                    dir("build-debug.${distro}") {
-                      withEnv(["DISTRO=${distro}"]) {
-                        sh '''
-                          rm -rf CMakeCache.txt CMakeFiles _deps || true
-                          cmake -DCMAKE_BUILD_TYPE=Debug -DSTRICT=ON -DBUILD_COVERAGE=OFF \
-                                -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
-                                -DGENERATE_PYLIBFRANKA=ON ..
-                          make -j$(nproc)
-                          cmake --install . --prefix ../install-debug.${DISTRO}
-                        '''
-                      }
-                    }
+                  dir("build-debug.${env.DISTRO}") {
+                    sh '''
+                      rm -rf CMakeCache.txt CMakeFiles _deps || true
+                      cmake -DCMAKE_BUILD_TYPE=Debug -DSTRICT=ON -DBUILD_COVERAGE=OFF \
+                            -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
+                            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGENERATE_PYLIBFRANKA=ON ..
+                      make -j$(nproc)
+                      cmake --install . --prefix ../install-debug.${DISTRO}
+                    '''
                   }
                 }
               }
               stage('Build release') {
                 steps {
-                  script {
-                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
-                    dir("build-release.${distro}") {
-                      withEnv(["DISTRO=${distro}"]) {
-                        sh '''
-                          rm -rf CMakeCache.txt CMakeFiles _deps || true
-                          cmake -DCMAKE_BUILD_TYPE=Release -DSTRICT=ON -DBUILD_COVERAGE=OFF \
-                                -DBUILD_DOCUMENTATION=ON -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
-                                -DGENERATE_PYLIBFRANKA=ON ..
-                          make -j$(nproc)
-                          cmake --install . --prefix ../install-release.${DISTRO}
-                        '''
-                      }
-                    }
+                  dir("build-release.${env.DISTRO}") {
+                    sh '''
+                      rm -rf CMakeCache.txt CMakeFiles _deps || true
+                      cmake -DCMAKE_BUILD_TYPE=Release -DSTRICT=ON -DBUILD_COVERAGE=OFF \
+                            -DBUILD_DOCUMENTATION=ON -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON \
+                            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGENERATE_PYLIBFRANKA=ON ..
+                      make -j$(nproc)
+                      cmake --install . --prefix ../install-release.${DISTRO}
+                    '''
                   }
                 }
               }
@@ -151,16 +146,14 @@ pipeline {
                   }
                 }
                 steps {
-                  script {
-                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
-                    dir("build-coverage.${distro}") {
-                      sh '''
-                        rm -rf CMakeCache.txt CMakeFiles _deps || true
-                        cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_COVERAGE=ON \
-                              -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=ON ..
-                        make -j$(nproc)
-                      '''
-                    }
+                  dir("build-coverage.${env.DISTRO}") {
+                    sh '''
+                      rm -rf CMakeCache.txt CMakeFiles _deps || true
+                      cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_COVERAGE=ON \
+                            -DBUILD_DOCUMENTATION=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+                            -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=ON ..
+                      make -j$(nproc)
+                    '''
                   }
                 }
               }
@@ -168,30 +161,24 @@ pipeline {
           }
           stage('Lint') {
             steps {
-              script {
-                def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
-                dir("build-lint.${distro}") {
-                  catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                    sh '''
-                      cmake -DBUILD_COVERAGE=OFF -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
-                      make check-tidy -j$(nproc)
-                    '''
-                  }
+              dir("build-lint.${env.DISTRO}") {
+                catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
+                  sh '''
+                    cmake -DBUILD_COVERAGE=OFF -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_TESTS=ON ..
+                    make check-tidy -j$(nproc)
+                  '''
                 }
               }
             }
           }
           stage('Format') {
             steps {
-              script {
-                def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
-                dir("build-format.${distro}") {
-                  catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                    sh '''
-                      cmake -DBUILD_COVERAGE=OFF -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON ..
-                      make check-format -j$(nproc)
-                    '''
-                  }
+              dir("build-format.${env.DISTRO}") {
+                catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
+                  sh '''
+                    cmake -DBUILD_COVERAGE=OFF -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_TESTS=ON ..
+                    make check-format -j$(nproc)
+                  '''
                 }
               }
             }
@@ -203,21 +190,18 @@ pipeline {
               }
             }
             steps {
-              script {
-                def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
-                dir("build-coverage.${distro}") {
-                  catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                    sh '''
-                      cmake -DBUILD_COVERAGE=ON -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=ON ..
-                      make coverage -j$(nproc)
-                    '''
-                    publishHTML([allowMissing: false,
-                                alwaysLinkToLastBuild: false,
-                                keepAll: true,
-                                reportDir: 'coverage',
-                                reportFiles: 'index.html',
-                                reportName: "Code Coverage (${distro})"])
-                  }
+              dir("build-coverage.${env.DISTRO}") {
+                catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
+                  sh '''
+                    cmake -DBUILD_COVERAGE=ON -DBUILD_DOCUMENTATION=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_TESTS=ON ..
+                    make coverage -j$(nproc)
+                  '''
+                  publishHTML([allowMissing: false,
+                              alwaysLinkToLastBuild: false,
+                              keepAll: true,
+                              reportDir: 'coverage',
+                              reportFiles: 'index.html',
+                              reportName: "Code Coverage (${env.DISTRO})"])
                 }
               }
             }
