@@ -25,6 +25,7 @@
   <exec_depend>fmt</exec_depend>
   <exec_depend>libpoco-dev</exec_depend>
   <exec_depend>pinocchio</exec_depend>
+  <exec_depend>tinyxml2</exec_depend>
 
   <doc_depend>doxygen</doc_depend>
   <doc_depend>graphviz</doc_depend>
