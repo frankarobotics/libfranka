@@ -20,6 +20,7 @@
   <build_depend>fmt</build_depend>
   <build_depend>libpoco-dev</build_depend>
   <build_depend>pinocchio</build_depend>
+  <build_depend>tinyxml2</build_depend>
 
   <exec_depend>fmt</exec_depend>
   <exec_depend>libpoco-dev</exec_depend>
