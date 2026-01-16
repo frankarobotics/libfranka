@@ -6,13 +6,26 @@ on:
       - '*'
   workflow_dispatch:
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/pylibfranka-build
+
 jobs:
   build-deb:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: ["20.04", "22.04", "24.04"]
+        include:
+          - ubuntu_version: "20.04"
+            python_version: "3.8"
+          - ubuntu_version: "22.04"
+            python_version: "3.10"
+          - ubuntu_version: "24.04"
+            python_version: "3.12"
 
     steps:
       - name: Checkout repository
@@ -21,21 +34,18 @@ jobs:
           submodules: 'recursive'
           fetch-depth: 0
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          context: .ci/
-          file: .ci/Dockerfile
-          build-args: |
-            UBUNTU_VERSION=${{ matrix.ubuntu_version }}
-          tags: libfranka-build:${{ matrix.ubuntu_version }}
-          push: false
-          load: true
-          cache-from: type=gha,scope=${{ matrix.ubuntu_version }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.ubuntu_version }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull pre-built Docker image
+        run: |
+          echo "Pulling pre-built image for Ubuntu ${{ matrix.ubuntu_version }}..."
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ubuntu${{ matrix.ubuntu_version }}
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ubuntu${{ matrix.ubuntu_version }} libfranka-build:${{ matrix.ubuntu_version }}
 
       - name: Build and package in container
         uses: addnab/docker-run-action@v3
@@ -44,7 +54,7 @@ jobs:
           options: -v ${{ github.workspace }}:/workspaces
           run: |
             cd /workspaces
-            cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -B build -S .
+            cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -B build -S .
             cmake --build build -- -j$(nproc)
             cd build
             cpack -G DEB

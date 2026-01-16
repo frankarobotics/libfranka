@@ -160,6 +160,7 @@ target_link_libraries(franka PUBLIC
   fmt::fmt
 )
 
+
 ## Compile pylibfranka
 if (GENERATE_PYLIBFRANKA)
   add_subdirectory(pylibfranka)

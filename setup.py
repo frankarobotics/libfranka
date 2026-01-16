@@ -7,56 +7,43 @@ from pathlib import Path
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
+# Root directory of the project
+ROOT_DIR = Path(__file__).parent
+
 
 def get_version():
     """Extract version from CMakeLists.txt."""
-    cmake_file = Path(__file__).parent / "CMakeLists.txt"
+    cmake_file = ROOT_DIR / "CMakeLists.txt"
     if cmake_file.exists():
-        with open(cmake_file, 'r') as f:
+        with open(cmake_file, "r", encoding="utf-8") as f:
             content = f.read()
-            match = re.search(r'set\(libfranka_VERSION\s+(\d+\.\d+\.\d+)\)', content)
+            match = re.search(r"set\(libfranka_VERSION\s+(\d+\.\d+\.\d+)\)", content)
             if match:
                 return match.group(1)
     return "0.0.0"
 
 
-def update_version_file():
-    """Update _version.py with current version from CMakeLists.txt."""
-    version = get_version()
-    version_file = Path(__file__).parent / "pylibfranka" / "_version.py"
-    
-    if version_file.exists():
-        # Read current content
-        with open(version_file, 'r') as f:
-            content = f.read()
-        
-        # Update the version line (matches the pattern with AUTO-GENERATED comment)
-        new_content = re.sub(
-            r'__version__ = "[^"]*"  # AUTO-GENERATED',
-            f'__version__ = "{version}"  # AUTO-GENERATED',
-            content
-        )
-        
-        # Write the updated content
-        with open(version_file, 'w') as f:
-            f.write(new_content)
-    else:
-        # Create the file if it doesn't exist
-        with open(version_file, 'w') as f:
-            f.write(f'''"""Version information for pylibfranka."""
+def write_version_files(version):
+    """Write version to VERSION file and _version.py for runtime access."""
+    pylibfranka_dir = ROOT_DIR / "pylibfranka"
 
-__all__ = ['__version__']
+    # Write VERSION file (used by pyproject.toml for build metadata)
+    version_file = pylibfranka_dir / "VERSION"
+    version_file.write_text(f"{version}\n")
+
+    # Write _version.py (used at runtime for pylibfranka.__version__)
+    version_py = pylibfranka_dir / "_version.py"
+    version_py.write_text(
+        '"""Version information for pylibfranka."""\n\n'
+        "__all__ = ['__version__']\n\n"
+        "# Version is auto-generated from CMakeLists.txt during build\n"
+        f'__version__ = "{version}"\n'
+    )
 
 
-# Version will be written here by pip install . command
-# or setup.py during build/install
-# DO NOT EDIT THIS LINE - it is automatically replaced
-__version__ = "{version}"  # AUTO-GENERATED
-''')
-
-
-# Update version file immediately when setup.py is loaded
-update_version_file()
+# Extract and write version files before setuptools processes pyproject.toml
+_version = get_version()
+write_version_files(_version)
 
 
 class CMakeExtension(Extension):
@@ -65,14 +52,22 @@ class CMakeExtension(Extension):
         self.sourcedir = os.path.abspath(sourcedir)
 
 
+def get_pybind11_cmake_dir():
+    """Get pybind11 CMake directory from pip-installed pybind11."""
+    try:
+        import pybind11
+
+        return pybind11.get_cmake_dir()
+    except (ImportError, AttributeError):
+        # Fallback to system pybind11 or let CMake find it
+        return None
+
+
 class CMakeBuild(build_ext):
     def run(self):
-        # Ensure version file is updated (redundant but safe)
-        update_version_file()
-        
         # Call parent run
         super().run()
-    
+
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
 
@@ -91,6 +86,11 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_POLICY_VERSION_MINIMUM=3.5",
             "-DCMAKE_BUILD_TYPE=Release",
         ]
+
+        # Use pip-installed pybind11 if available (ensures Python version compatibility)
+        pybind11_dir = get_pybind11_cmake_dir()
+        if pybind11_dir:
+            cmake_args.append(f"-Dpybind11_DIR={pybind11_dir}")
 
         subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=build_temp)
         subprocess.check_call(
@@ -113,9 +113,9 @@ class CMakeBuild(build_ext):
 
 setup(
     name="pylibfranka",
-    version=get_version(),
+    version=_version,
     packages=["pylibfranka"],
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     install_requires=["numpy>=1.19.0"],
     ext_modules=[CMakeExtension("pylibfranka._pylibfranka")],
     cmdclass={
@@ -123,6 +123,6 @@ setup(
     },
     zip_safe=False,
     package_data={
-        "pylibfranka": ["*.so", "*.pyd"],
+        "pylibfranka": ["*.so", "*.pyd", "VERSION"],
     },
 )
