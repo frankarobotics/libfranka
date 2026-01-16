@@ -231,29 +231,67 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.get_release_info.outputs.tag }}
-          name: pylibfranka ${{ steps.get_release_info.outputs.version }}
+          name: libfranka ${{ steps.get_release_info.outputs.version }}
           draft: false
           prerelease: false
           files: dist/*
           body: |
-            # pylibfranka ${{ steps.get_release_info.outputs.version }}
+            # libfranka ${{ steps.get_release_info.outputs.version }}
+            
+            C++ library and Python bindings for controlling Franka robots.
+            
+            ---
+            
+            ## libfranka (C++ Library)
+            
+            ### Installation from Debian Package
+            Download the appropriate `.deb` file for your Ubuntu version from the assets below and install:
+            
+            **Ubuntu 20.04 (Focal):**
+            ```bash
+            sudo dpkg -i libfranka_${{ steps.get_release_info.outputs.version }}_focal_amd64.deb
+            sudo apt-get install -f  # Install dependencies if needed
+            ```
+            
+            **Ubuntu 22.04 (Jammy):**
+            ```bash
+            sudo dpkg -i libfranka_${{ steps.get_release_info.outputs.version }}_jammy_amd64.deb
+            sudo apt-get install -f  # Install dependencies if needed
+            ```
+            
+            **Ubuntu 24.04 (Noble):**
+            ```bash
+            sudo dpkg -i libfranka_${{ steps.get_release_info.outputs.version }}_noble_amd64.deb
+            sudo apt-get install -f  # Install dependencies if needed
+            ```
+            
+            ### Available Debian Packages
+            | Ubuntu Version | Package |
+            |----------------|---------|
+            | 20.04 (Focal)  | `libfranka_${{ steps.get_release_info.outputs.version }}_focal_amd64.deb` |
+            | 22.04 (Jammy)  | `libfranka_${{ steps.get_release_info.outputs.version }}_jammy_amd64.deb` |
+            | 24.04 (Noble)  | `libfranka_${{ steps.get_release_info.outputs.version }}_noble_amd64.deb` |
+            
+            ---
+            
+            ## pylibfranka (Python Bindings)
             
             Python bindings for libfranka, providing easy-to-use Python interfaces for controlling Franka robots.
             
-            ## Installation
+            ### Installation
             
-            ### From PyPI (Recommended)
+            #### From PyPI (Recommended)
             ```bash
             pip install pylibfranka==${{ steps.get_release_info.outputs.version }}
             ```
             
-            ### From GitHub Release
+            #### From GitHub Release
             Download the appropriate wheel for your Python version and install:
             ```bash
             pip install pylibfranka-${{ steps.get_release_info.outputs.version }}-cp310-cp310-manylinux_2_34_x86_64.whl
             ```
             
-            ## Platform Compatibility
+            ### Platform Compatibility
             
             | Ubuntu Version | Supported Python Versions |
             |----------------|---------------------------|
@@ -263,14 +301,14 @@ jobs:
             
             **Note:** Ubuntu 20.04 users must use Python 3.9 due to glibc compatibility requirements.
             
-            ## Available Wheels
+            ### Available Wheels
             - Python 3.9: `cp39-cp39-manylinux_2_31_x86_64.whl` (Ubuntu 20.04+)
             - Python 3.10: `cp310-cp310-manylinux_2_34_x86_64.whl` (Ubuntu 22.04+)
             - Python 3.11: `cp311-cp311-manylinux_2_34_x86_64.whl` (Ubuntu 22.04+)
             - Python 3.12: `cp312-cp312-manylinux_2_34_x86_64.whl` (Ubuntu 22.04+)
             - Source: `pylibfranka-${{ steps.get_release_info.outputs.version }}.tar.gz`
             
-            ## Quick Start
+            ### Quick Start
             ```python
             import pylibfranka
             print(f"pylibfranka version: {pylibfranka.__version__}")
@@ -279,10 +317,13 @@ jobs:
             state = robot.read_once()
             ```
             
+            ---
+            
             ## Documentation
-            - [Examples](https://github.com/frankarobotics/libfranka/tree/main/pylibfranka/examples)
-            - [API Documentation](https://frankarobotics.github.io/libfranka/pylibfranka/latest)
-            - [README](https://github.com/frankarobotics/libfranka/blob/main/pylibfranka/README.md)
+            - [libfranka Documentation](https://frankarobotics.github.io/libfranka/)
+            - [pylibfranka Examples](https://github.com/frankarobotics/libfranka/tree/main/pylibfranka/examples)
+            - [pylibfranka API Documentation](https://frankarobotics.github.io/libfranka/pylibfranka/latest)
+            - [pylibfranka README](https://github.com/frankarobotics/libfranka/blob/main/pylibfranka/README.md)
 
   publish_pypi:
     name: Publish to PyPI
