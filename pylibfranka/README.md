@@ -3,9 +3,9 @@
 This document provides comprehensive instructions for installing and using pylibfranka, a Python binding for libfranka that enables control of Franka Robotics robots.
 
 ## Table of Contents
-- [Prerequisites](#prerequisites)
 - [Installation](#installation)
-  - [Installation from Source](#installation-from-source)
+  - [From PyPI (Recommended)](#from-pypi-recommended)
+  - [From Source](#from-source)
 - [Examples](#examples)
   - [Joint Position Example](#joint-position-example)
   - [Print Robot State Example](#print-robot-state-example)
@@ -13,11 +13,33 @@ This document provides comprehensive instructions for installing and using pylib
   - [Gripper Control Example](#gripper-control-example)
 - [Troubleshooting](#troubleshooting)
 
-## Prerequisites
+## Installation
 
-Before installing pylibfranka, ensure you have the following prerequisites:
+### From PyPI (Recommended)
 
-- Python 3.8 or newer
+The easiest way to install pylibfranka is via pip. Pre-built wheels include all necessary dependencies.
+
+```bash
+pip install pylibfranka
+```
+
+#### Platform Compatibility
+
+| Ubuntu Version | Supported Python Versions |
+|----------------|---------------------------|
+| 20.04 (Focal)  | Python 3.9 only           |
+| 22.04 (Jammy)  | Python 3.9, 3.10, 3.11, 3.12 |
+| 24.04 (Noble)  | Python 3.9, 3.10, 3.11, 3.12 |
+
+**Note:** Ubuntu 20.04 users must use Python 3.9 due to glibc compatibility requirements.
+
+### From Source
+
+If you need to build from source (e.g., for development or unsupported platforms):
+
+#### Prerequisites
+
+- Python 3.9 or newer
 - CMake 3.16 or newer
 - C++ compiler with C++17 support
 - Eigen3 development headers
@@ -25,25 +47,19 @@ Before installing pylibfranka, ensure you have the following prerequisites:
 
 **Disclaimer: If you are using the provided devcontainer, you can skip the prerequisites installation as they are already included in the container.**
 
-### Installing Prerequisites on Ubuntu/Debian
+#### Installing Prerequisites on Ubuntu/Debian
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y build-essential cmake libeigen3-dev libpoco-dev python3-dev
 ```
 
-#### Installing pylibfranka via PIP
+#### Build and Install
 
-From the root folder, you can install `pylibfranka` (therefore, NOT in the build folder) using pip:
+From the root folder, you can install `pylibfranka` using pip:
 
 ```bash
 pip install .
-```
-
-or
-
-```bash
-pip3 install .
 ```
 
 This will install pylibfranka in your current Python environment.

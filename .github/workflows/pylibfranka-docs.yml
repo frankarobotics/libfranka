@@ -5,9 +5,16 @@ on:
     tags:
       - '*'
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/pylibfranka-build
+
 jobs:
   sphinx-docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
 
     steps:
     - name: Checkout repository
@@ -16,16 +23,18 @@ jobs:
         submodules: 'recursive'
         fetch-depth: 0  # Fetch all history including tags for version detection
 
-    - name: Build Docker Image
-      uses: docker/build-push-action@v4
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
       with:
-        context: .ci/
-        file: .ci/Dockerfile
-        tags: pylibfranka:latest
-        build-args: |
-            UBUNTU_VERSION=20.04
-        push: false
-        load: true
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Pull pre-built Docker image
+      run: |
+        echo "Pulling pre-built image..."
+        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:py3.10
+        docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:py3.10 pylibfranka:latest
 
     - name: Setup Dependencies
       uses: addnab/docker-run-action@v3
@@ -54,7 +63,7 @@ jobs:
           cd pylibfranka/docs
 
           # Install Sphinx requirements
-          pip3 install -r requirements.txt --user
+          pip3 install -r requirements.txt
 
           # Get version from installed package (synced from CMakeLists.txt)
           VERSION=$(python3 -c "import pylibfranka; print(pylibfranka.__version__)")
