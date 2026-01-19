@@ -1,0 +1,42 @@
+<map id="include/franka/active_control_base.h" name="include/franka/active_control_base.h">
+<area shape="rect" id="Node000001" title="Abstract interface class as the base of the active controllers." alt="" coords="671,5,830,45"/>
+<area shape="rect" id="Node000002" href="$control__types_8h.html" title="Contains helper types for returning motion generation and joint&#45;level torque commands." alt="" coords="30,93,197,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="672,39,211,95,210,90,671,34"/>
+<area shape="rect" id="Node000006" href="$exception_8h.html" title="Contains exception definitions." alt="" coords="377,93,519,119"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="679,48,506,92,505,87,677,43"/>
+<area shape="rect" id="Node000010" href="$robot__state_8h.html" title="Contains the franka::RobotState types." alt="" coords="605,93,758,119"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="736,47,703,84,699,81,732,44"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="783,93,860,119"/>
+<area shape="poly" id="edge19_Node000001_Node000017" title=" " alt="" coords="770,44,804,81,800,85,766,47"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="884,93,959,119"/>
+<area shape="poly" id="edge20_Node000001_Node000018" title=" " alt="" coords="793,43,885,85,883,90,790,48"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="983,93,1043,119"/>
+<area shape="poly" id="edge21_Node000001_Node000019" title=" " alt="" coords="814,43,971,89,969,94,813,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="605,255,661,280"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="78,121,43,139,28,152,16,168,8,188,10,196,15,205,26,212,45,219,102,231,268,248,451,258,592,263,592,268,451,263,267,254,101,236,43,224,24,217,11,209,5,198,3,187,11,165,24,149,40,135,75,116"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="26,174,89,199"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="107,120,76,164,71,161,103,117"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="113,174,223,199"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="124,117,154,161,150,164,119,120"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="247,174,334,199"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="426,121,327,170,325,166,424,116"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="359,174,417,199"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="441,120,407,164,403,161,437,117"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="442,167,595,207"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="460,117,495,155,491,158,456,121"/>
+<area shape="poly" id="edge10_Node000010_Node000003" title=" " alt="" coords="679,120,661,167,641,241,636,240,656,166,674,118"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="698,255,774,280"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="732,116,771,135,788,148,802,165,809,186,802,208,787,231,768,249,764,245,783,227,798,206,803,186,798,168,784,152,768,139,730,121"/>
+<area shape="rect" id="Node000012" href="$duration_8h.html" title="Contains the franka::Duration type." alt="" coords="863,174,996,199"/>
+<area shape="poly" id="edge12_Node000010_Node000012" title=" " alt="" coords="718,116,881,167,880,172,717,121"/>
+<area shape="rect" id="Node000016" href="$errors_8h.html" title="Contains the franka::Errors type." alt="" coords="671,174,788,199"/>
+<area shape="poly" id="edge16_Node000010_Node000016" title=" " alt="" coords="691,117,717,161,713,164,686,120"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="805,255,872,280"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="918,202,864,248,861,244,914,197"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="896,255,963,280"/>
+<area shape="poly" id="edge14_Node000012_Node000014" title=" " alt="" coords="932,200,932,241,927,241,927,200"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="987,255,1039,280"/>
+<area shape="poly" id="edge15_Node000012_Node000015" title=" " alt="" coords="944,198,993,243,989,247,940,201"/>
+<area shape="poly" id="edge17_Node000016_Node000003" title=" " alt="" coords="717,202,660,248,656,244,713,197"/>
+<area shape="poly" id="edge18_Node000016_Node000011" title=" " alt="" coords="733,199,736,241,731,241,728,200"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="franka::IncompatibleVersionException" name="franka::IncompatibleVersionException">
+<area shape="rect" id="Node000001" title="IncompatibleVersionException is thrown if the robot does not support this version of libfranka." alt="" coords="5,152,209,192"/>
+<area shape="rect" id="Node000002" href="$structfranka_1_1Exception.html" title="Base class for all exceptions used by libfranka." alt="" coords="40,79,175,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,118,110,152,105,152,105,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="38,5,177,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="110,44,110,79,105,79,105,44"/>
+</map>

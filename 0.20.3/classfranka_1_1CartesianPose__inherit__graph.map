@@ -1,0 +1,5 @@
+<map id="franka::CartesianPose" name="franka::CartesianPose">
+<area shape="rect" id="Node000001" title="Stores values for Cartesian pose motion generation." alt="" coords="5,79,169,104"/>
+<area shape="rect" id="Node000002" href="$structfranka_1_1Finishable.html" title="Helper type for control and motion generation loops." alt="" coords="19,5,156,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,44,90,79,85,79,85,44"/>
+</map>
