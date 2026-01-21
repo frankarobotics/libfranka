@@ -18,13 +18,14 @@ ControlException::ControlException(const std::string& what,
 
 IncompatibleVersionException::IncompatibleVersionException(uint16_t server_version,
                                                            uint16_t library_version) noexcept
-    : Exception("libfranka: Incompatible library version (server version: "s +
-                std::to_string(server_version) + ", library version: "s +
-                std::to_string(library_version) +
-                "). Please check https://frankarobotics.github.io for system updates "
-                "or choose a libfranka version that uses the server version " +
-                std::to_string(server_version) +
-                " from the table at https://frankarobotics.github.io/docs/compatibility.html ."s),
+    : Exception(
+          "libfranka: Incompatible library version (server version: "s +
+          std::to_string(server_version) + ", library version: "s +
+          std::to_string(library_version) +
+          "). Please check https://frankarobotics.github.io for system updates "
+          "or choose a libfranka version that uses the server version " +
+          std::to_string(server_version) +
+          " from the table at https://frankarobotics.github.io/docs/libfranka/docs/compatibility_with_images.html ."s),
       server_version(server_version),
       library_version(library_version) {}
 
