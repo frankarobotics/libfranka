@@ -70,7 +70,7 @@ pipeline {
               stage('Clean Workspace') {
                 steps {
                   script {
-                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                    def distro = env.DISTRO
                     withEnv(["DISTRO=${distro}"]) {
                       sh '''
                         # Clean build dirs for this distro axis
@@ -120,7 +120,7 @@ pipeline {
               stage('Build examples (debug)') {
                 steps {
                   script {
-                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                    def distro = env.DISTRO
                     dir("build-debug-examples.${distro}") {
                       sh "cmake -DCMAKE_PREFIX_PATH=../install-debug.${distro} ../examples"
                       sh 'make -j$(nproc)'
@@ -131,7 +131,7 @@ pipeline {
               stage('Build examples (release)') {
                 steps {
                   script {
-                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                    def distro = env.DISTRO
                     dir("build-release-examples.${distro}") {
                       sh "cmake -DCMAKE_PREFIX_PATH=../install-release.${distro} ../examples"
                       sh 'make -j$(nproc)'
@@ -218,15 +218,14 @@ pipeline {
                   '''
 
                   script {
-                    def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
-                    dir("build-debug.${distro}") {
+                    dir("build-debug.${env.DISTRO}") {
                       sh '''
                         echo "[Debug Tests] Running tests..."
                         ctest -V
                       '''
                     }
 
-                    dir("build-release.${distro}") {
+                    dir("build-release.${env.DISTRO}") {
                       sh '''
                         echo "[Release Tests] Running tests..."
                         ctest -V
@@ -246,8 +245,8 @@ pipeline {
             post {
               always {
                 catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                  junit "build-release.${DISTRO_VERSIONS[env.UBUNTU_VERSION]}/test_results/*.xml"
-                  junit "build-debug.${DISTRO_VERSIONS[env.UBUNTU_VERSION]}/test_results/*.xml"
+                  junit "build-release.${env.DISTRO}/test_results/*.xml"
+                  junit "build-debug.${env.DISTRO}/test_results/*.xml"
                 }
               }
             }
@@ -260,7 +259,7 @@ pipeline {
           stage('Publish') {
             steps {
               script {
-                def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                def distro = env.DISTRO
                 dir("build-release.${distro}") {
                   catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
                     sh 'cpack'
@@ -286,7 +285,7 @@ pipeline {
               // Build and publish pylibfranka documentation
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
                 script {
-                  def distro = DISTRO_VERSIONS[env.UBUNTU_VERSION]
+                  def distro = env.DISTRO
                   withEnv(["DISTRO=${distro}"]) {
                     sh '''
                       # Install pylibfranka from root (builds against libfranka in build-release.${DISTRO})
