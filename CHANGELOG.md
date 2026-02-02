@@ -2,6 +2,19 @@
 
 All notable changes to libfranka in this file.
 
+## UNRELEASED
+### libfranka - C++
+- fix: valgrind will not report as error reachable-type memleaks from gtest (see https://github.com/google/googletest/issues/4109)
+- fix: patch segfault in case active control has been resetted by someone else (see franka_hardware)
+- feat: do not pick git tag if not a git repo, fallback to cmakelists version, cleanup link dependencies
+
+### pylibfranka - Python
+- fix: patch runtime error for implicitly converted vector<double> to list[float]
+
+## [0.20.3]
+### libfranka - C++
+- Disable TSAN tests for ASRL problems with gcc.
+
 ## [0.20.2]
 ### libfranka - C++
 - Fix the github workflow to push all the debian packages from 20.4, 22.04 and 24.04
