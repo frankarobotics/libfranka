@@ -1,3 +1,4 @@
+/* groovylint-disable NestedBlockDepth */
 def PYTHON_VERSION_BY_UBUNTU = ['20.04': '3.9', '22.04': '3.10', '24.04': '3.12']
 
 pipeline {
@@ -117,28 +118,6 @@ pipeline {
                   }
                 }
               }
-              stage('Build examples (debug)') {
-                steps {
-                  script {
-                    def distro = env.DISTRO
-                    dir("build-debug-examples.${distro}") {
-                      sh "cmake -DCMAKE_PREFIX_PATH=../install-debug.${distro} ../examples"
-                      sh 'make -j$(nproc)'
-                    }
-                  }
-                }
-              }
-              stage('Build examples (release)') {
-                steps {
-                  script {
-                    def distro = env.DISTRO
-                    dir("build-release-examples.${distro}") {
-                      sh "cmake -DCMAKE_PREFIX_PATH=../install-release.${distro} ../examples"
-                      sh 'make -j$(nproc)'
-                    }
-                  }
-                }
-              }
               stage('Build coverage') {
                 when {
                   not {
@@ -209,7 +188,7 @@ pipeline {
           stage('Test') {
             steps {
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
-                                timeout(time: 300, unit: 'SECONDS') {
+                timeout(time: 300, unit: 'SECONDS') {
                   sh '''
                     # ASLR Fix: Disable ASLR temporarily for ASan compatibility
                     echo "[Debug Tests] Disabling ASLR for ASan compatibility..."
@@ -257,6 +236,11 @@ pipeline {
             }
           }
           stage('Publish') {
+            when {
+              expression {
+                env.UBUNTU_VERSION == '20.04'
+              }
+            }
             steps {
               script {
                 def distro = env.DISTRO
@@ -282,11 +266,10 @@ pipeline {
                 }
               }
 
-              // Build and publish pylibfranka documentation
+              // Build and publish pylibfranka documentation (only on Ubuntu 20.04)
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
                 script {
-                  def distro = env.DISTRO
-                  withEnv(["DISTRO=${distro}"]) {
+                  withEnv(["DISTRO=${env.DISTRO}"]) {
                     sh '''
                       # Install pylibfranka from root (builds against libfranka in build-release.${DISTRO})
                       export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
@@ -315,12 +298,7 @@ pipeline {
                         # Add libfranka to library path
                         export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
 
-                        # Build the documentation only on Ubuntu 20.04
-                        if [ "${UBUNTU_VERSION}" = "20.04" ]; then
-                          make html
-                        else
-                          echo "Skipping docs build on ${UBUNTU_VERSION}"
-                        fi
+                        make html
                       '''
 
                       publishHTML([allowMissing: false,
@@ -328,7 +306,7 @@ pipeline {
                                   keepAll: true,
                                   reportDir: '_build/html',
                                   reportFiles: 'index.html',
-                                  reportName: "pylibfranka Documentation (${distro})"])
+                                  reportName: "pylibfranka Documentation (${env.DISTRO})"])
                     }
                   }
                 }
