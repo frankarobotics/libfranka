@@ -147,9 +147,10 @@ auto AsyncPositionControlHandler::stopControl() -> void {
   try {
     auto motion_finished = JointPositions{target_position_};
     motion_finished.motion_finished = true;
-    active_robot_control_->writeOnce(motion_finished);
-
-    active_robot_control_.reset();
+    if (active_robot_control_) {
+      active_robot_control_->writeOnce(motion_finished);
+      active_robot_control_.reset();
+    }
     logging::logInfo("Async position control stopped successfully.");
   } catch (const std::exception& e) {
     logging::logError("Error while stopping async position control: {}", e.what());
