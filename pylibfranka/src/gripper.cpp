@@ -4,6 +4,9 @@
 #include <franka/gripper.h>
 #include <pylibfranka/gripper.hpp>
 
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
 namespace pylibfranka {
 
 void bind_gripper(py::module& m) {

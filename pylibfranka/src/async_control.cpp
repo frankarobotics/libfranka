@@ -4,6 +4,9 @@
 #include <franka/async_control/async_position_control_handler.hpp>
 #include <pylibfranka/async_control.hpp>
 
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
 namespace pylibfranka {
 
 void bind_async_control(py::module& m) {
