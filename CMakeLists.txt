@@ -146,18 +146,18 @@ target_include_directories(franka PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(franka PRIVATE
-  TinyXML2::TinyXML2
-  Poco::Foundation
-  Poco::Net
-  Eigen3::Eigen3
-  Threads::Threads
-  pinocchio::pinocchio
-)
-
-target_link_libraries(franka PUBLIC
-  libfranka-common
-  fmt::fmt
+target_link_libraries(franka
+  PUBLIC
+    libfranka-common
+    fmt::fmt 
+  INTERFACE
+    Eigen3::Eigen3
+  PRIVATE
+    TinyXML2::TinyXML2
+    Poco::Foundation
+    Poco::Net
+    Threads::Threads
+    pinocchio::pinocchio
 )
 
 
@@ -221,8 +221,16 @@ if(BUILD_EXAMPLES)
 endif()
 
 ## Packaging
-include(SetVersionFromGit)
-set_version_from_git(PACKAGE_VERSION PACKAGE_TAG)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
+  message(STATUS ".git directory found, setting version from latest git tag")
+  include(SetVersionFromGit)
+  set_version_from_git(PACKAGE_VERSION PACKAGE_TAG)
+else()
+  message(STATUS "No .git directory found, using version from CMakeLists.txt")
+  set(PACKAGE_VERSION ${PROJECT_VERSION})
+  set(PACKAGE_TAG ${PROJECT_VERSION})
+endif()
+message(STATUS "${PROJECT_NAME} version: ${PACKAGE_VERSION}, Package tag: ${PACKAGE_TAG}")
 
 # Get architecture
 execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE PACKAGE_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
