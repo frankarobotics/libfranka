@@ -43,7 +43,7 @@ pipeline {
                  '--cap-add=SYS_PTRACE ' +
                  '--security-opt seccomp=unconfined ' +
                  '--shm-size=2g '
-         }
+          }
         }
         stages {
           stage('Init Distro') {
