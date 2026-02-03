@@ -151,7 +151,7 @@ target_link_libraries(franka
     libfranka-common
     fmt::fmt 
   INTERFACE
-    Eigen3::Eigen3
+    Eigen3::Eigen
   PRIVATE
     TinyXML2::TinyXML2
     Poco::Foundation
