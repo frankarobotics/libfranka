@@ -167,6 +167,16 @@ RUN git clone --depth 1 --recurse-submodules --shallow-submodules --branch v3.4.
     && cd ../.. \
     && rm -rf pinocchio
 
+COPY ./gtest.patch /tmp/gtest.patch
+RUN git clone --depth 1 --branch v1.17.0 https://github.com/google/googletest.git \
+    && cd googletest \
+    && git apply /tmp/gtest.patch \
+    && mkdir build && cd build \
+    && cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    && make -j4 && make install \
+    && cd ../.. \
+    && rm -rf googletest
+
 # Install Python wheel building tools inside a virtualenv to satisfy PEP 668
 # Note: python3 -m venv uses ensurepip to bootstrap pip automatically
 RUN python3 -m venv /opt/venv && \
