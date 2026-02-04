@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(libfranka_VERSION 0.20.4)
+set(libfranka_VERSION 0.20.3)
 
 project(libfranka
   VERSION ${libfranka_VERSION}
@@ -150,7 +150,6 @@ target_link_libraries(franka
   PUBLIC
     libfranka-common
     fmt::fmt 
-    pinocchio::pinocchio
   INTERFACE
     Eigen3::Eigen
   PRIVATE
@@ -158,6 +157,7 @@ target_link_libraries(franka
     Poco::Foundation
     Poco::Net
     Threads::Threads
+    pinocchio::pinocchio
 )
 
 

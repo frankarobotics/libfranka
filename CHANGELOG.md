@@ -2,7 +2,7 @@
 
 All notable changes to libfranka in this file.
 
-## [0.20.4]
+## UNRELEASED
 ### libfranka - C++
 - fix: valgrind will not report as error reachable-type memleaks from gtest (see https://github.com/google/googletest/issues/4109)
 - fix: patch segfault in case active control has been resetted by someone else (see franka_hardware)
