@@ -146,18 +146,18 @@ target_include_directories(franka PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(franka
-  PUBLIC
-    libfranka-common
-    fmt::fmt 
-  INTERFACE
-    Eigen3::Eigen
-  PRIVATE
-    TinyXML2::TinyXML2
-    Poco::Foundation
-    Poco::Net
-    Threads::Threads
-    pinocchio::pinocchio
+target_link_libraries(franka PRIVATE
+  TinyXML2::TinyXML2
+  Poco::Foundation
+  Poco::Net
+  Eigen3::Eigen3
+  Threads::Threads
+  pinocchio::pinocchio
+)
+
+target_link_libraries(franka PUBLIC
+  libfranka-common
+  fmt::fmt
 )
 
 
