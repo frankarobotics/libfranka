@@ -58,7 +58,7 @@ class MockServer {
                            std::function<typename T::Response()> create_response);
 
   template <typename T>
-  MockServer& queueResponse(const uint32_t& command_id,
+  MockServer& queueResponse(uint32_t& command_id,
                             std::function<typename T::Response()> create_response);
 
   template <typename T>
@@ -139,7 +139,7 @@ MockServer<C>& MockServer<C>::sendResponse(const uint32_t& command_id,
   block_ = true;
   commands_.emplace_back(
       "sendResponse<"s + typeid(typename T::Response).name() + ">",
-      [=](Socket& tcp_socket, Socket&) {
+      [command_id, create_response](Socket& tcp_socket, Socket&) {
         typename T::template Message<typename T::Response> message(
             typename T::Header(T::kCommand, command_id,
                                sizeof(typename T::template Message<typename T::Response>)),
@@ -151,14 +151,14 @@ MockServer<C>& MockServer<C>::sendResponse(const uint32_t& command_id,
 
 template <typename C>
 template <typename T>
-MockServer<C>& MockServer<C>::queueResponse(const uint32_t& command_id,
+MockServer<C>& MockServer<C>::queueResponse(uint32_t& command_id,
                                             std::function<typename T::Response()> create_response) {
   using namespace std::string_literals;
 
   std::lock_guard<std::mutex> _(command_mutex_);
   commands_.emplace_back(
       "sendResponse<"s + typeid(typename T::Response).name() + ">",
-      [=](Socket& tcp_socket, Socket&) {
+      [&command_id, create_response](Socket& tcp_socket, Socket&) {
         typename T::template Message<typename T::Response> message(
             typename T::Header(T::kCommand, command_id,
                                sizeof(typename T::template Message<typename T::Response>)),
