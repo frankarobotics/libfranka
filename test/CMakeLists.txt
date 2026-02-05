@@ -135,8 +135,8 @@ if(VALGRIND_PROG)
   add_test(NAME Valgrind
     COMMAND ${VALGRIND_PROG} 
       --error-exitcode=1 
-      --errors-for-leak-kinds=definite,possible,indirect # avoid "still reachable" leaks from google test
       --track-origins=yes
+      --show-error-list=yes
       ./run_all_tests 
       --gtest_output=xml:${TEST_OUTPUT_DIR}/valgrind.xml
   )
