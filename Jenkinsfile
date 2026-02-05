@@ -236,11 +236,6 @@ pipeline {
             }
           }
           stage('Publish') {
-            when {
-              expression {
-                env.UBUNTU_VERSION == '20.04'
-              }
-            }
             steps {
               script {
                 def distro = env.DISTRO
@@ -269,6 +264,11 @@ pipeline {
               // Build and publish pylibfranka documentation (only on Ubuntu 20.04)
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
                 script {
+                  when {
+                    expression {
+                      env.UBUNTU_VERSION == '20.04'
+                    }
+                  }
                   withEnv(["DISTRO=${env.DISTRO}"]) {
                     sh '''
                       # Install pylibfranka from root (builds against libfranka in build-release.${DISTRO})
