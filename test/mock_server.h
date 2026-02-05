@@ -134,16 +134,19 @@ template <typename T>
 MockServer<C>& MockServer<C>::sendResponse(const uint32_t& command_id,
                                            std::function<typename T::Response()> create_response) {
   using namespace std::string_literals;
+  using Msg = typename T::template Message<typename T::Response>;
+  using Head = typename T::Header;
+  using Resp = typename T::Response;
 
   std::lock_guard<std::mutex> _(command_mutex_);
   block_ = true;
   commands_.emplace_back(
-      "sendResponse<"s + typeid(typename T::Response).name() + ">",
+      "sendResponse<"s + typeid(Resp).name() + ">",
       [=, &command_id](Socket& tcp_socket, Socket&) {
-        typename T::template Message<typename T::Response> message(
-            typename T::Header(T::kCommand, command_id,
-                               sizeof(typename T::template Message<typename T::Response>)),
-            create_response());
+        Msg message{}; // zero-initialize!
+        message.header = Head(T::kCommand, command_id, sizeof(Msg));
+        const Resp response = create_response();
+        std::memcpy(message.payload.data(), &response, sizeof(response));
         tcp_socket.sendBytes(&message, sizeof(message));
       });
   return *this;
