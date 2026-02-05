@@ -131,7 +131,7 @@ Configure the build::
 
 Compile the kernel (use multithreading based on CPU cores)::
 
-    make -j$(nproc) deb-pkg
+    make -j$(nproc) bindeb-pkg
 
 Install the generated packages::
 
