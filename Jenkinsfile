@@ -36,8 +36,8 @@ pipeline {
         }
         agent {
           dockerfile {
-            dir ".ci"
-            filename "Dockerfile"
+            dir '.ci'
+            filename 'Dockerfile'
             reuseNode true
             additionalBuildArgs "--pull --build-arg UBUNTU_VERSION=${env.UBUNTU_VERSION} --build-arg PYTHON_VERSION=${PYTHON_VERSION_BY_UBUNTU[env.UBUNTU_VERSION]} --tag libfranka:${env.UBUNTU_VERSION}"
             args '--privileged ' +
@@ -235,12 +235,7 @@ pipeline {
               sh '.ci/checkgithistory.sh https://github.com/frankarobotics/libfranka.git develop'
             }
           }
-          stage('Publish') {
-            when {
-              expression {
-                env.UBUNTU_VERSION == '20.04'
-              }
-            }
+          stage('Publish deb packages') {
             steps {
               script {
                 def distro = env.DISTRO
@@ -265,7 +260,15 @@ pipeline {
                   }
                 }
               }
-
+            }
+          }
+          stage('Publish pylibfranka documentation') {
+            when {
+              expression {
+                env.UBUNTU_VERSION == '20.04'
+              }
+            }
+            steps {
               // Build and publish pylibfranka documentation (only on Ubuntu 20.04)
               catchError(buildResult: env.UNSTABLE, stageResult: env.UNSTABLE) {
                 script {
