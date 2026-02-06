@@ -466,7 +466,7 @@ TEST(RobotImplTest, CanReceiveMotionRejected) {
             [&](const Move::Request&) { return Move::Response(Move::Status::kMotionStarted); },
             &move_id)
         .queueResponse<Move>(
-            move_id, []() { return Move::Response(Move::Status::kCommandNotPossibleRejected); })
+            &move_id, []() { return Move::Response(Move::Status::kCommandNotPossibleRejected); })
         .doForever([&]() {
           bool continue_sending = send.test_and_set();
           if (continue_sending) {
