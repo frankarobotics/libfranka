@@ -38,7 +38,7 @@ pipeline {
           dockerfile {
             dir ".ci"
             filename "Dockerfile"
-            reuseNode false
+            reuseNode true
             additionalBuildArgs "--pull --build-arg UBUNTU_VERSION=${env.UBUNTU_VERSION} --build-arg PYTHON_VERSION=${PYTHON_VERSION_BY_UBUNTU[env.UBUNTU_VERSION]} --tag libfranka:${env.UBUNTU_VERSION}"
             args '--privileged ' +
                  '--cap-add=SYS_PTRACE ' +
