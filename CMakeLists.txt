@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(libfranka_VERSION 0.20.3)
+set(libfranka_VERSION 0.20.4)
 
 project(libfranka
   VERSION ${libfranka_VERSION}
