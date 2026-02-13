@@ -176,6 +176,12 @@ install(TARGETS franka libfranka-common
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+# Extract the directory containing the cmake folder
+get_filename_component(PINOCCHIO_CMAKE_PATH "${pinocchio_DIR}" DIRECTORY)
+get_filename_component(PINOCCHIO_LIB_PATH "${PINOCCHIO_CMAKE_PATH}" DIRECTORY)
+set_target_properties(franka PROPERTIES INSTALL_RPATH "${PINOCCHIO_LIB_PATH}")
+
 install(DIRECTORY include/ common/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   USE_SOURCE_PERMISSIONS
 )
