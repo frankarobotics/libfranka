@@ -1,0 +1,7 @@
+<map id="include/franka/joint_velocity_limits.h" name="include/franka/joint_velocity_limits.h">
+<area shape="rect" id="Node000001" title="Contains types and utilities for managing position&#45;based joint velocity limits." alt="" coords="5,5,152,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="11,93,67,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,47,53,82,48,80,67,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="91,93,149,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="91,44,110,80,105,82,86,47"/>
+</map>

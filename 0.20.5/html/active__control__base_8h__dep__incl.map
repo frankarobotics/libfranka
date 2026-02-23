@@ -1,0 +1,9 @@
+<map id="include/franka/active_control_base.h" name="include/franka/active_control_base.h">
+<area shape="rect" id="Node000001" title="Abstract interface class as the base of the active controllers." alt="" coords="96,5,255,45"/>
+<area shape="rect" id="Node000002" href="$active__control_8h.html" title="Implements the ActiveControlBase abstract class." alt="" coords="96,93,255,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,59,178,93,173,93,173,59"/>
+<area shape="rect" id="Node000003" href="$active__motion__generator_8h.html" title="Contains the franka::ActiveMotionGenerator type." alt="" coords="5,181,164,221"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="147,145,107,183,103,179,144,141"/>
+<area shape="rect" id="Node000004" href="$active__torque__control_8h.html" title="Contains the franka::ActiveTorqueControl type." alt="" coords="188,181,347,221"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="207,141,249,179,245,183,204,145"/>
+</map>
