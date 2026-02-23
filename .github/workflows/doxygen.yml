@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - '*'
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -32,8 +34,11 @@ jobs:
 
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
             echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          else
+          elif [[ "$GITHUB_REF" == refs/heads/main ]]; then
             echo "TAG_NAME=latest" >> $GITHUB_OUTPUT
+          else
+            echo "Unsupported ref: $GITHUB_REF" >&2
+            exit 1
           fi
 
       - name: Build documentation
