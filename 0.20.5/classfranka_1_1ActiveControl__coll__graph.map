@@ -1,0 +1,5 @@
+<map id="franka::ActiveControl" name="franka::ActiveControl">
+<area shape="rect" id="Node000001" title="Documented in ActiveControlBase." alt="" coords="21,79,180,104"/>
+<area shape="rect" id="Node000002" href="$classfranka_1_1ActiveControlBase.html" title="Allows the user to read the state of a Robot and to send new control commands after starting a contro..." alt="" coords="5,5,196,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,44,103,79,98,79,98,44"/>
+</map>

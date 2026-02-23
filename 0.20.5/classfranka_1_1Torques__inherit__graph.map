@@ -1,0 +1,5 @@
+<map id="franka::Torques" name="franka::Torques">
+<area shape="rect" id="Node000001" title="Stores joint&#45;level torque commands without gravity and friction." alt="" coords="13,79,135,104"/>
+<area shape="rect" id="Node000002" href="$structfranka_1_1Finishable.html" title="Helper type for control and motion generation loops." alt="" coords="5,5,143,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,44,77,79,71,79,71,44"/>
+</map>

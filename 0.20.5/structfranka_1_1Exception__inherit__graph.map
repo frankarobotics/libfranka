@@ -1,0 +1,21 @@
+<map id="franka::Exception" name="franka::Exception">
+<area shape="rect" id="Node000001" title="Base class for all exceptions used by libfranka." alt="" coords="192,205,327,231"/>
+<area shape="rect" id="Node000003" href="$structfranka_1_1CommandException.html" title="CommandException is thrown if an error occurs during command execution." alt="" coords="375,5,578,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="268,191,283,157,306,116,336,74,373,40,395,28,397,33,376,44,340,78,310,118,288,159,272,193"/>
+<area shape="rect" id="Node000004" href="$structfranka_1_1ControlException.html" title="ControlException is thrown if an error occurs during motion generation or torque control." alt="" coords="385,55,568,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="274,192,315,140,342,113,373,90,402,78,404,82,376,95,346,117,319,144,278,195"/>
+<area shape="rect" id="Node000005" href="$structfranka_1_1IncompatibleVersionException.html" title="IncompatibleVersionException is thrown if the robot does not support this version of libfranka." alt="" coords="375,105,579,145"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="292,196,374,154,406,142,407,147,376,159,294,201"/>
+<area shape="rect" id="Node000006" href="$structfranka_1_1InvalidOperationException.html" title="InvalidOperationException is thrown if an operation cannot be performed." alt="" coords="387,169,566,209"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="340,205,387,198,388,203,340,210"/>
+<area shape="rect" id="Node000007" href="$structfranka_1_1ModelException.html" title="ModelException is thrown if an error occurs when loading the model library." alt="" coords="389,233,564,259"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="341,226,390,232,389,237,340,231"/>
+<area shape="rect" id="Node000008" href="$structfranka_1_1NetworkException.html" title="NetworkException is thrown if a connection to the robot cannot be established, or when a timeout occu..." alt="" coords="381,283,572,308"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="297,234,376,269,414,280,412,285,374,274,295,239"/>
+<area shape="rect" id="Node000009" href="$structfranka_1_1ProtocolException.html" title="ProtocolException is thrown if the robot returns an incorrect message." alt="" coords="383,332,571,357"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="282,240,323,280,348,301,376,318,403,329,401,334,373,323,345,305,319,284,278,243"/>
+<area shape="rect" id="Node000010" href="$structfranka_1_1RealtimeException.html" title="RealtimeException is thrown if realtime priority cannot be set." alt="" coords="379,381,574,407"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="275,242,314,306,342,340,376,368,398,379,396,384,373,372,339,343,310,309,270,244"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,205,144,231"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,215,192,215,192,221,158,221"/>
+</map>
