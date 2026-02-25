@@ -9,5 +9,6 @@ var searchData=
   ['invalidoperationexception_6',['InvalidOperationException',['../structfranka_1_1InvalidOperationException.html',1,'franka']]],
   ['is_5fgrasped_7',['is_grasped',['../structfranka_1_1GripperState.html#aa65b46313e740454ead9c9ea27e7bf8d',1,'franka::GripperState']]],
   ['ishomogeneoustransformation_8',['isHomogeneousTransformation',['../control__tools_8h.html#ad81c99e8af3f2536ae3c6ec1ce8dce1e',1,'franka']]],
-  ['isvalidelbow_9',['isValidElbow',['../control__tools_8h.html#a4eda3eda0514fabf6d630a6d8c0373a0',1,'franka']]]
+  ['ismobilerobot_9',['isMobileRobot',['../classfranka_1_1Robot.html#a4b9caf76352501a392f3ae83af0148b8',1,'franka::Robot']]],
+  ['isvalidelbow_10',['isValidElbow',['../control__tools_8h.html#a4eda3eda0514fabf6d630a6d8c0373a0',1,'franka']]]
 ];

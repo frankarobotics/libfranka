@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['vacuumgripperdevicestatus_0',['VacuumGripperDeviceStatus',['../vacuum__gripper__state_8h.html#a423e2ce5f95933b9897c6e308d91b611',1,'franka']]]
+  ['realtimeconfig_0',['RealtimeConfig',['../control__types_8h.html#aeede4f4629390fea21ca5e5a35a8a943',1,'franka']]],
+  ['robotmode_1',['RobotMode',['../robot__state_8h.html#adfe059ae23ebbad59e421edaa879651a',1,'franka']]]
 ];

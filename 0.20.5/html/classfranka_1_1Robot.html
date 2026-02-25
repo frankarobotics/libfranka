@@ -125,6 +125,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Robot</b> () noex
 <tr class="memitem:ae3c3d7c5c4491a1e96a0a543931e899a" id="r_ae3c3d7c5c4491a1e96a0a543931e899a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structfranka_1_1RobotState.html">RobotState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfranka_1_1Robot.html#ae3c3d7c5c4491a1e96a0a543931e899a">readOnce</a> ()</td></tr>
 <tr class="memdesc:ae3c3d7c5c4491a1e96a0a543931e899a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Waits for a robot state update and returns it.  <br /></td></tr>
 <tr class="separator:ae3c3d7c5c4491a1e96a0a543931e899a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b9caf76352501a392f3ae83af0148b8" id="r_a4b9caf76352501a392f3ae83af0148b8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfranka_1_1Robot.html#a4b9caf76352501a392f3ae83af0148b8">isMobileRobot</a> () const noexcept</td></tr>
+<tr class="memdesc:a4b9caf76352501a392f3ae83af0148b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the connected robot is a mobile robot (TMR).  <br /></td></tr>
+<tr class="separator:a4b9caf76352501a392f3ae83af0148b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2da598c539469827409ac7e3bb61d5da" id="r_a2da598c539469827409ac7e3bb61d5da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfranka_1_1Model.html">Model</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfranka_1_1Robot.html#a2da598c539469827409ac7e3bb61d5da">loadModel</a> ()</td></tr>
 <tr class="memdesc:a2da598c539469827409ac7e3bb61d5da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads the model library from the robot.  <br /></td></tr>
 <tr class="separator:a2da598c539469827409ac7e3bb61d5da"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1081,6 +1084,35 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a4b9caf76352501a392f3ae83af0148b8" name="a4b9caf76352501a392f3ae83af0148b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b9caf76352501a392f3ae83af0148b8">&#9670;&#160;</a></span>isMobileRobot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool franka::Robot::isMobileRobot </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns whether the connected robot is a mobile robot (TMR). </p>
+<p>This is detected at connection time from the robot's URDF.</p>
+<dl class="section return"><dt>Returns</dt><dd>true if the robot is a mobile robot, false if it is an arm robot. </dd></dl>
+
+</div>
+</div>
 <a id="a2da598c539469827409ac7e3bb61d5da" name="a2da598c539469827409ac7e3bb61d5da"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2da598c539469827409ac7e3bb61d5da">&#9670;&#160;</a></span>loadModel()</h2>
 
@@ -1101,6 +1133,7 @@ Protected Member Functions</h2></td></tr>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname"><a class="el" href="structfranka_1_1ModelException.html" title="ModelException is thrown if an error occurs when loading the model library.">ModelException</a></td><td>if the model library cannot be loaded. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structfranka_1_1InvalidOperationException.html" title="InvalidOperationException is thrown if an operation cannot be performed.">InvalidOperationException</a></td><td>if called on a mobile robot. Use <a class="el" href="classfranka_1_1MobileModel.html" title="Calculates poses for mobile robot frames using Pinocchio.">franka::MobileModel</a> with the URDF from <a class="el" href="classfranka_1_1Robot.html#a54565ca0eb7b58727f88a8dcbf2f98ab">getRobotModel()</a> instead. </td></tr>
     <tr><td class="paramname"><a class="el" href="structfranka_1_1NetworkException.html" title="NetworkException is thrown if a connection to the robot cannot be established, or when a timeout occu...">NetworkException</a></td><td>if the connection is lost, e.g. after a timeout. </td></tr>
   </table>
   </dd>

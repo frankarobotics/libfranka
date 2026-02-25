@@ -6,6 +6,7 @@ var searchData=
   ['device_5fstatus_3',['device_status',['../structfranka_1_1VacuumGripperState.html#ab44560b09c4a959c06ddafbd7f21da02',1,'franka::VacuumGripperState']]],
   ['dq_4',['dq',['../classfranka_1_1JointVelocities.html#a14fddb6fe7a7c4034dc82c283de8c2d3',1,'franka::JointVelocities::dq'],['../structfranka_1_1RobotState.html#af372a0081d72bc7b4fe873f99c7b2d8c',1,'franka::RobotState::dq']]],
   ['dq_5fd_5',['dq_d',['../structfranka_1_1RobotState.html#aed294a088be27b927be9575a18bec949',1,'franka::RobotState']]],
-  ['dtau_5fj_6',['dtau_J',['../structfranka_1_1RobotState.html#ae6b0d4ee0d7b36240a2165e6ded6f4b9',1,'franka::RobotState']]],
-  ['dtheta_7',['dtheta',['../structfranka_1_1RobotState.html#a271db0a55dd346715ed8a0daf3f8887c',1,'franka::RobotState']]]
+  ['drive_5fmodules_6',['drive_modules',['../structfranka_1_1MobileJointPositions.html#a45e8096363c69545ef4706c2cbc9b54a',1,'franka::MobileJointPositions']]],
+  ['dtau_5fj_7',['dtau_J',['../structfranka_1_1RobotState.html#ae6b0d4ee0d7b36240a2165e6ded6f4b9',1,'franka::RobotState']]],
+  ['dtheta_8',['dtheta',['../structfranka_1_1RobotState.html#a271db0a55dd346715ed8a0daf3f8887c',1,'franka::RobotState']]]
 ];
