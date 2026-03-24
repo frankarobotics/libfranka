@@ -1,0 +1,7 @@
+<map id="franka::ActiveTorqueControl" name="franka::ActiveTorqueControl">
+<area shape="rect" id="Node000001" title="Allows the user to read the state of a Robot and to send new torque control commands after starting a..." alt="" coords="5,152,208,177"/>
+<area shape="rect" id="Node000002" href="$classfranka_1_1ActiveControl.html" title="Documented in ActiveControlBase." alt="" coords="27,79,186,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,118,109,152,104,152,104,118"/>
+<area shape="rect" id="Node000003" href="$classfranka_1_1ActiveControlBase.html" title="Allows the user to read the state of a Robot and to send new control commands after starting a contro..." alt="" coords="11,5,202,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="109,44,109,79,104,79,104,44"/>
+</map>
