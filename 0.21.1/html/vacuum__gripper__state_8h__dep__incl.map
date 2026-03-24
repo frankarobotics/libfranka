@@ -1,0 +1,5 @@
+<map id="include/franka/vacuum_gripper_state.h" name="include/franka/vacuum_gripper_state.h">
+<area shape="rect" id="Node000001" title="Contains the franka::VacuumGripperState type." alt="" coords="5,5,176,45"/>
+<area shape="rect" id="Node000002" href="$vacuum__gripper_8h.html" title="Contains the franka::VacuumGripper type." alt="" coords="5,93,176,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,59,93,93,88,93,88,59"/>
+</map>

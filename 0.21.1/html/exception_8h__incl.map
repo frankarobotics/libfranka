@@ -1,0 +1,9 @@
+<map id="include/franka/exception.h" name="include/franka/exception.h">
+<area shape="rect" id="Node000001" title="Contains exception definitions." alt="" coords="49,5,243,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,86,92,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,33,75,79,72,75,130,29"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="117,86,175,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="149,31,149,72,143,72,143,31"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="200,79,353,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="167,29,235,69,232,74,164,33"/>
+</map>
