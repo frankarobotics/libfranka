@@ -53,23 +53,25 @@ After installation, verify that libfranka is correctly installed:
    dpkg -l | grep libfranka
 
 .. _libfranka_installation_docker:
+
 Inside docker container
 ~~~~~~~~~~~~~~~~~~~~~~~
 If you prefer to build **libfranka** inside a Docker container, you can use the
-provided Docker setup. Follow :ref:`building-in-docker` for detailed building
-and installation instructions.
+provided Docker setup.
 
 .. _libfranka_installation_plain_cmake:
+
 Plain CMake
 ~~~~~~~~~~~
 
-Before you begin, check the :ref:`system-requirements` and install the necessary dependencies listed in :ref:`installing-dependencies`.
+Before you begin, check the :ref:`system-requirements`.
 
-After installing the dependencies, proceed to :ref:`building-from-source`.
+Afterwards, proceed to :ref:`building-from-source`.
 
-Once the build is complete, you can optionally create and install a Debian package as described in :ref:`installing-debian-package`.
+Once the build is complete, you can optionally create and install a Debian package as described in :ref:`libfranka_installation_debian_package`.
 
 .. _libfranka_installation_pip:
+
 Python Package (pip)
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -136,6 +138,7 @@ Quick Start Example
 For more examples, see the `pylibfranka examples <https://github.com/frankarobotics/libfranka/tree/main/pylibfranka/examples>`_ on GitHub.
 
 .. _libfranka_installation_python_bindings:
+
 Building Python Bindings from Source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -182,59 +185,9 @@ For development (editable install):
 Inside a ROS / ROS 2 workspace
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-ROS 2
-^^^^^
-
-TODO: Add ROS 2 installation instructions
-
-ROS Noetic
-^^^^^^^^^^
-
-.. note::
-
-   While ``libfranka`` and the ``franka_ros`` packages should work on different Linux distributions,
-   official support is currently only provided for:
-
-   * Ubuntu 18.04 LTS `Bionic Beaver` and ROS `Melodic Morenia` (requires at least ``libfranka`` 0.6.0)
-   * Ubuntu 20.04 LTS `Focal Fossa` and ROS `Noetic Ninjemys` (requires at least ``libfranka`` 0.8.0)
-
-   The following instructions are exemplary for Ubuntu 20.04 LTS system and ROS `Noetic Ninjemys`.
-   They only work in the supported environments.
-
-**Building the ROS packages**
-
-After `setting up ROS Noetic <https://wiki.ros.org/noetic/Installation/Ubuntu>`__, create a Catkin workspace in a directory of your choice:
-
-.. code-block:: shell
-
-    cd /path/to/desired/folder
-    mkdir -p catkin_ws/src
-    cd catkin_ws
-    source /opt/ros/noetic/setup.sh
-    catkin_init_workspace src
-
-Then clone the ``franka_ros`` repository from `GitHub <https://github.com/frankarobotics/franka_ros>`__:
-
-.. code-block:: shell
-
-    git clone --recursive https://github.com/frankarobotics/franka_ros src/franka_ros
-
-By default, this will check out the newest release of ``franka_ros``. If you want to build a particular version of ``franka_ros`` instead, check out the corresponding Git tag:
-
-.. code-block:: shell
-
-    git checkout <version>
-
-Install any missing dependencies and build the packages:
-
-.. code-block:: shell
-
-    rosdep install --from-paths src --ignore-src --rosdistro noetic -y --skip-keys libfranka
-    catkin_make -DCMAKE_BUILD_TYPE=Release -DFranka_DIR:PATH=/path/to/libfranka/build
-    source devel/setup.sh
-
-.. warning::
-    If you also installed ``ros-noetic-libfranka``, ``libfranka`` might be picked up from ``/opt/ros/noetic`` instead of from your custom ``libfranka`` build!
+If you want to use libfranka in a ROS or ROS 2 workspace, please head over to the :ref:`franka_ros2_jazzy`
+and :ref:`franka_ros2_humble` chapters for instructions on how to use libfranka in ROS 2,
+and to the :ref:`franka_ros` chapter for ROS 1 instructions.
 
 Use this Library in Other Projects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

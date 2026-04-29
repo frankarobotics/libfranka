@@ -68,13 +68,24 @@ jobs:
 
           TAG_NAME="${{ steps.doc_tag.outputs.TAG_NAME }}"
           DOC_DIR="${DOC_BASE}/$TAG_NAME"
-          SRC="${DOC_DIR}/html"
 
-          if [[ -d "$SRC" ]]; then
-            mv "$SRC"/* "$DOC_DIR"/
-            rm -rf "$SRC"
+          # Doxygen outputs to docs/<cmake_version>/html/ which may differ
+          # from TAG_NAME (e.g. "latest" vs "0.20.5"). Find the actual output.
+          BUILT_HTML=$(find "${DOC_BASE}" -type d -name html | head -1)
+
+          if [[ -n "$BUILT_HTML" && -d "$BUILT_HTML" ]]; then
+            # Move HTML contents into the target directory
+            rm -rf "$DOC_DIR"
+            mkdir -p "$DOC_DIR"
+            mv "$BUILT_HTML"/* "$DOC_DIR"/
+            # Clean up the versioned build directory if it's different from DOC_DIR
+            BUILT_PARENT=$(dirname "$BUILT_HTML")
+            if [[ "$BUILT_PARENT" != "$DOC_DIR" ]]; then
+              rm -rf "$BUILT_PARENT"
+            fi
           else
-            echo "HTML directory not found — skipping"
+            echo "::error::HTML directory not found after build"
+            exit 1
           fi
 
       - name: Create redirect index

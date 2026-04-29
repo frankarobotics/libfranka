@@ -1,4 +1,5 @@
 .. _libfranka_usage_examples:
+
 Usage Examples
 --------------------
 

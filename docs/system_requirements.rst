@@ -1,3 +1,5 @@
+.. _system-requirements:
+
 Minimum system and network requirements
 =======================================
 
@@ -37,7 +39,7 @@ performance of your controller or make it unusable.
 .. hint::
     The best performance can be achieved when connecting directly to the LAN port of Control.
     This requires setting up a static IP for the shop floor network in the administrator's interface
-    beforehand. See :ref:`setting-up-the-network`.
+    beforehand. See :ref:`network_setup`.
 
 To control the robot, it must be guaranteed that the sum of the following time measurements is
 less than 1 ms:

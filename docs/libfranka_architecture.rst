@@ -1,4 +1,5 @@
 .. _libfranka_architecture:
+
 Library Architecture
 --------------------
 

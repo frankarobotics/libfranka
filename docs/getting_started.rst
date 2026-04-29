@@ -8,7 +8,7 @@ After completing the :ref:`real-time kernel setup <realtime_kernel_setup>`, ensu
 .. _operating_the_robot:
 
 Operating the Robot
-------------------
+-------------------
 
 Before proceeding, review the following safety considerations:
 
@@ -48,7 +48,7 @@ Refer to the `Franka World user manual <https://download.franka.de/franka-world-
 .. _network_setup:
 
 Setting Up the Network
----------------------
+----------------------
 
 Good network performance is critical when using FCI.
 A direct connection between the workstation PC and Franka's Control is recommended.
@@ -110,7 +110,7 @@ After applying the settings, connect the workstation LAN port to the Control uni
 .. _linux_network_config:
 
 Linux Workstation Network Configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 On Ubuntu 16.04 (GUI):
 
@@ -147,7 +147,7 @@ The robot is ready when the blue LED is active.
 .. _activating_fci_mode:
 
 Activating FCI Mode
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 In Desk:
 
@@ -190,7 +190,7 @@ After activation, a pop-up appears requiring user confirmation.
 .. _verifying_fci_connection:
 
 Verifying the Connection
------------------------
+------------------------
 
 The IP of the Control's LAN port is referred to as ``<fci-ip>`` in the following examples.
 
@@ -203,7 +203,7 @@ Run the ``echo_robot_state`` example from ``libfranka``:
 
 The program prints the current robot state to the console. Refer to :api:`RobotState|structfranka_1_1RobotState.html` for field explanations.
 
-.. code-block:: json
+.. code-block:: text
 
     {
       "O_T_EE": [0.998578,0.0328747,-0.0417381,0,0.0335224,-0.999317,0.0149157,0,-0.04122,-0.016294,

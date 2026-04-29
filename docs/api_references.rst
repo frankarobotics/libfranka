@@ -1,10 +1,12 @@
 .. _libfranka_api_references:
+
 API References
 --------------
 
 This section provides comprehensive API documentation for libfranka in both C++ and Python.
 
 .. _libfranka_cpp_api:
+
 C++ API
 ~~~~~~~
 
@@ -21,6 +23,7 @@ The C++ API documentation contains detailed information about classes, methods, 
 Replace ``{version}`` with your desired version number.
 
 .. _libfranka_python_api:
+
 Python API
 ~~~~~~~~~~
 

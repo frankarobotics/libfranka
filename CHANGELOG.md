@@ -2,6 +2,10 @@
 
 All notable changes to libfranka in this file.
 
+## UNRELEASED
+
+- docu: Maintenance work on documentation
+
 ## [0.21.1]
 ### libfranka - C++
 - Fix package version

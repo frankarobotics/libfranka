@@ -214,6 +214,8 @@ You can find examples for all interfaces and combinations of control loops in th
 
     For writing your own motion generators or controllers it is crucial to deliver a smooth signal to the robot. Nonsmooth signals can easily generate discontinuity errors or even make the robot unstable. Check the :ref:`interface specifications <control_parameters_specifications>` before starting.
 
+.. _signal-processing:
+
 Signal Processing
 ~~~~~~~~~~~~~~~~~
 
@@ -224,7 +226,14 @@ To facilitate the control of the robot under non-ideal network connections, libf
 
 As of version ``0.5.0``, libfranka includes a **low-pass filter** for all realtime interfaces **running by default** with a 100 Hz cutoff frequency. The filter smooths commanded signals to provide more stable robot motions but does not prevent the violation of the :ref:`limits of the interface<control_parameters_specifications>`.
 
-As of version ``0.4.0``, **rate limiters** for all realtime interfaces are **running by default**. Rate limiters, also called safe controllers, will limit the rate of change of the signals sent by the user to prevent the violation of the :ref:`limits of the interface<control_parameters_specifications>`. For motion generators, it will limit the acceleration and jerk, while, for an external controller, it will limit the torque rate. Their main purpose is to increase the robustness of your control loop. In case of packet losses, even when the signals that you send conform with the interface limits, Control might detect a violation of velocity, acceleration or jerk limits. Rate limiting will adapt your commands to make sure that this does not happen. Check the :ref:`noncompliant errors section<noncompliant-errors>` for more details.
+As of version ``0.4.0``, **rate limiters** for all realtime interfaces are **running by default**. Rate limiters,
+also called safe controllers, will limit the rate of change of the signals sent by the user to prevent the
+violation of the :ref:`limits of the interface<control_parameters_specifications>`. For motion generators,
+it will limit the acceleration and jerk, while, for an external controller, it will limit the torque rate.
+Their main purpose is to increase the robustness of your control loop. In case of packet losses, even when
+the signals that you send conform with the interface limits, Control might detect a violation of velocity,
+acceleration or jerk limits. Rate limiting will adapt your commands to make sure that this does not happen.
+Check the :ref:`noncompliant errors section<noncompliant-errors>` for more details.
 
 .. caution::
 
@@ -268,6 +277,8 @@ Or similarly for an external controller:
 .. danger::
 
     The low-pass filter and the rate limiter are robustness features against packet losses to be used **after** you have already designed a smooth motion generator or controller. For the first tests of a new control loop we strongly recommend to deactivate these features. Filtering and limiting the rate of a nonsmooth signal can yield instabilities or unexpected behavior. Too many packet losses can also generate unstable behavior. Check your communication quality by monitoring the ``control_command_success_rate`` signal of the robot state.
+
+.. _control-side:
 
 Under the Hood
 ~~~~~~~~~~~~~~
@@ -373,6 +384,8 @@ Using the FCI you will encounter several errors that happen either due to noncom
 
     Some errors can also be cleared manually by toggling the external activation device or by using the error recovery button in Desk.
 
+.. _noncompliant-errors:
+
 Errors Due to Noncompliant Commanded Values
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -449,7 +462,12 @@ Control also computes the torque rate with backwards Euler, i.e. :math:`\dot{\ta
 Errors Due to Communication Problems
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If during a realtime loop Control does not receive any packets during 20 cycles, i.e. 20 ms, you will receive a ``communication_constraints_violation`` error. Note that if your connection has intermittent packet drops, it might not stop, but it could trigger `discontinuity` errors even when your source signals conform with the interface specification. In that case, check our :ref:`troubleshooting section <motion-stopped-due-to-discontinuities>` and consider enabling the :ref:`signal processing functions <signal-processing>` to increase the robustness of your control loop.
+If during a realtime loop Control does not receive any packets during 20 cycles, i.e. 20 ms, you will receive
+a ``communication_constraints_violation`` error. Note that if your connection has intermittent packet drops,
+it might not stop, but it could trigger `discontinuity` errors even when your source signals conform with the
+interface specification. In that case, check our
+:ref:`troubleshooting section <motion-stopped-due-to-discontinuities>` and consider enabling
+the :ref:`signal processing functions <signal-processing>` to increase the robustness of your control loop.
 
 Behavioral Errors
 ^^^^^^^^^^^^^^^^^

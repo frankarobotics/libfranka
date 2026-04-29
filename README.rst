@@ -1,3 +1,5 @@
+:orphan:
+
 libfranka: C++ Library for Franka Robotics Research Robots
 ===========================================================
 
@@ -621,14 +623,14 @@ Example:
          -DGENERATE_PYLIBFRANKA=ON \
          ..
 
-.. _troubleshooting:
+.. _libfranka_readme_troubleshooting:
 
 Troubleshooting
 ~~~~~~~~~~~~~~~
 
 **Network connection issues**
 
-See the `Troubleshooting Network <https://frankarobotics.github.io/docs/libfranka/docs/troubleshooting.html>`_ guide.
+See the `Troubleshooting Network <https://frankarobotics.github.io/docs/troubleshooting.html>`_ guide.
 
 License
 -------
