@@ -152,7 +152,7 @@ target_link_libraries(franka PRIVATE
   TinyXML2::TinyXML2
   Poco::Foundation
   Poco::Net
-  Eigen3::Eigen3
+  Eigen3::Eigen
   Threads::Threads
   pinocchio::pinocchio
 )
