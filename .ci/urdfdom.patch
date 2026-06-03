@@ -11,3 +11,13 @@ index 20a6a05..5577e99 100644
      ${add_urdfdom_library_SOURCES})
    target_include_directories(${add_urdfdom_library_LIBNAME} PUBLIC
      "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+diff --git a/urdf_parser/include/urdf_parser/urdf_parser.h b/urdf_parser/include/urdf_parser/urdf_parser.h
+--- a/urdf_parser/include/urdf_parser/urdf_parser.h
++++ b/urdf_parser/include/urdf_parser/urdf_parser.h
+@@ -49,6 +49,7 @@
+ #include <string>
+ #include <vector>
+ #include "exportdecl.h"
++#include <cstdint>
+
+ namespace urdf_export_helpers {
