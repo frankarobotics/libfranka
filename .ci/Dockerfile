@@ -26,16 +26,19 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Add LLVM repository for newer clang versions
+# Add LLVM repository for newer clang versions.
+# apt.llvm.org publishes LLVM 18 for Ubuntu <= 24.04 but only LLVM 21+ for
+# Ubuntu 26.04 (resolute); use LLVM 22 (current stable) for that release.
 RUN apt-get update && \
     apt-get install -y wget gnupg lsb-release software-properties-common && \
     wget https://apt.llvm.org/llvm.sh && \
     chmod +x llvm.sh && \
-    ./llvm.sh 18 && \
+    if [ "${UBUNTU_VERSION}" = "26.04" ]; then LLVM_VER=22; else LLVM_VER=18; fi && \
+    ./llvm.sh ${LLVM_VER} && \
     apt-get update && \
-    apt-get install -y clang-format-18 clang-tidy-18 \
-    && ln -s $(which clang-tidy-18) /usr/bin/clang-tidy \
-    && ln -s $(which clang-format-18) /usr/bin/clang-format
+    apt-get install -y clang-format-${LLVM_VER} clang-tidy-${LLVM_VER} && \
+    ln -s $(which clang-tidy-${LLVM_VER}) /usr/bin/clang-tidy && \
+    ln -s $(which clang-format-${LLVM_VER}) /usr/bin/clang-format
 
 # Install necessary packages (without Python - we'll install specific version later)
 # Note: pybind11-dev kept for devcontainer users (works with Ubuntu's default Python)

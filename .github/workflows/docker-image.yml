@@ -48,6 +48,10 @@ jobs:
             ubuntu-version: '22.04'
             name: 'Python 3.12'
             tag-prefix: 'py'
+          - python-version: '3.14'
+            ubuntu-version: '26.04'  # Ubuntu 26.04 for glibc 2.43 compatibility
+            name: 'Python 3.14'
+            tag-prefix: 'py'
           # Debian package build images (Ubuntu version specific)
           - python-version: '3.8'
             ubuntu-version: '20.04'
@@ -60,6 +64,10 @@ jobs:
           - python-version: '3.12'
             ubuntu-version: '24.04'
             name: 'Ubuntu 24.04'
+            tag-prefix: 'ubuntu'
+          - python-version: '3.14'
+            ubuntu-version: '26.04'
+            name: 'Ubuntu 26.04'
             tag-prefix: 'ubuntu'
 
     steps:
