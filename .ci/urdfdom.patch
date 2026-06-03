@@ -5,7 +5,7 @@ index 20a6a05..5577e99 100644
 @@ -3,7 +3,7 @@ macro(add_urdfdom_library)
    set(multiValueArgs SOURCES LINK)
    cmake_parse_arguments(add_urdfdom_library "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-
+ 
 -  add_library(${add_urdfdom_library_LIBNAME} SHARED
 +  add_library(${add_urdfdom_library_LIBNAME} STATIC
      ${add_urdfdom_library_SOURCES})
@@ -14,10 +14,10 @@ index 20a6a05..5577e99 100644
 diff --git a/urdf_parser/include/urdf_parser/urdf_parser.h b/urdf_parser/include/urdf_parser/urdf_parser.h
 --- a/urdf_parser/include/urdf_parser/urdf_parser.h
 +++ b/urdf_parser/include/urdf_parser/urdf_parser.h
-@@ -49,6 +49,7 @@
- #include <string>
- #include <vector>
+@@ -49,5 +49,6 @@
+ #include <urdf_world/types.h>
+ 
  #include "exportdecl.h"
 +#include <cstdint>
-
- namespace urdf_export_helpers {
+ 
+ namespace tinyxml2{

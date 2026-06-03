@@ -155,7 +155,7 @@ RUN git clone --depth 1 --branch 4.0.0 https://github.com/ros/urdfdom.git \
 RUN git clone --depth 1 --recurse-submodules --shallow-submodules --branch v5.4.3 https://github.com/assimp/assimp.git \
     && cd assimp \
     && mkdir build && cd build \
-    && cmake .. -DBoost_USE_STATIC_LIBS=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DASSIMP_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    && cmake .. -DBoost_USE_STATIC_LIBS=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DASSIMP_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib -DASSIMP_WARNINGS_AS_ERRORS=OFF \
     && make -j4 && make install \
     && cd ../.. \
     && rm -rf assimp
