@@ -137,7 +137,7 @@ RUN git clone --depth 1 --branch 1.0.2 https://github.com/ros/console_bridge.git
 RUN git clone --depth 1 --branch 1.0.5 https://github.com/ros/urdfdom_headers.git \
     && cd urdfdom_headers \
     && mkdir build && cd build \
-    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     && make -j4 && make install \
     && cd ../.. \
     && rm -rf urdfdom_headers
@@ -147,7 +147,7 @@ RUN git clone --depth 1 --branch 4.0.0 https://github.com/ros/urdfdom.git \
     && cd urdfdom \
     && git apply  /tmp/urdfdom.patch \
     && mkdir build && cd build \
-    && cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    && cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     && make -j4 && make install \
     && cd ../.. \
     && rm -rf urdfdom
