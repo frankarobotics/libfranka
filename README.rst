@@ -34,7 +34,7 @@ Key Features
 
 - **Low-level control**: Access precise motion control for research robots.
 - **Real-time communication**: Interact with the robot in real-time.
-- **Multi-platform support**: Ubuntu 20.04, 22.04, and 24.04 LTS
+- **Multi-platform support**: Ubuntu 20.04, 22.04, 24.04, and 26.04 LTS
 
 
 1. System Requirements
@@ -46,6 +46,7 @@ Before using **libfranka**, ensure your system meets the following requirements:
    - Ubuntu 20.04 LTS (Focal Fossa)
    - Ubuntu 22.04 LTS (Jammy Jellyfish)
    - Ubuntu 24.04 LTS (Noble Numbat)
+   - Ubuntu 26.04 LTS (Resolute Raccoon)
    - `Linux with PREEMPT_RT patched kernel <https://frankarobotics.github.io/docs/doc/libfranka/docs/real_time_kernel.html>`_ recommended for real-time control
 
 **Build Tools** (for building from source):
@@ -59,7 +60,7 @@ Before using **libfranka**, ensure your system meets the following requirements:
 
 .. _installation-debian-package:
 
-2. Installation from Debian Package (Recommended)
+1. Installation from Debian Package (Recommended)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The easiest way to install **libfranka** is by using the pre-built Debian packages
@@ -94,6 +95,12 @@ Supported Platforms
      - .. image:: https://img.shields.io/github/actions/workflow/status/frankarobotics/libfranka/libfranka-build.yml?label=Ubuntu+24.04&logo=ubuntu&logoColor=white
           :target: https://github.com/frankarobotics/libfranka/actions/workflows/libfranka-build.yml
           :alt: Ubuntu 24.04 build status
+   * - 26.04 LTS
+     - resolute
+     - amd64
+     - .. image:: https://img.shields.io/github/actions/workflow/status/frankarobotics/libfranka/libfranka-build.yml?label=Ubuntu+26.04&logo=ubuntu&logoColor=white
+          :target: https://github.com/frankarobotics/libfranka/actions/workflows/libfranka-build.yml
+          :alt: Ubuntu 26.04 build status
 
 Quick Install
 ^^^^^^^^^^^^^
@@ -230,6 +237,9 @@ Method B: Using Docker Command Line
 
       # For Ubuntu 24.04
       docker build --build-arg UBUNTU_VERSION=24.04 -t libfranka-build:24.04 .ci/
+
+      # For Ubuntu 26.04
+      docker build --build-arg UBUNTU_VERSION=26.04 -t libfranka-build:26.04 .ci/
 
 2. **Run the container and build**
 
@@ -540,6 +550,10 @@ For more examples, see the `Usage Examples documentation <https://frankarobotics
      - .. image:: https://img.shields.io/github/actions/workflow/status/frankarobotics/libfranka/pylibfranka-wheels.yml?label=python3.12&logo=python&logoColor=white
           :target: https://github.com/frankarobotics/libfranka/actions/workflows/pylibfranka-wheels.yml
           :alt: Python 3.12 wheel build status
+   * - Ubuntu 26.04
+     - .. image:: https://img.shields.io/github/actions/workflow/status/frankarobotics/libfranka/pylibfranka-wheels.yml?label=python3.14&logo=python&logoColor=white
+          :target: https://github.com/frankarobotics/libfranka/actions/workflows/pylibfranka-wheels.yml
+          :alt: Python 3.14 wheel build status
 
 **Pylibfranka** provides Python bindings for libfranka, allowing robot control with Python.
 
@@ -678,6 +692,8 @@ Platform Compatibility
      - Python 3.9, 3.10, 3.11, 3.12
    * - 24.04 (Noble)
      - Python 3.9, 3.10, 3.11, 3.12
+   * - 26.04 (Resolute Raccoon)
+     - Python 3.14
 
 **Note:** Ubuntu 20.04 users must use Python 3.9 due to glibc compatibility requirements.
 
