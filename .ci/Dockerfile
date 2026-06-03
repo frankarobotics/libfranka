@@ -128,7 +128,7 @@ RUN git clone --depth 1 --branch 10.0.0 https://github.com/leethomason/tinyxml2.
 RUN git clone --depth 1 --branch 1.0.2 https://github.com/ros/console_bridge.git \
     && cd console_bridge \
     && mkdir build && cd build \
-    && cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    && cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     && make -j4 \
     && make install \
     && cd ../.. \
