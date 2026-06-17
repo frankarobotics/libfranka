@@ -26,16 +26,19 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Add LLVM repository for newer clang versions
+# Add LLVM repository for newer clang versions.
+# apt.llvm.org publishes LLVM 18 for Ubuntu <= 24.04 but only LLVM 21+ for
+# Ubuntu 26.04 (resolute); use LLVM 22 (current stable) for that release.
 RUN apt-get update && \
     apt-get install -y wget gnupg lsb-release software-properties-common && \
     wget https://apt.llvm.org/llvm.sh && \
     chmod +x llvm.sh && \
-    ./llvm.sh 18 && \
+    if [ "${UBUNTU_VERSION}" = "26.04" ]; then LLVM_VER=22; else LLVM_VER=18; fi && \
+    ./llvm.sh ${LLVM_VER} && \
     apt-get update && \
-    apt-get install -y clang-format-18 clang-tidy-18 \
-    && ln -s $(which clang-tidy-18) /usr/bin/clang-tidy \
-    && ln -s $(which clang-format-18) /usr/bin/clang-format
+    apt-get install -y clang-format-${LLVM_VER} clang-tidy-${LLVM_VER} && \
+    ln -s $(which clang-tidy-${LLVM_VER}) /usr/bin/clang-tidy && \
+    ln -s $(which clang-format-${LLVM_VER}) /usr/bin/clang-format
 
 # Install necessary packages (without Python - we'll install specific version later)
 # Note: pybind11-dev kept for devcontainer users (works with Ubuntu's default Python)
@@ -125,7 +128,7 @@ RUN git clone --depth 1 --branch 10.0.0 https://github.com/leethomason/tinyxml2.
 RUN git clone --depth 1 --branch 1.0.2 https://github.com/ros/console_bridge.git \
     && cd console_bridge \
     && mkdir build && cd build \
-    && cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    && cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     && make -j4 \
     && make install \
     && cd ../.. \
@@ -134,7 +137,7 @@ RUN git clone --depth 1 --branch 1.0.2 https://github.com/ros/console_bridge.git
 RUN git clone --depth 1 --branch 1.0.5 https://github.com/ros/urdfdom_headers.git \
     && cd urdfdom_headers \
     && mkdir build && cd build \
-    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     && make -j4 && make install \
     && cd ../.. \
     && rm -rf urdfdom_headers
@@ -144,7 +147,7 @@ RUN git clone --depth 1 --branch 4.0.0 https://github.com/ros/urdfdom.git \
     && cd urdfdom \
     && git apply  /tmp/urdfdom.patch \
     && mkdir build && cd build \
-    && cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    && cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     && make -j4 && make install \
     && cd ../.. \
     && rm -rf urdfdom
@@ -152,7 +155,7 @@ RUN git clone --depth 1 --branch 4.0.0 https://github.com/ros/urdfdom.git \
 RUN git clone --depth 1 --recurse-submodules --shallow-submodules --branch v5.4.3 https://github.com/assimp/assimp.git \
     && cd assimp \
     && mkdir build && cd build \
-    && cmake .. -DBoost_USE_STATIC_LIBS=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DASSIMP_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    && cmake .. -DBoost_USE_STATIC_LIBS=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS=OFF -DASSIMP_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=/usr/lib -DASSIMP_WARNINGS_AS_ERRORS=OFF \
     && make -j4 && make install \
     && cd ../.. \
     && rm -rf assimp
