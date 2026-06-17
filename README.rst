@@ -24,10 +24,10 @@ libfranka: C++ Library for Franka Robotics Research Robots
    :alt: docker build status
 
 **libfranka** is a C++ library that provides low-level control of Franka Robotics research robots.
-The `API References <https://frankarobotics.github.io/docs/libfranka/docs/api_references.html>`_ offers an overview of its capabilities,
+The `API References <https://frankarobotics.github.io/docs/doc/libfranka/docs/api_references.html>`_ offers an overview of its capabilities,
 while the `Franka Control Interface (FCI) documentation <https://frankarobotics.github.io/docs>`_ provides more information on setting up the robot and utilizing its features and functionalities.
 
-To find the appropriate version to use, please refer to the `Robot System Version Compatibility <https://frankarobotics.github.io/docs/libfranka/docs/compatibility_with_images.html>`_.
+To find the appropriate version to use, please refer to the `Robot System Version Compatibility <https://frankarobotics.github.io/docs/doc/libfranka/docs/compatibility_matrix.html>`_.
 
 Key Features
 ------------
@@ -46,7 +46,7 @@ Before using **libfranka**, ensure your system meets the following requirements:
    - Ubuntu 20.04 LTS (Focal Fossa)
    - Ubuntu 22.04 LTS (Jammy Jellyfish)
    - Ubuntu 24.04 LTS (Noble Numbat)
-   - `Linux with PREEMPT_RT patched kernel <https://frankarobotics.github.io/docs/libfranka/docs/real_time_kernel.html>`_ recommended for real-time control
+   - `Linux with PREEMPT_RT patched kernel <https://frankarobotics.github.io/docs/doc/libfranka/docs/real_time_kernel.html>`_ recommended for real-time control
 
 **Build Tools** (for building from source):
    - GCC 9 or later
@@ -497,9 +497,9 @@ After installation, configure your system for real-time control and run example 
 System Setup
 ^^^^^^^^^^^^
 
-1. **Network configuration**: Follow `Minimum System and Network Requirements <https://frankarobotics.github.io/docs/libfranka/docs/system_requirements.html>`_
-2. **Real-time kernel**: See `Setting up the Real-Time Kernel <https://frankarobotics.github.io/docs/libfranka/docs/real_time_kernel.html>`_
-3. **Getting started**: Read the `Getting Started Manual <https://frankarobotics.github.io/docs/libfranka/docs/getting_started.html>`_
+1. **Network configuration**: Follow `Minimum System and Network Requirements <https://frankarobotics.github.io/docs/doc/libfranka/docs/system_requirements.html>`_
+2. **Real-time kernel**: See `Setting up the Real-Time Kernel <https://frankarobotics.github.io/docs/doc/libfranka/docs/real_time_kernel.html>`_
+3. **Getting started**: Read the `Getting Started Manual <https://frankarobotics.github.io/docs/doc/libfranka/docs/getting_started.html>`_
 
 Running Examples
 ^^^^^^^^^^^^^^^^
@@ -513,7 +513,7 @@ If you built from source, example programs are in the ``build/examples/`` direct
 
 Replace ``<robot-ip>`` with your robot's IP address (e.g., ``192.168.1.1``).
 
-For more examples, see the `Usage Examples documentation <https://frankarobotics.github.io/docs/libfranka/docs/usage_examples.html>`_.
+For more examples, see the `Usage Examples documentation <https://frankarobotics.github.io/docs/doc/libfranka/docs/usage_examples.html>`_.
 
 .. _pylibfranka:
 
