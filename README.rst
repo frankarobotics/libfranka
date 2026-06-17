@@ -60,7 +60,7 @@ Before using **libfranka**, ensure your system meets the following requirements:
 
 .. _installation-debian-package:
 
-1. Installation from Debian Package (Recommended)
+2. Installation from Debian Package (Recommended)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The easiest way to install **libfranka** is by using the pre-built Debian packages
