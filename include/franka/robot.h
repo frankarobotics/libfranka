@@ -487,40 +487,73 @@ class Robot {
       -> std::array<double, kNumJoints>;
 
   /**
-   * Changes the collision behavior.
+   * Configures the contact and collision detection thresholds.
    *
-   * Set separate torque and force boundaries for acceleration/deceleration and constant velocity
-   * movement phases.
+   * The robot continuously monitors the estimated external joint torques
+   * (\f$\hat{\tau}_{ext}\f$) and the estimated external wrench (\f$\hat{F}_{ext}\f$)
+   * and compares them against two configurable threshold levels:
    *
-   * Forces or torques between lower and upper threshold are shown as contacts in the RobotState.
-   * Forces or torques above the upper threshold are registered as collision and cause the robot to
-   * stop moving.
+   * - **Lower threshold (contact):** When the estimate crosses the lower threshold, a
+   *   contact is reported in RobotState::joint_contact / RobotState::cartesian_contact.
+   *   The robot continues moving normally. The signal resets automatically when the
+   *   estimated external load drops back below the threshold.
    *
-   * @param[in] lower_torque_thresholds_acceleration Contact torque thresholds during
-   * acceleration/deceleration for each joint in \f$[Nm]\f$.
-   * @param[in] upper_torque_thresholds_acceleration Collision torque thresholds during
-   * acceleration/deceleration for each joint in \f$[Nm]\f$.
-   * @param[in] lower_torque_thresholds_nominal Contact torque thresholds for each joint
-   * in \f$[Nm]\f$.
-   * @param[in] upper_torque_thresholds_nominal Collision torque thresholds for each joint
-   * in \f$[Nm]\f$.
-   * @param[in] lower_force_thresholds_acceleration Contact force thresholds during
-   * acceleration/deceleration for \f$(x,y,z,R,P,Y)\f$ in \f$[N]\f$.
-   * @param[in] upper_force_thresholds_acceleration Collision force thresholds during
-   * acceleration/deceleration for \f$(x,y,z,R,P,Y)\f$ in \f$[N]\f$.
-   * @param[in] lower_force_thresholds_nominal Contact force thresholds for \f$(x,y,z,R,P,Y)\f$
-   * in \f$[N]\f$.
-   * @param[in] upper_force_thresholds_nominal Collision force thresholds for \f$(x,y,z,R,P,Y)\f$
-   * in \f$[N]\f$.
+   * - **Upper threshold (collision):** When the estimate crosses the upper threshold, a
+   *   collision is detected. The robot triggers a reflex stop and enters
+   *   RobotMode::kReflex. The collision signal latches until explicitly cleared via
+   *   automaticErrorRecovery().
+   *
+   * This overload allows setting separate threshold values for two motion phases:
+   *
+   * - **Acceleration thresholds:** Active during acceleration and deceleration phases.
+   *   Typically set higher because the external torque/force estimates are less accurate
+   *   during dynamic motion due to model inaccuracies amplified by inertial forces.
+   *
+   * - **Nominal thresholds:** Active during constant-velocity motion. Can be set tighter
+   *   for more sensitive detection, since the estimates are more reliable at steady state.
+   *
+   * @note The default thresholds are very high (effectively disabling detection). If you
+   * expect environmental interaction (grasping, pushing against surfaces), tune the
+   * thresholds by observing RobotState::tau_ext_hat_filtered and RobotState::O_F_ext_hat_K
+   * during your application. Set thresholds above the expected interaction forces but below
+   * what constitutes an unexpected collision.
+   *
+   * @note Thresholds persist across control loops and connections — they are only reset on
+   * robot reboot. Calling this function once is sufficient; you do not need to re-send
+   * thresholds before each control() call. During guiding mode, thresholds are temporarily
+   * raised internally and restored to your configured values when guiding ends.
+   *
+   * @param[in] lower_torque_thresholds_acceleration Contact torque threshold per joint during
+   * acceleration/deceleration. Unit: \f$[Nm]\f$. Range: \f$[0, \infty)\f$.
+   * @param[in] upper_torque_thresholds_acceleration Collision torque threshold per joint during
+   * acceleration/deceleration. Unit: \f$[Nm]\f$. Range: \f$[0, \infty)\f$.
+   * @param[in] lower_torque_thresholds_nominal Contact torque threshold per joint during
+   * constant-velocity motion. Unit: \f$[Nm]\f$. Range: \f$[0, \infty)\f$.
+   * @param[in] upper_torque_thresholds_nominal Collision torque threshold per joint during
+   * constant-velocity motion. Unit: \f$[Nm]\f$. Range: \f$[0, \infty)\f$.
+   * @param[in] lower_force_thresholds_acceleration Contact wrench threshold per Cartesian axis
+   * \f$(x,y,z,R,P,Y)\f$ during acceleration/deceleration.
+   * Unit: \f$[N,N,N,Nm,Nm,Nm]\f$. Range: \f$[0, \infty)\f$.
+   * @param[in] upper_force_thresholds_acceleration Collision wrench threshold per Cartesian axis
+   * \f$(x,y,z,R,P,Y)\f$ during acceleration/deceleration.
+   * Unit: \f$[N,N,N,Nm,Nm,Nm]\f$. Range: \f$[0, \infty)\f$.
+   * @param[in] lower_force_thresholds_nominal Contact wrench threshold per Cartesian axis
+   * \f$(x,y,z,R,P,Y)\f$ during constant-velocity motion.
+   * Unit: \f$[N,N,N,Nm,Nm,Nm]\f$. Range: \f$[0, \infty)\f$.
+   * @param[in] upper_force_thresholds_nominal Collision wrench threshold per Cartesian axis
+   * \f$(x,y,z,R,P,Y)\f$ during constant-velocity motion.
+   * Unit: \f$[N,N,N,Nm,Nm,Nm]\f$. Range: \f$[0, \infty)\f$.
    *
    * @throw CommandException if the Control reports an error.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    *
-   * @see RobotState::cartesian_contact
-   * @see RobotState::cartesian_collision
    * @see RobotState::joint_contact
    * @see RobotState::joint_collision
-   * @see Robot::automaticErrorRecovery for performing a reset after a collision.
+   * @see RobotState::cartesian_contact
+   * @see RobotState::cartesian_collision
+   * @see RobotState::tau_ext_hat_filtered
+   * @see RobotState::O_F_ext_hat_K
+   * @see Robot::automaticErrorRecovery for clearing a collision state.
    */
   void setCollisionBehavior(const std::array<double, 7>& lower_torque_thresholds_acceleration,
                             const std::array<double, 7>& upper_torque_thresholds_acceleration,
@@ -532,30 +565,36 @@ class Robot {
                             const std::array<double, 6>& upper_force_thresholds_nominal);
 
   /**
-   * Changes the collision behavior.
+   * Configures the contact and collision detection thresholds.
    *
-   * Set common torque and force boundaries for acceleration/deceleration and constant velocity
-   * movement phases.
+   * Convenience overload that applies the same thresholds to both acceleration/deceleration
+   * and constant-velocity motion phases. Use the 8-parameter overload if you need different
+   * sensitivity during dynamic vs. steady-state motion.
    *
-   * Forces or torques between lower and upper threshold are shown as contacts in the RobotState.
-   * Forces or torques above the upper threshold are registered as collision and cause the robot to
-   * stop moving.
+   * - **Lower threshold → contact:** reported in RobotState, robot continues moving, auto-resets.
+   * - **Upper threshold → collision:** triggers reflex (robot stops), latches until recovery.
    *
-   * @param[in] lower_torque_thresholds Contact torque thresholds for each joint in \f$[Nm]\f$.
-   * @param[in] upper_torque_thresholds Collision torque thresholds for each joint in \f$[Nm]\f$.
-   * @param[in] lower_force_thresholds Contact force thresholds for \f$(x,y,z,R,P,Y)\f$
-   * in \f$[N]\f$.
-   * @param[in] upper_force_thresholds Collision force thresholds for \f$(x,y,z,R,P,Y)\f$
-   * in \f$[N]\f$.
+   * @note The default thresholds are very high (effectively disabling detection). Tune them
+   * for your application by observing RobotState::tau_ext_hat_filtered and
+   * RobotState::O_F_ext_hat_K.
+   *
+   * @param[in] lower_torque_thresholds Contact torque threshold per joint.
+   * Unit: \f$[Nm]\f$. Range: \f$[0, \infty)\f$.
+   * @param[in] upper_torque_thresholds Collision torque threshold per joint.
+   * Unit: \f$[Nm]\f$. Range: \f$[0, \infty)\f$.
+   * @param[in] lower_force_thresholds Contact wrench threshold per Cartesian axis
+   * \f$(x,y,z,R,P,Y)\f$. Unit: \f$[N,N,N,Nm,Nm,Nm]\f$. Range: \f$[0, \infty)\f$.
+   * @param[in] upper_force_thresholds Collision wrench threshold per Cartesian axis
+   * \f$(x,y,z,R,P,Y)\f$. Unit: \f$[N,N,N,Nm,Nm,Nm]\f$. Range: \f$[0, \infty)\f$.
    *
    * @throw CommandException if the Control reports an error.
    * @throw NetworkException if the connection is lost, e.g. after a timeout.
    *
-   * @see RobotState::cartesian_contact
-   * @see RobotState::cartesian_collision
    * @see RobotState::joint_contact
    * @see RobotState::joint_collision
-   * @see Robot::automaticErrorRecovery for performing a reset after a collision.
+   * @see RobotState::cartesian_contact
+   * @see RobotState::cartesian_collision
+   * @see Robot::automaticErrorRecovery for clearing a collision state.
    */
   void setCollisionBehavior(const std::array<double, 7>& lower_torque_thresholds,
                             const std::array<double, 7>& upper_torque_thresholds,

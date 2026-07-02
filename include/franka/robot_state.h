@@ -257,36 +257,66 @@ struct RobotState {
   std::array<double, 7> ddq_d{};
 
   /**
-   * Indicates which contact level is activated in which joint. After contact disappears, value
-   * turns to zero.
+   * Indicates whether contact is reported for each joint.
    *
-   * @see Robot::setCollisionBehavior for setting sensitivity values.
+   * The signal is derived from the estimated external joint torque and the lower torque
+   * threshold configured with Robot::setCollisionBehavior. The value is 0.0 when no contact
+   * is reported and non-zero while contact is active. It returns to zero automatically once
+   * contact is no longer detected.
+   *
+   * @see Robot::setCollisionBehavior for configuring contact thresholds.
+   * @see RobotState::tau_ext_hat_filtered for the underlying torque estimate.
    */
   std::array<double, 7> joint_contact{};
 
   /**
-   * Indicates which contact level is activated in which Cartesian dimension \f$(x,y,z,R,P,Y)\f$.
-   * After contact disappears, the value turns to zero.
+   * Indicates whether contact is reported for each Cartesian dimension \f$(x,y,z,R,P,Y)\f$.
    *
-   * @see Robot::setCollisionBehavior for setting sensitivity values.
+   * The signal is derived from the estimated external wrench and the lower force threshold
+   * configured with Robot::setCollisionBehavior. The value is 0.0 when no contact is reported
+   * and non-zero while contact is active. It returns to zero automatically once contact is
+   * no longer detected.
+   *
+   * @see Robot::setCollisionBehavior for configuring contact thresholds.
+   * @see RobotState::O_F_ext_hat_K for the underlying wrench estimate.
    */
   std::array<double, 6> cartesian_contact{};
 
   /**
-   * Indicates which contact level is activated in which joint. After contact disappears, the value
-   * stays the same until a reset command is sent.
+   * Indicates whether a collision is reported for each joint.
    *
-   * @see Robot::setCollisionBehavior for setting sensitivity values.
-   * @see Robot::automaticErrorRecovery for performing a reset after a collision.
+   * The signal is derived from the estimated external joint torque and the upper torque
+   * threshold configured with Robot::setCollisionBehavior. Unlike contact, collision is a
+   * latching signal: it remains non-zero even after the external torque drops, until the
+   * error is explicitly cleared via automaticErrorRecovery().
+   *
+   * A collision triggers a reflex stop; while the reflex is active, the robot enters
+   * RobotMode::kReflex.
+   *
+   * Values: 0.0 = no collision, non-zero = collision detected (latched).
+   *
+   * @see Robot::setCollisionBehavior for configuring collision thresholds.
+   * @see Robot::automaticErrorRecovery for clearing the collision state.
+   * @see RobotState::tau_ext_hat_filtered for the underlying torque estimate.
    */
   std::array<double, 7> joint_collision{};
 
   /**
-   * Indicates which contact level is activated in which Cartesian dimension \f$(x,y,z,R,P,Y)\f$.
-   * After contact disappears, the value stays the same until a reset command is sent.
+   * Indicates whether a collision is reported for each Cartesian dimension \f$(x,y,z,R,P,Y)\f$.
    *
-   * @see Robot::setCollisionBehavior for setting sensitivity values.
-   * @see Robot::automaticErrorRecovery for performing a reset after a collision.
+   * The signal is derived from the estimated external wrench and the upper force threshold
+   * configured with Robot::setCollisionBehavior. Unlike contact, collision is a latching
+   * signal: it remains non-zero even after the external wrench drops, until the error is
+   * explicitly cleared via automaticErrorRecovery().
+   *
+   * A collision triggers a reflex stop; while the reflex is active, the robot enters
+   * RobotMode::kReflex.
+   *
+   * Values: 0.0 = no collision, non-zero = collision detected (latched).
+   *
+   * @see Robot::setCollisionBehavior for configuring collision thresholds.
+   * @see Robot::automaticErrorRecovery for clearing the collision state.
+   * @see RobotState::O_F_ext_hat_K for the underlying wrench estimate.
    */
   std::array<double, 6> cartesian_collision{};
 
