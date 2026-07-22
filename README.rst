@@ -712,7 +712,7 @@ From the root folder, you can install `pylibfranka` using pip:
 
 .. code-block:: bash
 
-   pip install .
+   pip install ./pylibfranka
 
 
 This will install pylibfranka in your current Python environment.

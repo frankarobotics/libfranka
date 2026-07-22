@@ -172,7 +172,7 @@ From the libfranka root folder, install pylibfranka using pip:
 
 .. code-block:: bash
 
-   pip install .
+   pip install ./pylibfranka
 
 This will build the C++ extension and install pylibfranka in your current Python environment.
 
@@ -180,7 +180,7 @@ For development (editable install):
 
 .. code-block:: bash
 
-   pip install -e .
+   pip install -e ./pylibfranka
 
 Inside a ROS / ROS 2 workspace
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

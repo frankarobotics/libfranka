@@ -7,20 +7,32 @@ from pathlib import Path
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
-# Root directory of the project
+# Directory of the pylibfranka python project (this file's location).
 ROOT_DIR = Path(__file__).parent
+# Repository root: the C++ libfranka project one level up. The bindings are a
+# subproject; the shared version lives in the top-level CMakeLists.txt and the
+# native build is driven from the repo root (add_subdirectory(pylibfranka)).
+REPO_ROOT = ROOT_DIR.parent
 
 
 def get_version():
-    """Extract version from CMakeLists.txt."""
-    cmake_file = ROOT_DIR / "CMakeLists.txt"
+    """Extract version from the top-level (repo root) CMakeLists.txt.
+
+    Fails loudly rather than silently defaulting: a wrong version would produce
+    a publishable-but-mislabelled artifact. This also surfaces the case where
+    pylibfranka is built outside the libfranka source tree (e.g. from an sdist
+    that does not vendor the repo root), instead of shipping ``0.0.0``.
+    """
+    cmake_file = REPO_ROOT / "CMakeLists.txt"
     if cmake_file.exists():
-        with open(cmake_file, "r", encoding="utf-8") as f:
-            content = f.read()
-            match = re.search(r"set\(libfranka_VERSION\s+(\d+\.\d+\.\d+)\)", content)
-            if match:
-                return match.group(1)
-    return "0.0.0"
+        content = cmake_file.read_text(encoding="utf-8")
+        match = re.search(r"set\(libfranka_VERSION\s+(\d+\.\d+\.\d+)\)", content)
+        if match:
+            return match.group(1)
+    raise RuntimeError(
+        f"Could not determine libfranka version: expected 'set(libfranka_VERSION X.Y.Z)' "
+        f"in {cmake_file}. pylibfranka must be built from within the libfranka source tree."
+    )
 
 
 def write_version_files(version):
@@ -131,6 +143,20 @@ class CMakeBuild(build_ext):
         # not the source tree (which does not).
         package_dir = Path(extdir)
         build_lib_root = package_dir.parent
+        stub_file = package_dir / f"{ext.name.split('.')[-1]}.pyi"
+        py_typed = package_dir / "py.typed"
+
+        # Explicit opt-out: skip generation entirely and ensure the wheel does not
+        # advertise types it does not ship (drop any stub/marker copied in by
+        # build_py from the source tree).
+        if os.environ.get("PYLIBFRANKA_SKIP_STUBS"):
+            print("WARNING: skipping .pyi stub generation (PYLIBFRANKA_SKIP_STUBS set)")
+            stub_file.unlink(missing_ok=True)
+            py_typed.unlink(missing_ok=True)
+            return
+
+        # Never ship a stale stub: start from a clean slate for this build.
+        stub_file.unlink(missing_ok=True)
 
         env = dict(os.environ)
         python_path = [str(build_lib_root), env.get("PYTHONPATH", "")]
@@ -151,23 +177,18 @@ class CMakeBuild(build_ext):
             )
         except (subprocess.CalledProcessError, FileNotFoundError) as exc:
             # Stub generation is part of the deliverable (typed wheels), so a
-            # failure is fatal by default. Allow an explicit opt-out for
-            # constrained environments that only need the compiled module.
-            if os.environ.get("PYLIBFRANKA_SKIP_STUBS"):
-                print(f"WARNING: skipping .pyi stubs (PYLIBFRANKA_SKIP_STUBS set): {exc}")
-                return
+            # failure is fatal. Set PYLIBFRANKA_SKIP_STUBS=1 to opt out.
             raise RuntimeError(
                 "pybind11-stubgen failed to generate type stubs. Install "
                 "'pybind11-stubgen' (a build dependency) or set "
                 "PYLIBFRANKA_SKIP_STUBS=1 to build an untyped wheel."
             ) from exc
 
-        stub_file = package_dir / f"{ext.name.split('.')[-1]}.pyi"
         if not stub_file.exists():
             raise RuntimeError(f"pybind11-stubgen ran but produced no stub at {stub_file}")
 
         # PEP 561 marker so type checkers discover the stubs in the installed wheel.
-        (package_dir / "py.typed").write_text("")
+        py_typed.write_text("")
 
 
 setup(
@@ -176,7 +197,7 @@ setup(
     packages=["pylibfranka"],
     python_requires=">=3.9",
     install_requires=["numpy>=1.19.0"],
-    ext_modules=[CMakeExtension("pylibfranka._pylibfranka")],
+    ext_modules=[CMakeExtension("pylibfranka._pylibfranka", sourcedir=str(REPO_ROOT))],
     cmdclass={
         "build_ext": CMakeBuild,
     },

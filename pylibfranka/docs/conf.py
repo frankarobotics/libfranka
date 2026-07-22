@@ -27,8 +27,10 @@ if new_paths:
     else:
         os.environ['LD_LIBRARY_PATH'] = new_paths
 
-# Add the parent directory to sys.path to import the module
-sys.path.insert(0, os.path.abspath('..'))
+# pylibfranka is a compiled extension package: autodoc imports it from the
+# installed wheel (the CI installs it before building docs). Do NOT prepend the
+# source tree here -- the in-tree pylibfranka/ package has no compiled
+# _pylibfranka extension and would shadow the installed one, breaking import.
 
 # -- Project information -----------------------------------------------------
 project = 'pylibfranka'

@@ -294,12 +294,18 @@ pipeline {
                 script {
                   withEnv(["DISTRO=${env.DISTRO}"]) {
                     sh '''
-                      # Install pylibfranka from root (builds against libfranka in build-release.${DISTRO})
+                      # Install pylibfranka from its subproject dir. Requires pip
+                      # >= 21.3, which builds the local dir in-tree so setup.py can
+                      # reach the repo root (parent) to drive the cmake build. Not
+                      # editable: an editable install points at the source tree,
+                      # which lacks the co-located libfranka.so and fails to import.
                       export LD_LIBRARY_PATH="${WORKSPACE}/build-release.${DISTRO}:${LD_LIBRARY_PATH:-}"
+                      # Docs only need the importable module, not type stubs.
+                      export PYLIBFRANKA_SKIP_STUBS=1
                       if [ -n "$VIRTUAL_ENV" ]; then
-                        python3 -m pip install .
+                        python3 -m pip install ./pylibfranka
                       else
-                        python3 -m pip install . --user
+                        python3 -m pip install ./pylibfranka --user
                       fi
                     '''
 

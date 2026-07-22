@@ -20,13 +20,14 @@ repos:
     hooks:
       - id: flake8
         additional_dependencies: [flake8-docstrings]
+        args: ["--config", "pylibfranka/setup.cfg"]
 
   # Python type checking with mypy
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.3.0
     hooks:
       - id: mypy
-        args: [--ignore-missing-imports]
+        args: [--ignore-missing-imports, --config-file, pylibfranka/setup.cfg]
 
   # C++ formatting with clang-format
   - repo: https://github.com/pre-commit/mirrors-clang-format

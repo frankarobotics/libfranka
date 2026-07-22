@@ -16,7 +16,7 @@ build-backend = "setuptools.build_meta"
 name = "pylibfranka"
 dynamic = ["version"]
 description = "Python bindings for libfranka - Control Franka robots with Python"
-readme = "pylibfranka/README.md"
+readme = "README.md"
 authors = [{name = "Franka Robotics GmbH", email = "info@franka.de"}]
 license = {text = "Apache-2.0"}
 requires-python = ">=3.9"

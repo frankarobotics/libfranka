@@ -51,16 +51,23 @@ jobs:
         image: pylibfranka:latest
         options: -v ${{ github.workspace }}:/workspace
         run: |
-          cd /workspace
+          cd /workspace/pylibfranka
           export PATH="$HOME/.local/bin:$PATH"
           export LC_ALL=C.UTF-8
           export LANG=C.UTF-8
+          # Docs only need the importable module, not type stubs.
+          export PYLIBFRANKA_SKIP_STUBS=1
 
-          # Install pylibfranka
+          # Install pylibfranka (requires pip >= 21.3, which builds the local dir
+          # in-tree so setup.py can reach the repo root to drive the cmake build;
+          # this also ships libfranka.so alongside the extension so it imports
+          # without LD_LIBRARY_PATH). Do NOT use editable here: an editable
+          # install points at the source tree, which lacks the co-located
+          # libfranka.so and fails to import.
           pip3 install .
 
           # Move to docs directory
-          cd pylibfranka/docs
+          cd docs
 
           # Install Sphinx requirements
           pip3 install -r requirements.txt

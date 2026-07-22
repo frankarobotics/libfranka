@@ -56,7 +56,7 @@ sudo apt-get install -y build-essential cmake libeigen3-dev libpoco-dev python3-
 
 #### Build and Install
 
-From the root folder, you can install `pylibfranka` using pip:
+From the `pylibfranka/` folder, you can install `pylibfranka` using pip:
 
 ```bash
 pip install .

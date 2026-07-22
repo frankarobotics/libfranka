@@ -5,7 +5,7 @@ echo "Setting up dependencies for pylibfranka..."
 
 # Get script and project directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Update package lists (allow failure for non-root users)
 echo "Updating package lists..."
@@ -51,6 +51,7 @@ python3 -m pip install $PIP_USER_FLAG --upgrade \
     auditwheel \
     patchelf \
     pybind11 \
+    pybind11-stubgen \
     numpy \
     cmake \
     twine
@@ -90,6 +91,6 @@ echo "Dependencies setup complete!"
 echo ""
 echo "To build the wheel, run:"
 echo "  cd $PROJECT_ROOT"
-echo "  ./pylibfranka/scripts/build_package.sh"
-echo "  ./pylibfranka/scripts/repair_wheels.sh"
-echo "  ./pylibfranka/scripts/test_installation.sh"
+echo "  ./scripts/build_package.sh"
+echo "  ./scripts/repair_wheels.sh"
+echo "  ./scripts/test_installation.sh"
