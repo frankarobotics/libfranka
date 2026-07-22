@@ -94,6 +94,15 @@ void bind_async_control(py::module& m) {
       .def_readwrite("joint_positions",
                      &franka::AsyncPositionControlHandler::JointPositionTarget::joint_positions);
 
+  py::enum_<franka::TargetStatus>(m,
+    "TargetStatus", R"pbdoc(
+    Status of the target feedback.
+    )pbdoc")
+      .value("kIdle", franka::TargetStatus::kIdle)
+      .value("kExecuting", franka::TargetStatus::kExecuting)
+      .value("kTargetReached", franka::TargetStatus::kTargetReached)
+      .value("kAborted", franka::TargetStatus::kAborted);
+
   py::class_<franka::AsyncPositionControlHandler::CommandResult>(async_position_control_handler,
                                                                  "CommandResult", R"pbdoc(
     Result of setting a joint position target.

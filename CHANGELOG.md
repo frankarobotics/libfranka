@@ -2,6 +2,11 @@
 
 All notable changes to libfranka in this file.
 
+
+## [UNRELEASED]
+### pylibfranka - Python
+- fix: TargetStatus enum pybind added.
+
 ## [0.21.2]
 - fix broken test on builds relying on poco 1.12.x
 - docu: Maintenance work on documentation
