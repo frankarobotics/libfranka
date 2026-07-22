@@ -5,6 +5,7 @@
 
 #include <gmock/gmock.h>
 
+#include <franka/exception.h>
 #include <franka/lowpass_filter.h>
 #include "control_loop.h"
 #include "motion_generator_traits.h"
@@ -1006,6 +1007,45 @@ TYPED_TEST(ControlLoops, LoopWithThrowingMotionCallback) {
     loop.loop();
   } catch (const std::domain_error&) {
   }
+}
+
+// When the callback throws, the loop cancels the motion in its catch block. If that cleanup
+// cancelMotion() itself throws (e.g. NetworkException on a connection already interrupted by a
+// reflex/stop), it must be swallowed so the ORIGINAL callback exception still propagates to the
+// user - never replaced by the secondary network error.
+TYPED_TEST(ControlLoops, LoopSwallowsThrowingCancelMotionAndPropagatesOriginalException) {
+  NiceMock<MockRobotControl> robot;
+  {
+    InSequence s;
+    EXPECT_CALL(robot, startMotion(Move::ControllerMode::kExternalController,
+                                   this->kMotionGeneratorMode, TestFixture::Loop::kDefaultDeviation,
+                                   TestFixture::Loop::kDefaultDeviation, kUseNoAsyncMotionGenerator,
+                                   kNoMaximumVelocities))
+        .WillOnce(Return(200));
+    EXPECT_CALL(robot, cancelMotion(200))
+        .WillOnce(Throw(franka::NetworkException("libfranka: TCP connection got interrupted.")));
+  }
+
+  NiceMock<MockControlCallback> control_callback;
+  ON_CALL(control_callback, invoke(_, _)).WillByDefault(Return(Torques({0, 1, 2, 3, 4, 5, 6})));
+
+  MockMotionCallback<typename TestFixture::TMotion> motion_callback;
+  EXPECT_CALL(motion_callback, invoke(_, _)).WillOnce(Throw(std::domain_error("original error")));
+
+  bool caught_original = false;
+  try {
+    typename TestFixture::Loop loop(
+        robot, std::bind(&MockControlCallback::invoke, &control_callback, _1, _2),
+        std::bind(&decltype(motion_callback)::invoke, &motion_callback, _1, _2),
+        TestFixture::kLimitRate, getCutoffFreq(TestFixture::kFilter));
+
+    loop.loop();
+  } catch (const franka::NetworkException&) {
+    FAIL() << "cancelMotion's NetworkException must not escape; the original exception should win.";
+  } catch (const std::domain_error&) {
+    caught_original = true;
+  }
+  EXPECT_TRUE(caught_original);
 }
 
 TYPED_TEST(ControlLoops, SpinOnceWithFinishingMotionCallbackAndControllerMode) {

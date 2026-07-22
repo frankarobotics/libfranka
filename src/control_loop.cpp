@@ -143,6 +143,10 @@ auto ControlLoop<MotionControlType>::loop() -> void try {
 } catch (...) {
   try {
     robot_.cancelMotion(motion_id_);
+  } catch (const std::exception& e) {
+    // The original control-loop exception below is the meaningful one and is always rethrown; log
+    // the secondary cancel failure so it stays visible instead of silently swallowed.
+    logging::logError("libfranka: failed to cancel motion after a control-loop error: {}", e.what());
   } catch (...) {
   }
   throw;

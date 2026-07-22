@@ -127,6 +127,32 @@ TYPED_TEST(ActiveMotionGeneratorTest, CanWriteOnceIfControlNotFinished) {
   }
 }
 
+TYPED_TEST(ActiveMotionGeneratorTest, DestructorDoesNotPropagateNetworkExceptionFromCancelMotion) {
+  auto active_control =
+      this->startControl(research_interface::robot::Move::ControllerMode::kCartesianImpedance);
+
+  // Simulate a broken TCP connection (e.g. after a reflex or user stop): cancelMotion, which is
+  // invoked from the destructor, throws. The destructor must swallow it instead of terminating.
+  EXPECT_CALL(*(this->robot_impl_mock_), cancelMotion(this->default_motion_id))
+      .Times(1)
+      .WillOnce(::testing::Throw(NetworkException("libfranka: TCP connection got interrupted.")));
+
+  EXPECT_NO_THROW(active_control.reset());
+}
+
+TYPED_TEST(ActiveMotionGeneratorTest, DestructorDoesNotPropagateNonFrankaExceptionFromCancelMotion) {
+  auto active_control =
+      this->startControl(research_interface::robot::Move::ControllerMode::kCartesianImpedance);
+
+  // The destructor's catch-all must also swallow exceptions that do not derive from
+  // franka::Exception.
+  EXPECT_CALL(*(this->robot_impl_mock_), cancelMotion(this->default_motion_id))
+      .Times(1)
+      .WillOnce(::testing::Throw(std::runtime_error("unexpected")));
+
+  EXPECT_NO_THROW(active_control.reset());
+}
+
 TYPED_TEST(ActiveMotionGeneratorTest, CanWriteOnceWithExternalControllerIfControlNotFinished) {
   using CurrentMotionGeneratorType = typename TestFixture::CurrentMotionGeneratorType;
 
@@ -158,6 +184,36 @@ TYPED_TEST(ActiveMotionGeneratorTest, CanWriteOnceWithExternalControllerIfContro
         .Times(1);
     EXPECT_NO_THROW(active_control->writeOnce(motion_generator_output, this->default_torques));
   }
+}
+
+TYPED_TEST(ActiveMotionGeneratorTest, DestructorDoesNotCancelMotionWhenControlFinished) {
+  using CurrentMotionGeneratorType = typename TestFixture::CurrentMotionGeneratorType;
+  auto active_control =
+      this->startControl(research_interface::robot::Move::ControllerMode::kCartesianImpedance);
+
+  EXPECT_CALL(*(this->robot_impl_mock_),
+              finishMotion(this->default_motion_id, testing::_, testing::_))
+      .Times(1);
+
+  if (std::is_same<CurrentMotionGeneratorType, JointPositions>::value ||
+      std::is_same<CurrentMotionGeneratorType, JointVelocities>::value) {
+    CurrentMotionGeneratorType motion_generator_output{{0, 0, 0, 0, 0, 0, 0}};
+    motion_generator_output.motion_finished = true;
+    EXPECT_NO_THROW(active_control->writeOnce(motion_generator_output));
+  } else if (std::is_same<CurrentMotionGeneratorType, CartesianPose>::value) {
+    CurrentMotionGeneratorType motion_generator_output{
+        {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}};
+    motion_generator_output.motion_finished = true;
+    EXPECT_NO_THROW(active_control->writeOnce(motion_generator_output));
+  } else {
+    CurrentMotionGeneratorType motion_generator_output{{0, 0, 0, 0, 0, 0}};
+    motion_generator_output.motion_finished = true;
+    EXPECT_NO_THROW(active_control->writeOnce(motion_generator_output));
+  }
+
+  // Motion already finished, so the destructor must not attempt to cancel it.
+  EXPECT_CALL(*(this->robot_impl_mock_), cancelMotion(testing::_)).Times(0);
+  EXPECT_NO_THROW(active_control.reset());
 }
 
 TYPED_TEST(ActiveMotionGeneratorTest, CanCallFinishMotionWhenFinished) {

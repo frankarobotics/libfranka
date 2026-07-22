@@ -82,6 +82,43 @@ TEST_F(ActiveTorqueControlTest, ControlTokenReleasedAfterFinishingControl) {
   EXPECT_NO_THROW(startTorqueControl());
 }
 
+TEST_F(ActiveTorqueControlTest, DestructorDoesNotPropagateNetworkExceptionFromCancelMotion) {
+  auto active_control = startTorqueControl();
+
+  // Simulate a broken TCP connection (e.g. after a reflex or user stop): cancelMotion, which is
+  // invoked from the destructor, throws. The destructor must swallow it instead of terminating.
+  EXPECT_CALL(*robot_impl_mock, cancelMotion(100))
+      .Times(1)
+      .WillOnce(::testing::Throw(NetworkException("libfranka: TCP connection got interrupted.")));
+
+  EXPECT_NO_THROW(active_control.reset());
+}
+
+TEST_F(ActiveTorqueControlTest, DestructorDoesNotPropagateNonFrankaExceptionFromCancelMotion) {
+  auto active_control = startTorqueControl();
+
+  // The destructor's catch-all must also swallow exceptions that do not derive from
+  // franka::Exception.
+  EXPECT_CALL(*robot_impl_mock, cancelMotion(100))
+      .Times(1)
+      .WillOnce(::testing::Throw(std::runtime_error("unexpected")));
+
+  EXPECT_NO_THROW(active_control.reset());
+}
+
+TEST_F(ActiveTorqueControlTest, DestructorDoesNotCancelMotionWhenControlFinished) {
+  auto active_control = startTorqueControl();
+  Torques default_control_output{{0, 0, 0, 0, 0, 0, 0}};
+  default_control_output.motion_finished = true;
+
+  EXPECT_CALL(*robot_impl_mock, finishMotion(100, testing::_, testing::_)).Times(1);
+  EXPECT_NO_THROW(active_control->writeOnce(default_control_output));
+
+  // Motion already finished, so the destructor must not attempt to cancel it.
+  EXPECT_CALL(*robot_impl_mock, cancelMotion(testing::_)).Times(0);
+  EXPECT_NO_THROW(active_control.reset());
+}
+
 TEST_F(ActiveTorqueControlTest, CanReadOnce) {
   auto active_control = startTorqueControl();
   const Duration time_first_read(1);

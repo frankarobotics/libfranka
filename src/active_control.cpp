@@ -21,8 +21,21 @@ ActiveControl::ActiveControl(std::shared_ptr<Robot::Impl> robot_impl,
       control_lock(std::move(control_lock)) {}
 
 ActiveControl::~ActiveControl() {
-  if (!control_finished) {
+  if (control_finished) {
+    return;
+  }
+  // A destructor must not throw. Only the NetworkException from an already-interrupted connection is
+  // expected and tolerated; anything else is surfaced (still not rethrown) instead of hidden.
+  try {
     robot_impl->cancelMotion(motion_id);
+  } catch (const NetworkException&) {
+  } catch (const std::exception& e) {
+    try {
+      logging::logError("libfranka: unexpected error cancelling motion in ActiveControl destructor: {}",
+                        e.what());
+    } catch (...) {  // NOLINT(bugprone-empty-catch)
+    }
+  } catch (...) {  // NOLINT(bugprone-empty-catch)
   }
 }
 
