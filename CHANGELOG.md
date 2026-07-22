@@ -6,6 +6,8 @@ All notable changes to libfranka in this file.
 ## [UNRELEASED]
 ### pylibfranka - Python
 - fix: TargetStatus enum pybind added.
+### pylibfranka - Python
+- Ship PEP 561 type stubs (`.pyi`) generated with `pybind11-stubgen` as a post-build step, bundled in the wheels together with a `py.typed` marker for LSP/IDE type hints.
 
 ## [0.21.2]
 - fix broken test on builds relying on poco 1.12.x

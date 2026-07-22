@@ -109,6 +109,66 @@ class CMakeBuild(build_ext):
                 if not target.exists():
                     shutil.copy2(built_lib, target)
 
+        # Post-build step: generate .pyi type stubs so LSP servers / IDEs get
+        # type hints for the compiled bindings (pybind11 does not emit stubs).
+        self.generate_stubs(ext, extdir)
+
+    def generate_stubs(self, ext, extdir):
+        """Generate PEP 561 stub files (.pyi) for the compiled extension.
+
+        pybind11-stubgen imports the freshly built module and introspects it, so
+        the extension (and its runtime dependencies, e.g. libfranka.so) must be
+        importable. Stubs are written directly into the build-tree package
+        directory (``extdir``, i.e. ``build/lib.../pylibfranka``), alongside the
+        compiled ``.so``. This is what setuptools packages into the wheel, and it
+        sidesteps the fact that ``build_py`` (which copies ``package_data``) runs
+        *before* ``build_ext`` -- so writing into the source tree would be too
+        late to be picked up.
+        """
+        # ``extdir`` is ``<build_lib>/pylibfranka``; its parent is the build-lib
+        # root that must be on PYTHONPATH so ``import pylibfranka._pylibfranka``
+        # resolves to the *built* package (which contains the compiled .so),
+        # not the source tree (which does not).
+        package_dir = Path(extdir)
+        build_lib_root = package_dir.parent
+
+        env = dict(os.environ)
+        python_path = [str(build_lib_root), env.get("PYTHONPATH", "")]
+        env["PYTHONPATH"] = os.pathsep.join(p for p in python_path if p)
+
+        try:
+            subprocess.check_call(
+                [
+                    sys.executable,
+                    "-m",
+                    "pybind11_stubgen",
+                    ext.name,  # pylibfranka._pylibfranka
+                    "--output-dir",
+                    str(build_lib_root),
+                ],
+                cwd=str(build_lib_root),
+                env=env,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+            # Stub generation is part of the deliverable (typed wheels), so a
+            # failure is fatal by default. Allow an explicit opt-out for
+            # constrained environments that only need the compiled module.
+            if os.environ.get("PYLIBFRANKA_SKIP_STUBS"):
+                print(f"WARNING: skipping .pyi stubs (PYLIBFRANKA_SKIP_STUBS set): {exc}")
+                return
+            raise RuntimeError(
+                "pybind11-stubgen failed to generate type stubs. Install "
+                "'pybind11-stubgen' (a build dependency) or set "
+                "PYLIBFRANKA_SKIP_STUBS=1 to build an untyped wheel."
+            ) from exc
+
+        stub_file = package_dir / f"{ext.name.split('.')[-1]}.pyi"
+        if not stub_file.exists():
+            raise RuntimeError(f"pybind11-stubgen ran but produced no stub at {stub_file}")
+
+        # PEP 561 marker so type checkers discover the stubs in the installed wheel.
+        (package_dir / "py.typed").write_text("")
+
 
 setup(
     name="pylibfranka",
@@ -122,6 +182,6 @@ setup(
     },
     zip_safe=False,
     package_data={
-        "pylibfranka": ["*.so", "*.pyd", "VERSION"],
+        "pylibfranka": ["*.so", "*.pyd", "VERSION", "*.pyi", "py.typed"],
     },
 )

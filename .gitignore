@@ -23,3 +23,8 @@ version_info.properties
 pylibfranka/docs/_build/
 pylibfranka/_version.py
 pylibfranka/VERSION
+# Generated type stubs (produced by pybind11-stubgen at build time)
+pylibfranka/_pylibfranka.pyi
+
+# Local agent scratch (do not commit)
+activity.log

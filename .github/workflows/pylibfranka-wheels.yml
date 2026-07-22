@@ -135,6 +135,7 @@ jobs:
             
             # Test import and version
             python -c "
+            import pathlib
             import pylibfranka
             print('pylibfranka imported successfully')
             print(f'Version: {pylibfranka.__version__}')
@@ -147,6 +148,12 @@ jobs:
             from pylibfranka import JointPositions, JointVelocities, Torques
             jp = JointPositions([0.0] * 7)
             print(f'JointPositions: {jp.q}')
+            
+            # Verify the type stubs shipped with the wheel (PEP 561)
+            pkg_dir = pathlib.Path(pylibfranka.__file__).parent
+            assert (pkg_dir / 'py.typed').exists(), 'missing py.typed marker'
+            assert (pkg_dir / '_pylibfranka.pyi').exists(), 'missing _pylibfranka.pyi stub'
+            print(f'Type stubs shipped: {[p.name for p in pkg_dir.glob(\"*.pyi\")]}')
             print('All tests passed!')
             "
 
