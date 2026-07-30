@@ -29,7 +29,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="Logo_FRANKA_ROBOTICS_dark.png"/></td>
   <td id="projectalign">
-   <div id="projectname">libfranka<span id="projectnumber">&#160;0.21.2</span>
+   <div id="projectname">libfranka<span id="projectnumber">&#160;0.21.3</span>
    </div>
    <div id="projectbrief">FCI C++ API</div>
   </td>
@@ -205,10 +205,10 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Robot</b> () noex
 <tr class="memdesc:af7e0c9d14b4649a9cf14d74245353497"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes lower limits for joint velocities based on current joint positions.  <br /></td></tr>
 <tr class="separator:af7e0c9d14b4649a9cf14d74245353497"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a168e1214ac36d74ac64f894332b84534" id="r_a168e1214ac36d74ac64f894332b84534"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfranka_1_1Robot.html#a168e1214ac36d74ac64f894332b84534">setCollisionBehavior</a> (const std::array&lt; double, 7 &gt; &amp;lower_torque_thresholds_acceleration, const std::array&lt; double, 7 &gt; &amp;upper_torque_thresholds_acceleration, const std::array&lt; double, 7 &gt; &amp;lower_torque_thresholds_nominal, const std::array&lt; double, 7 &gt; &amp;upper_torque_thresholds_nominal, const std::array&lt; double, 6 &gt; &amp;lower_force_thresholds_acceleration, const std::array&lt; double, 6 &gt; &amp;upper_force_thresholds_acceleration, const std::array&lt; double, 6 &gt; &amp;lower_force_thresholds_nominal, const std::array&lt; double, 6 &gt; &amp;upper_force_thresholds_nominal)</td></tr>
-<tr class="memdesc:a168e1214ac36d74ac64f894332b84534"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the collision behavior.  <br /></td></tr>
+<tr class="memdesc:a168e1214ac36d74ac64f894332b84534"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configures the contact and collision detection thresholds.  <br /></td></tr>
 <tr class="separator:a168e1214ac36d74ac64f894332b84534"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa188f58c9025594be4d1700da744a962" id="r_aa188f58c9025594be4d1700da744a962"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfranka_1_1Robot.html#aa188f58c9025594be4d1700da744a962">setCollisionBehavior</a> (const std::array&lt; double, 7 &gt; &amp;lower_torque_thresholds, const std::array&lt; double, 7 &gt; &amp;upper_torque_thresholds, const std::array&lt; double, 6 &gt; &amp;lower_force_thresholds, const std::array&lt; double, 6 &gt; &amp;upper_force_thresholds)</td></tr>
-<tr class="memdesc:aa188f58c9025594be4d1700da744a962"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the collision behavior.  <br /></td></tr>
+<tr class="memdesc:aa188f58c9025594be4d1700da744a962"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configures the contact and collision detection thresholds.  <br /></td></tr>
 <tr class="separator:aa188f58c9025594be4d1700da744a962"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa18a28697cf6e3be16c6cff2dd839560" id="r_aa18a28697cf6e3be16c6cff2dd839560"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfranka_1_1Robot.html#aa18a28697cf6e3be16c6cff2dd839560">setJointImpedance</a> (const std::array&lt; double, 7 &gt; &amp;K_theta)</td></tr>
 <tr class="memdesc:aa18a28697cf6e3be16c6cff2dd839560"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the impedance for each joint in the internal controller.  <br /></td></tr>
@@ -1362,15 +1362,19 @@ K_{x_{R,P,Y}} \in [1,300] \frac{Nm}{rad})\) </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Changes the collision behavior. </p>
-<p>Set common torque and force boundaries for acceleration/deceleration and constant velocity movement phases.</p>
-<p>Forces or torques between lower and upper threshold are shown as contacts in the <a class="el" href="structfranka_1_1RobotState.html" title="Describes the robot state.">RobotState</a>. Forces or torques above the upper threshold are registered as collision and cause the robot to stop moving.</p>
+<p>Configures the contact and collision detection thresholds. </p>
+<p>Convenience overload that applies the same thresholds to both acceleration/deceleration and constant-velocity motion phases. Use the 8-parameter overload if you need different sensitivity during dynamic vs. steady-state motion.</p>
+<ul>
+<li><b>Lower threshold → contact:</b> reported in <a class="el" href="structfranka_1_1RobotState.html" title="Describes the robot state.">RobotState</a>, robot continues moving, auto-resets.</li>
+<li><b>Upper threshold → collision:</b> triggers reflex (robot stops), latches until recovery.</li>
+</ul>
+<dl class="section note"><dt>Note</dt><dd>The default thresholds are very high (effectively disabling detection). Tune them for your application by observing <a class="el" href="structfranka_1_1RobotState.html#acdef8005828d193e45b128085a9e363b" title="Low-pass filtered torques generated by external forces on the joints.">RobotState::tau_ext_hat_filtered</a> and <a class="el" href="structfranka_1_1RobotState.html#a5a830b4f9d6a3c2dc92e4a9cc6050493" title="Estimated external wrench (force, torque) acting on stiffness frame, expressed relative to the base f...">RobotState::O_F_ext_hat_K</a>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">lower_torque_thresholds</td><td>Contact torque thresholds for each joint in \([Nm]\). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">upper_torque_thresholds</td><td>Collision torque thresholds for each joint in \([Nm]\). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">lower_force_thresholds</td><td>Contact force thresholds for \((x,y,z,R,P,Y)\) in \([N]\). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">upper_force_thresholds</td><td>Collision force thresholds for \((x,y,z,R,P,Y)\) in \([N]\).</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lower_torque_thresholds</td><td>Contact torque threshold per joint. Unit: \([Nm]\). Range: \([0, \infty)\). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">upper_torque_thresholds</td><td>Collision torque threshold per joint. Unit: \([Nm]\). Range: \([0, \infty)\). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lower_force_thresholds</td><td>Contact wrench threshold per Cartesian axis \((x,y,z,R,P,Y)\). Unit: \([N,N,N,Nm,Nm,Nm]\). Range: \([0, \infty)\). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">upper_force_thresholds</td><td>Collision wrench threshold per Cartesian axis \((x,y,z,R,P,Y)\). Unit: \([N,N,N,Nm,Nm,Nm]\). Range: \([0, \infty)\).</td></tr>
   </table>
   </dd>
 </dl>
@@ -1381,15 +1385,15 @@ K_{x_{R,P,Y}} \in [1,300] \frac{Nm}{rad})\) </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="structfranka_1_1RobotState.html#a7fc1f0358d2104d39d301d70544fa6c1" title="Indicates which contact level is activated in which Cartesian dimension .">RobotState::cartesian_contact</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structfranka_1_1RobotState.html#a7243c652a8efe58c343a0d1252302fa4" title="Indicates whether contact is reported for each joint.">RobotState::joint_contact</a> </dd>
 <dd>
-<a class="el" href="structfranka_1_1RobotState.html#a52c20478f4c1e162df38582ea9bda044" title="Indicates which contact level is activated in which Cartesian dimension .">RobotState::cartesian_collision</a> </dd>
+<a class="el" href="structfranka_1_1RobotState.html#a38757bafd4dd8e138410de1dca0c36f8" title="Indicates whether a collision is reported for each joint.">RobotState::joint_collision</a> </dd>
 <dd>
-<a class="el" href="structfranka_1_1RobotState.html#a7243c652a8efe58c343a0d1252302fa4" title="Indicates which contact level is activated in which joint.">RobotState::joint_contact</a> </dd>
+<a class="el" href="structfranka_1_1RobotState.html#a7fc1f0358d2104d39d301d70544fa6c1" title="Indicates whether contact is reported for each Cartesian dimension .">RobotState::cartesian_contact</a> </dd>
 <dd>
-<a class="el" href="structfranka_1_1RobotState.html#a38757bafd4dd8e138410de1dca0c36f8" title="Indicates which contact level is activated in which joint.">RobotState::joint_collision</a> </dd>
+<a class="el" href="structfranka_1_1RobotState.html#a52c20478f4c1e162df38582ea9bda044" title="Indicates whether a collision is reported for each Cartesian dimension .">RobotState::cartesian_collision</a> </dd>
 <dd>
-<a class="el" href="classfranka_1_1Robot.html#af682aa673415718715bd859116bc2fed" title="Runs automatic error recovery on the robot.">Robot::automaticErrorRecovery</a> for performing a reset after a collision. </dd></dl>
+<a class="el" href="classfranka_1_1Robot.html#af682aa673415718715bd859116bc2fed" title="Runs automatic error recovery on the robot.">Robot::automaticErrorRecovery</a> for clearing a collision state. </dd></dl>
 
 </div>
 </div>
@@ -1455,19 +1459,30 @@ K_{x_{R,P,Y}} \in [1,300] \frac{Nm}{rad})\) </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Changes the collision behavior. </p>
-<p>Set separate torque and force boundaries for acceleration/deceleration and constant velocity movement phases.</p>
-<p>Forces or torques between lower and upper threshold are shown as contacts in the <a class="el" href="structfranka_1_1RobotState.html" title="Describes the robot state.">RobotState</a>. Forces or torques above the upper threshold are registered as collision and cause the robot to stop moving.</p>
+<p>Configures the contact and collision detection thresholds. </p>
+<p>The robot continuously monitors the estimated external joint torques ( \(\hat{\tau}_{ext}\)) and the estimated external wrench ( \(\hat{F}_{ext}\)) and compares them against two configurable threshold levels:</p>
+<ul>
+<li><b>Lower threshold (contact):</b> When the estimate crosses the lower threshold, a contact is reported in <a class="el" href="structfranka_1_1RobotState.html#a7243c652a8efe58c343a0d1252302fa4" title="Indicates whether contact is reported for each joint.">RobotState::joint_contact</a> / <a class="el" href="structfranka_1_1RobotState.html#a7fc1f0358d2104d39d301d70544fa6c1" title="Indicates whether contact is reported for each Cartesian dimension .">RobotState::cartesian_contact</a>. The robot continues moving normally. The signal resets automatically when the estimated external load drops back below the threshold.</li>
+<li><b>Upper threshold (collision):</b> When the estimate crosses the upper threshold, a collision is detected. The robot triggers a reflex stop and enters RobotMode::kReflex. The collision signal latches until explicitly cleared via <a class="el" href="classfranka_1_1Robot.html#af682aa673415718715bd859116bc2fed" title="Runs automatic error recovery on the robot.">automaticErrorRecovery()</a>.</li>
+</ul>
+<p>This overload allows setting separate threshold values for two motion phases:</p>
+<ul>
+<li><b>Acceleration thresholds:</b> Active during acceleration and deceleration phases. Typically set higher because the external torque/force estimates are less accurate during dynamic motion due to model inaccuracies amplified by inertial forces.</li>
+<li><b>Nominal thresholds:</b> Active during constant-velocity motion. Can be set tighter for more sensitive detection, since the estimates are more reliable at steady state.</li>
+</ul>
+<dl class="section note"><dt>Note</dt><dd>The default thresholds are very high (effectively disabling detection). If you expect environmental interaction (grasping, pushing against surfaces), tune the thresholds by observing <a class="el" href="structfranka_1_1RobotState.html#acdef8005828d193e45b128085a9e363b" title="Low-pass filtered torques generated by external forces on the joints.">RobotState::tau_ext_hat_filtered</a> and <a class="el" href="structfranka_1_1RobotState.html#a5a830b4f9d6a3c2dc92e4a9cc6050493" title="Estimated external wrench (force, torque) acting on stiffness frame, expressed relative to the base f...">RobotState::O_F_ext_hat_K</a> during your application. Set thresholds above the expected interaction forces but below what constitutes an unexpected collision.</dd>
+<dd>
+Thresholds persist across control loops and connections — they are only reset on robot reboot. Calling this function once is sufficient; you do not need to re-send thresholds before each <a class="el" href="classfranka_1_1Robot.html#a0d5effba5daff2fee123802bbd5f95d1" title="Starts a control loop for sending joint-level torque commands.">control()</a> call. During guiding mode, thresholds are temporarily raised internally and restored to your configured values when guiding ends.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">lower_torque_thresholds_acceleration</td><td>Contact torque thresholds during acceleration/deceleration for each joint in \([Nm]\). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">upper_torque_thresholds_acceleration</td><td>Collision torque thresholds during acceleration/deceleration for each joint in \([Nm]\). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">lower_torque_thresholds_nominal</td><td>Contact torque thresholds for each joint in \([Nm]\). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">upper_torque_thresholds_nominal</td><td>Collision torque thresholds for each joint in \([Nm]\). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">lower_force_thresholds_acceleration</td><td>Contact force thresholds during acceleration/deceleration for \((x,y,z,R,P,Y)\) in \([N]\). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">upper_force_thresholds_acceleration</td><td>Collision force thresholds during acceleration/deceleration for \((x,y,z,R,P,Y)\) in \([N]\). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">lower_force_thresholds_nominal</td><td>Contact force thresholds for \((x,y,z,R,P,Y)\) in \([N]\). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">upper_force_thresholds_nominal</td><td>Collision force thresholds for \((x,y,z,R,P,Y)\) in \([N]\).</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lower_torque_thresholds_acceleration</td><td>Contact torque threshold per joint during acceleration/deceleration. Unit: \([Nm]\). Range: \([0, \infty)\). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">upper_torque_thresholds_acceleration</td><td>Collision torque threshold per joint during acceleration/deceleration. Unit: \([Nm]\). Range: \([0, \infty)\). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lower_torque_thresholds_nominal</td><td>Contact torque threshold per joint during constant-velocity motion. Unit: \([Nm]\). Range: \([0, \infty)\). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">upper_torque_thresholds_nominal</td><td>Collision torque threshold per joint during constant-velocity motion. Unit: \([Nm]\). Range: \([0, \infty)\). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lower_force_thresholds_acceleration</td><td>Contact wrench threshold per Cartesian axis \((x,y,z,R,P,Y)\) during acceleration/deceleration. Unit: \([N,N,N,Nm,Nm,Nm]\). Range: \([0, \infty)\). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">upper_force_thresholds_acceleration</td><td>Collision wrench threshold per Cartesian axis \((x,y,z,R,P,Y)\) during acceleration/deceleration. Unit: \([N,N,N,Nm,Nm,Nm]\). Range: \([0, \infty)\). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lower_force_thresholds_nominal</td><td>Contact wrench threshold per Cartesian axis \((x,y,z,R,P,Y)\) during constant-velocity motion. Unit: \([N,N,N,Nm,Nm,Nm]\). Range: \([0, \infty)\). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">upper_force_thresholds_nominal</td><td>Collision wrench threshold per Cartesian axis \((x,y,z,R,P,Y)\) during constant-velocity motion. Unit: \([N,N,N,Nm,Nm,Nm]\). Range: \([0, \infty)\).</td></tr>
   </table>
   </dd>
 </dl>
@@ -1478,15 +1493,19 @@ K_{x_{R,P,Y}} \in [1,300] \frac{Nm}{rad})\) </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="structfranka_1_1RobotState.html#a7fc1f0358d2104d39d301d70544fa6c1" title="Indicates which contact level is activated in which Cartesian dimension .">RobotState::cartesian_contact</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structfranka_1_1RobotState.html#a7243c652a8efe58c343a0d1252302fa4" title="Indicates whether contact is reported for each joint.">RobotState::joint_contact</a> </dd>
 <dd>
-<a class="el" href="structfranka_1_1RobotState.html#a52c20478f4c1e162df38582ea9bda044" title="Indicates which contact level is activated in which Cartesian dimension .">RobotState::cartesian_collision</a> </dd>
+<a class="el" href="structfranka_1_1RobotState.html#a38757bafd4dd8e138410de1dca0c36f8" title="Indicates whether a collision is reported for each joint.">RobotState::joint_collision</a> </dd>
 <dd>
-<a class="el" href="structfranka_1_1RobotState.html#a7243c652a8efe58c343a0d1252302fa4" title="Indicates which contact level is activated in which joint.">RobotState::joint_contact</a> </dd>
+<a class="el" href="structfranka_1_1RobotState.html#a7fc1f0358d2104d39d301d70544fa6c1" title="Indicates whether contact is reported for each Cartesian dimension .">RobotState::cartesian_contact</a> </dd>
 <dd>
-<a class="el" href="structfranka_1_1RobotState.html#a38757bafd4dd8e138410de1dca0c36f8" title="Indicates which contact level is activated in which joint.">RobotState::joint_collision</a> </dd>
+<a class="el" href="structfranka_1_1RobotState.html#a52c20478f4c1e162df38582ea9bda044" title="Indicates whether a collision is reported for each Cartesian dimension .">RobotState::cartesian_collision</a> </dd>
 <dd>
-<a class="el" href="classfranka_1_1Robot.html#af682aa673415718715bd859116bc2fed" title="Runs automatic error recovery on the robot.">Robot::automaticErrorRecovery</a> for performing a reset after a collision. </dd></dl>
+<a class="el" href="structfranka_1_1RobotState.html#acdef8005828d193e45b128085a9e363b" title="Low-pass filtered torques generated by external forces on the joints.">RobotState::tau_ext_hat_filtered</a> </dd>
+<dd>
+<a class="el" href="structfranka_1_1RobotState.html#a5a830b4f9d6a3c2dc92e4a9cc6050493" title="Estimated external wrench (force, torque) acting on stiffness frame, expressed relative to the base f...">RobotState::O_F_ext_hat_K</a> </dd>
+<dd>
+<a class="el" href="classfranka_1_1Robot.html#af682aa673415718715bd859116bc2fed" title="Runs automatic error recovery on the robot.">Robot::automaticErrorRecovery</a> for clearing a collision state. </dd></dl>
 <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="cartesian_impedance_control_8cpp-example.html#a6">cartesian_impedance_control.cpp</a>, <a class="el" href="communication_test_8cpp-example.html#a3">communication_test.cpp</a>, <a class="el" href="force_control_8cpp-example.html#a3">force_control.cpp</a>, <a class="el" href="generate_cartesian_pose_motion_8cpp-example.html#a3">generate_cartesian_pose_motion.cpp</a>, <a class="el" href="generate_cartesian_pose_motion_external_control_loop_8cpp-example.html#a3">generate_cartesian_pose_motion_external_control_loop.cpp</a>, <a class="el" href="generate_cartesian_velocity_motion_8cpp-example.html#a4">generate_cartesian_velocity_motion.cpp</a>, <a class="el" href="generate_cartesian_velocity_motion_external_control_loop_8cpp-example.html#a4">generate_cartesian_velocity_motion_external_control_loop.cpp</a>, <a class="el" href="generate_consecutive_motions_8cpp-example.html#a3">generate_consecutive_motions.cpp</a>, <a class="el" href="generate_elbow_motion_8cpp-example.html#a3">generate_elbow_motion.cpp</a>, <a class="el" href="generate_joint_position_motion_8cpp-example.html#a3">generate_joint_position_motion.cpp</a>, <a class="el" href="generate_joint_position_motion_external_control_loop_8cpp-example.html#a3">generate_joint_position_motion_external_control_loop.cpp</a>, <a class="el" href="generate_joint_velocity_motion_8cpp-example.html#a3">generate_joint_velocity_motion.cpp</a>, <a class="el" href="generate_joint_velocity_motion_external_control_loop_8cpp-example.html#a3">generate_joint_velocity_motion_external_control_loop.cpp</a>, and <a class="el" href="joint_point_to_point_motion_8cpp-example.html#a1">joint_point_to_point_motion.cpp</a>.</dd>
 </dl>
 
