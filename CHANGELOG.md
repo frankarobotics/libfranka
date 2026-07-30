@@ -3,7 +3,7 @@
 All notable changes to libfranka in this file.
 
 
-## [UNRELEASED]
+## [0.21.3]
 - fix: `ActiveControl` destructor no longer lets exceptions (e.g. `NetworkException` from `cancelMotion()` on an already-interrupted TCP connection) escape, which previously called `std::terminate()` and crashed the process after an error/reflex interrupted a motion (notably via pylibfranka).
 ### pylibfranka - Python
 - fix: TargetStatus enum pybind added.
