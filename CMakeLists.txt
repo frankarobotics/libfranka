@@ -223,16 +223,26 @@ if(BUILD_EXAMPLES)
 endif()
 
 ## Packaging
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
-  message(STATUS ".git directory found, setting version from latest git tag")
-  include(SetVersionFromGit)
-  set_version_from_git(PACKAGE_VERSION PACKAGE_TAG)
-else()
-  message(STATUS "No .git directory found, using version from CMakeLists.txt")
-  set(PACKAGE_VERSION ${PROJECT_VERSION})
-  set(PACKAGE_TAG ${PROJECT_VERSION})
+# Package identity is always the hardcoded library version. The short commit hash is
+# appended when git is available so untagged CI uploads do not clobber each other.
+# Use +g so the same string is a valid Debian version (underscore is not).
+# Missing git or a failed rev-parse must not fail configure.
+set(PACKAGE_TAG ${libfranka_VERSION})
+find_package(Git QUIET)
+if(GIT_FOUND)
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE LIBFRANKA_GIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+    RESULT_VARIABLE LIBFRANKA_GIT_HASH_RESULT
+  )
+  if(LIBFRANKA_GIT_HASH_RESULT EQUAL 0 AND LIBFRANKA_GIT_HASH)
+    set(PACKAGE_TAG "${libfranka_VERSION}+g${LIBFRANKA_GIT_HASH}")
+  endif()
 endif()
-message(STATUS "${PROJECT_NAME} version: ${PACKAGE_VERSION}, Package tag: ${PACKAGE_TAG}")
+message(STATUS "${PROJECT_NAME} version: ${libfranka_VERSION}, package tag: ${PACKAGE_TAG}")
 
 # Get architecture
 execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE PACKAGE_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -242,11 +252,10 @@ execute_process(COMMAND lsb_release -cs OUTPUT_VARIABLE UBUNTU_CODENAME OUTPUT_S
 
 set(CPACK_PACKAGE_VENDOR "Franka Robotics GmbH")
 set(CPACK_GENERATOR "DEB;TGZ")
-set(CPACK_PACKAGE_VERSION ${libfranka_VERSION})
-
-# Updated filename format: libfranka_VERSION_CODENAME_ARCH.deb
-set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}_${PACKAGE_TAG}_${UBUNTU_CODENAME}_${PACKAGE_ARCH})
 set(CPACK_PACKAGE_VERSION ${PACKAGE_TAG})
+
+# Filename format: libfranka_VERSION[+gHASH]_CODENAME_ARCH.deb
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}_${PACKAGE_TAG}_${UBUNTU_CODENAME}_${PACKAGE_ARCH})
 set(CPACK_PACKAGE_ARCHITECTURE ${PACKAGE_ARCH})
 set(CPACK_SYSTEM_NAME ${CMAKE_HOST_SYSTEM_PROCESSOR})
 
