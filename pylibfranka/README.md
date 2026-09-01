@@ -44,6 +44,7 @@ If you need to build from source (e.g., for development or unsupported platforms
 - C++ compiler with C++17 support
 - Eigen3 development headers
 - Poco development headers
+- Full libfranka native CMake dependencies already installed
 
 **Disclaimer: If you are using the provided devcontainer, you can skip the prerequisites installation as they are already included in the container.**
 
@@ -54,11 +55,23 @@ sudo apt-get update
 sudo apt-get install -y build-essential cmake libeigen3-dev libpoco-dev python3-dev
 ```
 
+The apt command above installs only the basic toolchain. Before running pip, install the
+full native dependency set from the libfranka root source-build instructions, including
+`console_bridge`, `TinyXML2`, and the patched `Pinocchio` build, or point CMake to an
+existing installation with `*_DIR` variables or `CMAKE_PREFIX_PATH`.
+
 #### Build and Install
 
-From the `pylibfranka/` folder, you can install `pylibfranka` using pip:
+You can install `pylibfranka` either from the libfranka repository root:
 
 ```bash
+pip install ./pylibfranka
+```
+
+or from inside the `pylibfranka/` subdirectory:
+
+```bash
+cd pylibfranka
 pip install .
 ```
 

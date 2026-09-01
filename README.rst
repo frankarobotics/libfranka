@@ -710,6 +710,7 @@ Prerequisites
 - C++ compiler with C++17 support
 - Eigen3 development headers
 - Poco development headers
+- Full libfranka native CMake dependencies already installed
 
 **Disclaimer: If you are using the provided devcontainer, you can skip the prerequisites installation as they are already included in the container.**
 
@@ -721,14 +722,26 @@ Installing Prerequisites on Ubuntu/Debian
    sudo apt-get update
    sudo apt-get install -y build-essential cmake libeigen3-dev libpoco-dev python3-dev
 
+The apt command above installs only the basic toolchain. Before running pip, install the
+full native dependency set from the source-build instructions, including
+``console_bridge``, ``TinyXML2``, and the patched ``Pinocchio`` build, or point CMake
+to an existing installation with ``*_DIR`` variables or ``CMAKE_PREFIX_PATH``.
+
 Build and Install
 ~~~~~~~~~~~~~~~~~
 
-From the root folder, you can install `pylibfranka` using pip:
+You can install ``pylibfranka`` either from the repository root:
 
 .. code-block:: bash
 
    pip install ./pylibfranka
+
+or from inside the ``pylibfranka/`` subdirectory:
+
+.. code-block:: bash
+
+   cd pylibfranka
+   pip install .
 
 
 This will install pylibfranka in your current Python environment.

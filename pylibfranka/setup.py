@@ -1,3 +1,4 @@
+import importlib.util
 import os
 import re
 import subprocess
@@ -13,6 +14,20 @@ ROOT_DIR = Path(__file__).parent
 # subproject; the shared version lives in the top-level CMakeLists.txt and the
 # native build is driven from the repo root (add_subdirectory(pylibfranka)).
 REPO_ROOT = ROOT_DIR.parent
+
+
+def load_setup_helpers():
+    helper_path = ROOT_DIR / "setup_helpers.py"
+    spec = importlib.util.spec_from_file_location("pylibfranka_setup_helpers", helper_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Could not load setup helpers from {helper_path}")
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+SETUP_HELPERS = load_setup_helpers()
 
 
 def get_version():
@@ -103,7 +118,21 @@ class CMakeBuild(build_ext):
         if pybind11_dir:
             cmake_args.append(f"-Dpybind11_DIR={pybind11_dir}")
 
-        subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=build_temp)
+        configure = subprocess.run(
+            ["cmake", ext.sourcedir] + cmake_args,
+            cwd=build_temp,
+            capture_output=True,
+            text=True,
+        )
+        if configure.returncode != 0:
+            sys.stdout.write(configure.stdout)
+            sys.stderr.write(configure.stderr)
+            guidance = SETUP_HELPERS.explain_cmake_configure_failure(
+                configure.stdout, configure.stderr
+            )
+            if guidance:
+                raise RuntimeError(guidance)
+            configure.check_returncode()
         subprocess.check_call(
             ["cmake", "--build", ".", "--config", "Release", "--parallel"],
             cwd=build_temp,
