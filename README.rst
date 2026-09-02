@@ -167,6 +167,7 @@ Clone the Repository
    git clone --recurse-submodules https://github.com/frankarobotics/libfranka.git
    cd libfranka
    git checkout 0.19.0  # or your desired version
+   git submodule update
 
 Method A: Using Visual Studio Code (Recommended)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
