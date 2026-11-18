@@ -80,8 +80,9 @@ class Robot {
    * Establishes a connection with the robot.
    *
    * @param[in] franka_address IP/hostname of the robot.
-   * @param[in] realtime_config if set to Enforce, an exception will be thrown if realtime priority
-   * cannot be set when required. Setting realtime_config to Ignore disables this behavior.
+   * @param[in] realtime_config if set to Enforce, an exception is thrown if the kernel has no
+   * realtime capabilities. Setting realtime_config to Ignore disables this check. The constructor
+   * does not change the scheduling policy or priority of the calling thread.
    * @param[in] log_size sets how many last states should be kept for logging purposes.
    * The log is provided when a ControlException is thrown.
    *
