@@ -51,16 +51,7 @@ Robot::Impl::Impl(std::unique_ptr<Network> network, size_t log_size, RealtimeCon
     throw std::invalid_argument("libfranka robot: Invalid network argument");
   }
 
-  // Configure the thread priority to being set to the highest possible value.
-  bool throw_on_error = realtime_config_ == RealtimeConfig::kEnforce;
-  std::string error_message;
-  logging::logInfo("libfranka: Setting thread priority to the highest possible value.");
-  if (!setCurrentThreadToHighestSchedulerPriority(&error_message) && throw_on_error) {
-    logging::logError(error_message);
-    throw RealtimeException(error_message);
-  }
-
-  if (throw_on_error && !hasRealtimeKernel()) {
+  if (realtime_config_ == RealtimeConfig::kEnforce && !hasRealtimeKernel()) {
     logging::logError("libfranka: Running kernel does not have realtime capabilities.");
     throw RealtimeException("libfranka: Running kernel does not have realtime capabilities.");
   }
